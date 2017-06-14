@@ -11,7 +11,7 @@ import './gantt.scss';
 import Bar from './Bar';
 import Arrow from './Arrow';
 
-export default function Gantt(element, tasks, config) {
+export default function Gantt(element, projects, tasks, config) {
 
 	const self = {};
 
@@ -52,7 +52,8 @@ export default function Gantt(element, tasks, config) {
 			padding: 18,
 			view_mode: 'Day',
 			date_format: 'YYYY-MM-DD',
-			custom_popup_html: null
+			custom_popup_html: null,
+			project_group_width: 0
 		};
 		self.config = Object.assign({}, defaults, config);
 
@@ -197,10 +198,11 @@ export default function Gantt(element, tasks, config) {
 			self.gantt_end = self.gantt_end.clone().add(7, 'day');
 		} else if(view_is('Month')) {
 			self.gantt_start = self.gantt_start.clone().startOf('year');
-			self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
+			// self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
+			self.gantt_end = self.gantt_end.clone().endOf('year');
 		} else {
-			self.gantt_start = self.gantt_start.clone().startOf('month').subtract(1, 'month');
-			self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'month');
+			self.gantt_start = self.gantt_start.clone().startOf('month'); // .subtract(1, 'month');
+			self.gantt_end = self.gantt_end.clone().endOf('month'); // .add(1, 'month');
 		}
 	}
 
@@ -223,7 +225,7 @@ export default function Gantt(element, tasks, config) {
 
 	function setup_groups() {
 
-		const groups = ['grid', 'date', 'arrow', 'progress', 'bar', 'details'];
+		const groups = ['grid', 'date', 'project', 'arrow', 'progress', 'bar', 'details'];
 		// make group layers
 		for(let group of groups) {
 			self.element_groups[group] = self.canvas.group().attr({'id': group});
@@ -253,7 +255,8 @@ export default function Gantt(element, tasks, config) {
 
 	function set_width() {
 		const cur_width = self.canvas.node.getBoundingClientRect().width;
-		const actual_width = self.canvas.select('#grid .grid-row').attr('width');
+		const actual_width = parseFloat(self.canvas.select('#grid .grid-row').attr('width')) + self.config.project_group_width;
+
 		if(cur_width < actual_width) {
 			self.canvas.attr('width', actual_width);
 		}
@@ -277,15 +280,15 @@ export default function Gantt(element, tasks, config) {
 
 	function make_grid() {
 		make_grid_background();
-		make_grid_rows();
 		make_grid_header();
+		make_grid_rows();
 		make_grid_ticks();
 		make_grid_highlights();
 	}
 
 	function make_grid_background() {
 
-		const grid_width = self.dates.length * self.config.column_width,
+		const grid_width = (self.dates.length * self.config.column_width) + self.config.project_group_width,
 			grid_height = self.config.header_height + self.config.padding +
 				(self.config.bar.height + self.config.padding) * self.tasks.length;
 
@@ -302,7 +305,7 @@ export default function Gantt(element, tasks, config) {
 	function make_grid_header() {
 		const header_width = self.dates.length * self.config.column_width,
 			header_height = self.config.header_height + 10;
-		self.canvas.rect(0, 0, header_width, header_height)
+		self.canvas.rect(self.config.project_group_width, 0, header_width, header_height)
 			.addClass('grid-header')
 			.appendTo(self.element_groups.grid);
 	}
@@ -315,22 +318,42 @@ export default function Gantt(element, tasks, config) {
 			row_height = self.config.bar.height + self.config.padding;
 
 		let row_y = self.config.header_height + self.config.padding / 2;
+		let projectRows = 0;
 
-		for(let task of self.tasks) { // eslint-disable-line
-			self.canvas.rect(0, row_y, row_width, row_height)
+		self.tasks.forEach((task, index) => { // eslint-disable-line
+
+			const nextTask = self.tasks[index + 1];
+			const endProject = (nextTask && task.projectId !== nextTask.projectId) || !nextTask;
+
+			self.canvas.rect(self.config.project_group_width, row_y, row_width, row_height)
 				.addClass('grid-row')
 				.appendTo(rows);
 
-			self.canvas.line(0, row_y + row_height, row_width, row_y + row_height)
-				.addClass('row-line')
+			self.canvas.line(self.config.project_group_width, row_y + row_height, row_width + self.config.project_group_width, row_y + row_height)
+				.addClass(endProject ? 'row-line-project' : 'row-line')
 				.appendTo(lines);
 
 			row_y += self.config.bar.height + self.config.padding;
-		}
+			projectRows++;
+
+			if(endProject) {
+
+				self.canvas.rect(0, row_y - (row_height * projectRows), 200, row_height * projectRows)
+				.addClass('grid-project-row')
+				.appendTo(rows);
+
+				self.canvas.text(20, row_y - ((row_height * projectRows) / 2), 'test')
+					.addClass('upper-text')
+					.appendTo(rows);
+
+				console.log(task.projectId, projectRows);
+				projectRows = 0;
+			}
+		});
 	}
 
 	function make_grid_ticks() {
-		let tick_x = 0,
+		let tick_x = self.config.project_group_width,
 			tick_y = self.config.header_height + self.config.padding / 2,
 			tick_height = (self.config.bar.height + self.config.padding) * self.tasks.length;
 
@@ -369,8 +392,8 @@ export default function Gantt(element, tasks, config) {
 
 		// highlight today's date
 		if(view_is('Day')) {
-			const x = moment().startOf('day').diff(self.gantt_start, 'hours') /
-					self.config.step * self.config.column_width;
+			const x = (moment().startOf('day').diff(self.gantt_start, 'hours') /
+					self.config.step * self.config.column_width) + self.config.project_group_width;
 			const y = 0;
 			const width = self.config.column_width;
 			const height = (self.config.bar.height + self.config.padding) * self.tasks.length +
@@ -385,12 +408,12 @@ export default function Gantt(element, tasks, config) {
 	function make_dates() {
 
 		for(let date of get_dates_to_draw()) {
-			self.canvas.text(date.lower_x, date.lower_y, date.lower_text)
+			self.canvas.text(self.config.project_group_width + date.lower_x, date.lower_y, date.lower_text)
 				.addClass('lower-text')
 				.appendTo(self.element_groups.date);
 
 			if(date.upper_text) {
-				const $upper_text = self.canvas.text(date.upper_x, date.upper_y, date.upper_text)
+				const $upper_text = self.canvas.text(self.config.project_group_width + date.upper_x, date.upper_y, date.upper_text)
 					.addClass('upper-text')
 					.appendTo(self.element_groups.date);
 

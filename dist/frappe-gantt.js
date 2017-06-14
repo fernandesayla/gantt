@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function Gantt(element, tasks, config) {
+	function Gantt(element, projects, tasks, config) {
 	
 		var self = {};
 	
@@ -108,7 +108,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				padding: 18,
 				view_mode: 'Day',
 				date_format: 'YYYY-MM-DD',
-				custom_popup_html: null
+				custom_popup_html: null,
+				project_group_width: 0
 			};
 			self.config = Object.assign({}, defaults, config);
 	
@@ -317,10 +318,11 @@ return /******/ (function(modules) { // webpackBootstrap
 				self.gantt_end = self.gantt_end.clone().add(7, 'day');
 			} else if (view_is('Month')) {
 				self.gantt_start = self.gantt_start.clone().startOf('year');
-				self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
+				// self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
+				self.gantt_end = self.gantt_end.clone().endOf('year');
 			} else {
-				self.gantt_start = self.gantt_start.clone().startOf('month').subtract(1, 'month');
-				self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'month');
+				self.gantt_start = self.gantt_start.clone().startOf('month'); // .subtract(1, 'month');
+				self.gantt_end = self.gantt_end.clone().endOf('month'); // .add(1, 'month');
 			}
 		}
 	
@@ -341,7 +343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function setup_groups() {
 	
-			var groups = ['grid', 'date', 'arrow', 'progress', 'bar', 'details'];
+			var groups = ['grid', 'date', 'project', 'arrow', 'progress', 'bar', 'details'];
 			// make group layers
 			var _iteratorNormalCompletion4 = true;
 			var _didIteratorError4 = false;
@@ -392,7 +394,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function set_width() {
 			var cur_width = self.canvas.node.getBoundingClientRect().width;
-			var actual_width = self.canvas.select('#grid .grid-row').attr('width');
+			var actual_width = parseFloat(self.canvas.select('#grid .grid-row').attr('width')) + self.config.project_group_width;
+	
 			if (cur_width < actual_width) {
 				self.canvas.attr('width', actual_width);
 			}
@@ -415,15 +418,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function make_grid() {
 			make_grid_background();
-			make_grid_rows();
 			make_grid_header();
+			make_grid_rows();
 			make_grid_ticks();
 			make_grid_highlights();
 		}
 	
 		function make_grid_background() {
 	
-			var grid_width = self.dates.length * self.config.column_width,
+			var grid_width = self.dates.length * self.config.column_width + self.config.project_group_width,
 			    grid_height = self.config.header_height + self.config.padding + (self.config.bar.height + self.config.padding) * self.tasks.length;
 	
 			self.canvas.rect(0, 0, grid_width, grid_height).addClass('grid-background').appendTo(self.element_groups.grid);
@@ -437,7 +440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function make_grid_header() {
 			var header_width = self.dates.length * self.config.column_width,
 			    header_height = self.config.header_height + 10;
-			self.canvas.rect(0, 0, header_width, header_height).addClass('grid-header').appendTo(self.element_groups.grid);
+			self.canvas.rect(self.config.project_group_width, 0, header_width, header_height).addClass('grid-header').appendTo(self.element_groups.grid);
 		}
 	
 		function make_grid_rows() {
@@ -448,49 +451,45 @@ return /******/ (function(modules) { // webpackBootstrap
 			    row_height = self.config.bar.height + self.config.padding;
 	
 			var row_y = self.config.header_height + self.config.padding / 2;
+			var projectRows = 0;
+	
+			self.tasks.forEach(function (task, index) {
+				// eslint-disable-line
+	
+				var nextTask = self.tasks[index + 1];
+				var endProject = nextTask && task.projectId !== nextTask.projectId || !nextTask;
+	
+				self.canvas.rect(self.config.project_group_width, row_y, row_width, row_height).addClass('grid-row').appendTo(rows);
+	
+				self.canvas.line(self.config.project_group_width, row_y + row_height, row_width + self.config.project_group_width, row_y + row_height).addClass(endProject ? 'row-line-project' : 'row-line').appendTo(lines);
+	
+				row_y += self.config.bar.height + self.config.padding;
+				projectRows++;
+	
+				if (endProject) {
+	
+					self.canvas.rect(0, row_y - row_height * projectRows, 200, row_height * projectRows).addClass('grid-project-row').appendTo(rows);
+	
+					self.canvas.text(20, row_y - row_height * projectRows / 2, 'test').addClass('upper-text').appendTo(rows);
+	
+					console.log(task.projectId, projectRows);
+					projectRows = 0;
+				}
+			});
+		}
+	
+		function make_grid_ticks() {
+			var tick_x = self.config.project_group_width,
+			    tick_y = self.config.header_height + self.config.padding / 2,
+			    tick_height = (self.config.bar.height + self.config.padding) * self.tasks.length;
 	
 			var _iteratorNormalCompletion5 = true;
 			var _didIteratorError5 = false;
 			var _iteratorError5 = undefined;
 	
 			try {
-				for (var _iterator5 = self.tasks[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-					var task = _step5.value;
-					// eslint-disable-line
-					self.canvas.rect(0, row_y, row_width, row_height).addClass('grid-row').appendTo(rows);
-	
-					self.canvas.line(0, row_y + row_height, row_width, row_y + row_height).addClass('row-line').appendTo(lines);
-	
-					row_y += self.config.bar.height + self.config.padding;
-				}
-			} catch (err) {
-				_didIteratorError5 = true;
-				_iteratorError5 = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion5 && _iterator5.return) {
-						_iterator5.return();
-					}
-				} finally {
-					if (_didIteratorError5) {
-						throw _iteratorError5;
-					}
-				}
-			}
-		}
-	
-		function make_grid_ticks() {
-			var tick_x = 0,
-			    tick_y = self.config.header_height + self.config.padding / 2,
-			    tick_height = (self.config.bar.height + self.config.padding) * self.tasks.length;
-	
-			var _iteratorNormalCompletion6 = true;
-			var _didIteratorError6 = false;
-			var _iteratorError6 = undefined;
-	
-			try {
-				for (var _iterator6 = self.dates[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-					var date = _step6.value;
+				for (var _iterator5 = self.dates[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+					var date = _step5.value;
 	
 					var tick_class = 'tick';
 					// thick tick for monday
@@ -519,6 +518,56 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 				}
 			} catch (err) {
+				_didIteratorError5 = true;
+				_iteratorError5 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion5 && _iterator5.return) {
+						_iterator5.return();
+					}
+				} finally {
+					if (_didIteratorError5) {
+						throw _iteratorError5;
+					}
+				}
+			}
+		}
+	
+		function make_grid_highlights() {
+	
+			// highlight today's date
+			if (view_is('Day')) {
+				var x = moment().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.project_group_width;
+				var y = 0;
+				var width = self.config.column_width;
+				var height = (self.config.bar.height + self.config.padding) * self.tasks.length + self.config.header_height + self.config.padding / 2;
+	
+				self.canvas.rect(x, y, width, height).addClass('today-highlight').appendTo(self.element_groups.grid);
+			}
+		}
+	
+		function make_dates() {
+			var _iteratorNormalCompletion6 = true;
+			var _didIteratorError6 = false;
+			var _iteratorError6 = undefined;
+	
+			try {
+	
+				for (var _iterator6 = get_dates_to_draw()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+					var date = _step6.value;
+	
+					self.canvas.text(self.config.project_group_width + date.lower_x, date.lower_y, date.lower_text).addClass('lower-text').appendTo(self.element_groups.date);
+	
+					if (date.upper_text) {
+						var $upper_text = self.canvas.text(self.config.project_group_width + date.upper_x, date.upper_y, date.upper_text).addClass('upper-text').appendTo(self.element_groups.date);
+	
+						// remove out-of-bound dates
+						if ($upper_text.getBBox().x2 > self.element_groups.grid.getBBox().width) {
+							$upper_text.remove();
+						}
+					}
+				}
+			} catch (err) {
 				_didIteratorError6 = true;
 				_iteratorError6 = err;
 			} finally {
@@ -529,56 +578,6 @@ return /******/ (function(modules) { // webpackBootstrap
 				} finally {
 					if (_didIteratorError6) {
 						throw _iteratorError6;
-					}
-				}
-			}
-		}
-	
-		function make_grid_highlights() {
-	
-			// highlight today's date
-			if (view_is('Day')) {
-				var x = moment().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width;
-				var y = 0;
-				var width = self.config.column_width;
-				var height = (self.config.bar.height + self.config.padding) * self.tasks.length + self.config.header_height + self.config.padding / 2;
-	
-				self.canvas.rect(x, y, width, height).addClass('today-highlight').appendTo(self.element_groups.grid);
-			}
-		}
-	
-		function make_dates() {
-			var _iteratorNormalCompletion7 = true;
-			var _didIteratorError7 = false;
-			var _iteratorError7 = undefined;
-	
-			try {
-	
-				for (var _iterator7 = get_dates_to_draw()[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-					var date = _step7.value;
-	
-					self.canvas.text(date.lower_x, date.lower_y, date.lower_text).addClass('lower-text').appendTo(self.element_groups.date);
-	
-					if (date.upper_text) {
-						var $upper_text = self.canvas.text(date.upper_x, date.upper_y, date.upper_text).addClass('upper-text').appendTo(self.element_groups.date);
-	
-						// remove out-of-bound dates
-						if ($upper_text.getBBox().x2 > self.element_groups.grid.getBBox().width) {
-							$upper_text.remove();
-						}
-					}
-				}
-			} catch (err) {
-				_didIteratorError7 = true;
-				_iteratorError7 = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion7 && _iterator7.return) {
-						_iterator7.return();
-					}
-				} finally {
-					if (_didIteratorError7) {
-						throw _iteratorError7;
 					}
 				}
 			}
@@ -642,13 +641,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function make_arrows() {
 			self._arrows = [];
-			var _iteratorNormalCompletion8 = true;
-			var _didIteratorError8 = false;
-			var _iteratorError8 = undefined;
+			var _iteratorNormalCompletion7 = true;
+			var _didIteratorError7 = false;
+			var _iteratorError7 = undefined;
 	
 			try {
 				var _loop = function _loop() {
-					var task = _step8.value;
+					var task = _step7.value;
 	
 					var arrows = [];
 					arrows = task.dependencies.map(function (dep) {
@@ -667,20 +666,20 @@ return /******/ (function(modules) { // webpackBootstrap
 					self._arrows = self._arrows.concat(arrows);
 				};
 	
-				for (var _iterator8 = self.tasks[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+				for (var _iterator7 = self.tasks[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
 					_loop();
 				}
 			} catch (err) {
-				_didIteratorError8 = true;
-				_iteratorError8 = err;
+				_didIteratorError7 = true;
+				_iteratorError7 = err;
 			} finally {
 				try {
-					if (!_iteratorNormalCompletion8 && _iterator8.return) {
-						_iterator8.return();
+					if (!_iteratorNormalCompletion7 && _iterator7.return) {
+						_iterator7.return();
 					}
 				} finally {
-					if (_didIteratorError8) {
-						throw _iteratorError8;
+					if (_didIteratorError7) {
+						throw _iteratorError7;
 					}
 				}
 			}
@@ -696,33 +695,33 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function map_arrows_on_bars() {
-			var _iteratorNormalCompletion9 = true;
-			var _didIteratorError9 = false;
-			var _iteratorError9 = undefined;
+			var _iteratorNormalCompletion8 = true;
+			var _didIteratorError8 = false;
+			var _iteratorError8 = undefined;
 	
 			try {
 				var _loop2 = function _loop2() {
-					var bar = _step9.value;
+					var bar = _step8.value;
 	
 					bar.arrows = self._arrows.filter(function (arrow) {
 						return arrow.from_task.task.id === bar.task.id || arrow.to_task.task.id === bar.task.id;
 					});
 				};
 	
-				for (var _iterator9 = self._bars[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+				for (var _iterator8 = self._bars[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
 					_loop2();
 				}
 			} catch (err) {
-				_didIteratorError9 = true;
-				_iteratorError9 = err;
+				_didIteratorError8 = true;
+				_iteratorError8 = err;
 			} finally {
 				try {
-					if (!_iteratorNormalCompletion9 && _iterator9.return) {
-						_iterator9.return();
+					if (!_iteratorNormalCompletion8 && _iterator8.return) {
+						_iterator8.return();
 					}
 				} finally {
-					if (_didIteratorError9) {
-						throw _iteratorError9;
+					if (_didIteratorError8) {
+						throw _iteratorError8;
 					}
 				}
 			}
@@ -747,27 +746,27 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (typeof modes === 'string') {
 				return self.config.view_mode === modes;
 			} else if (Array.isArray(modes)) {
-				var _iteratorNormalCompletion10 = true;
-				var _didIteratorError10 = false;
-				var _iteratorError10 = undefined;
+				var _iteratorNormalCompletion9 = true;
+				var _didIteratorError9 = false;
+				var _iteratorError9 = undefined;
 	
 				try {
-					for (var _iterator10 = modes[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-						var mode = _step10.value;
+					for (var _iterator9 = modes[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+						var mode = _step9.value;
 	
 						if (self.config.view_mode === mode) return true;
 					}
 				} catch (err) {
-					_didIteratorError10 = true;
-					_iteratorError10 = err;
+					_didIteratorError9 = true;
+					_iteratorError9 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion10 && _iterator10.return) {
-							_iterator10.return();
+						if (!_iteratorNormalCompletion9 && _iterator9.return) {
+							_iterator9.return();
 						}
 					} finally {
-						if (_didIteratorError10) {
-							throw _iteratorError10;
+						if (_didIteratorError9) {
+							throw _iteratorError9;
 						}
 					}
 				}
@@ -827,8 +826,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/css-loader/index.js?sourceMap!./../node_modules/sass-loader/index.js?sourceMap!./gantt.scss", function() {
-				var newContent = require("!!./../node_modules/css-loader/index.js?sourceMap!./../node_modules/sass-loader/index.js?sourceMap!./gantt.scss");
+			module.hot.accept("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/sass-loader/index.js?sourceMap!./gantt.scss", function() {
+				var newContent = require("!!../node_modules/css-loader/index.js?sourceMap!../node_modules/sass-loader/index.js?sourceMap!./gantt.scss");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -846,7 +845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, ".gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.2; }\n  .gantt .tick.thick {\n    stroke-width: 0.4; }\n\n.gantt .today-highlight {\n  fill: #fcf8e3;\n  opacity: 0.5; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #b8c2cc;\n  stroke: #8D99A6;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-progress {\n  fill: #a3a3ff; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #8D99A6;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  font-weight: lighter;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0; }\n  .gantt #details .details-container h5 {\n    font-size: 12px;\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    font-size: 12px;\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n", "", {"version":3,"sources":["/./src/src/gantt.scss"],"names":[],"mappings":"AAYA;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBAjBoB;EAkBpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cAvBgB,EAwBhB;;AAfF;EAiBE,gBAzB0B,EA0B1B;;AAlBF;EAoBE,gBA9BoB;EA+BpB,kBAAiB,EAIjB;EAzBF;IAuBG,kBAAiB,EACjB;;AAxBH;EA2BE,cAlCoB;EAmCpB,aAAY,EACZ;;AA7BF;EAgCE,WAAU;EACV,aAvCe;EAwCf,kBAAiB,EACjB;;AAnCF;EAsCE,cAlDiB;EAmDjB,gBAlDkB;EAmDlB,gBAAe;EACf,kCAAiC,EACjC;;AA1CF;EA4CE,cA/CY,EAgDZ;;AA7CF;EA+CE,kBAAiB;EACjB,gBA3DkB;EA4DlB,gBAAe;EACf,oBAAmB,EAKnB;EAvDF;IAqDG,WA1Dc,EA2Dd;;AAtDH;EAyDE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EACf,qBAAoB;EACpB,sBAAqB,EAMrB;EApEF;IAiEG,WAtEc;IAuEd,mBAAkB,EAClB;;AAnEH;EAuEE,WAzEiB;EA0EjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AA5EF;EA+EE,gBAAe,EAkBf;EAjGF;IAmFI,gBAAe,EACf;EApFJ;IAuFI,oBAAmB;IACnB,WAAU,EACV;EAzFJ;IA8FI,gBAAe,EACf;;AA/FJ;EAoGE,gBAAe;EACf,oBAAmB,EACnB;;AAtGF;EAwGE,WA7Ge,EA8Gf;;AAzGF;EA2GE,WA/Ge,EAgHf;;AA5GF;EA+GE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EAvIF;IAoHG,UAAS,EACT;EArHH;IAwHG,gBAAe;IACf,kBAAiB;IACjB,oBAAmB;IACnB,YAhIc,EAiId;EA5HH;IA+HG,gBAAe;IACf,mBAAkB;IAClB,YAvIc,EAwId;EAlIH;IAqIG,iBAAgB,EAChB;;AAtIH;EA0IE,cAAa,EACb","file":"gantt.scss","sourcesContent":["$bar-color: #b8c2cc;\n$bar-stroke: #8D99A6;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n$light-yellow: #fcf8e3;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n$blue: #a3a3ff;\n$handle-color: #ddd;\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.2;\n\t\t&.thick {\n\t\t\tstroke-width: 0.4;\n\t\t}\n\t}\n\t.today-highlight {\n\t\tfill: $light-yellow;\n\t\topacity: 0.5;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\t.bar-progress {\n\t\tfill: $blue;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\tfont-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\n\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\th5 {\n\t\t\tfont-size: 12px;\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\n\t\t\tfont-size: 12px;\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n}"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, ".gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #333; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.2; }\n  .gantt .tick.thick {\n    stroke-width: 0.4; }\n\n.gantt .today-highlight {\n  fill: #fcf8e3;\n  opacity: 0.5; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #b8c2cc;\n  stroke: #8D99A6;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-progress {\n  fill: #a3a3ff; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #8D99A6;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  font-weight: lighter;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0; }\n  .gantt #details .details-container h5 {\n    font-size: 12px;\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    font-size: 12px;\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #e8e6e6; }\n\n.gantt .grid-project-row:nth-child(even) {\n  fill: #f5f5f5; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAYA;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBAjBoB;EAkBpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cAvBgB,EAwBhB;;AAfF;EAiBE,gBAzB0B,EA0B1B;;AAlBF;EAoBE,aAxBe,EAyBf;;AArBF;EAuBE,gBAjCoB;EAkCpB,kBAAiB,EAIjB;EA5BF;IA0BG,kBAAiB,EACjB;;AA3BH;EA8BE,cArCoB;EAsCpB,aAAY,EACZ;;AAhCF;EAmCE,WAAU;EACV,aA1Ce;EA2Cf,kBAAiB,EACjB;;AAtCF;EAyCE,cArDiB;EAsDjB,gBArDkB;EAsDlB,gBAAe;EACf,kCAAiC,EACjC;;AA7CF;EA+CE,cAlDY,EAmDZ;;AAhDF;EAkDE,kBAAiB;EACjB,gBA9DkB;EA+DlB,gBAAe;EACf,oBAAmB,EAKnB;EA1DF;IAwDG,WA7Dc,EA8Dd;;AAzDH;EA4DE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EACf,qBAAoB;EACpB,sBAAqB,EAMrB;EAvEF;IAoEG,WAzEc;IA0Ed,mBAAkB,EAClB;;AAtEH;EA0EE,WA5EiB;EA6EjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AA/EF;EAkFE,gBAAe,EAkBf;EApGF;IAsFI,gBAAe,EACf;EAvFJ;IA0FI,oBAAmB;IACnB,WAAU,EACV;EA5FJ;IAiGI,gBAAe,EACf;;AAlGJ;EAuGE,gBAAe;EACf,oBAAmB,EACnB;;AAzGF;EA2GE,WAhHe,EAiHf;;AA5GF;EA8GE,WAlHe,EAmHf;;AA/GF;EAkHE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EA1IF;IAuHG,UAAS,EACT;EAxHH;IA2HG,gBAAe;IACf,kBAAiB;IACjB,oBAAmB;IACnB,YAnIc,EAoId;EA/HH;IAkIG,gBAAe;IACf,mBAAkB;IAClB,YA1Ic,EA2Id;EArIH;IAwIG,iBAAgB,EAChB;;AAzIH;EA6IE,cAAa,EACb;;AA9IF;EAiJE,cAAa,EACb;;AAlJF;EAoJE,cA7JgB,EA8JhB","file":"gantt.scss","sourcesContent":["$bar-color: #b8c2cc;\n$bar-stroke: #8D99A6;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n$light-yellow: #fcf8e3;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n$blue: #a3a3ff;\n$handle-color: #ddd;\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\n\t\tstroke: $text-color;\t\t\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.2;\n\t\t&.thick {\n\t\t\tstroke-width: 0.4;\n\t\t}\n\t}\n\t.today-highlight {\n\t\tfill: $light-yellow;\n\t\topacity: 0.5;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\t.bar-progress {\n\t\tfill: $blue;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\tfont-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\n\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\th5 {\n\t\t\tfont-size: 12px;\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\n\t\t\tfont-size: 12px;\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: #e8e6e6;\n\t}\n\t.grid-project-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n}"],"sourceRoot":""}]);
 	
 	// exports
 
@@ -924,7 +923,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			};
 		},
 		isOldIE = memoize(function() {
-			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+			return /msie [6-9]\b/.test(self.navigator.userAgent.toLowerCase());
 		}),
 		getHeadElement = memoize(function () {
 			return document.head || document.getElementsByTagName("head")[0];
@@ -1602,7 +1601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function compute_x() {
-			var x = self.task._start.diff(gt.gantt_start, 'hours') / gt.config.step * gt.config.column_width;
+			var x = self.task._start.diff(gt.gantt_start, 'hours') / gt.config.step * gt.config.column_width + gt.config.project_group_width;
 	
 			if (gt.view_is('Month')) {
 				x = self.task._start.diff(gt.gantt_start, 'days') * gt.config.column_width / 30;

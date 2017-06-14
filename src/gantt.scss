@@ -27,7 +27,10 @@ $handle-color: #ddd;
 		fill: $light-bg;
 	}
 	.row-line {
-		stroke: $light-border-color;
+		stroke: $light-border-color;		
+	}
+	.row-line-project {
+		stroke: $text-color;		
 	}
 	.tick {
 		stroke: $border-color;
@@ -149,5 +152,12 @@ $handle-color: #ddd;
 
 	.hide {
 		display: none;
+	}
+
+	.grid-project-row {
+		fill: #e8e6e6;
+	}
+	.grid-project-row:nth-child(even) {
+		fill: $light-bg;
 	}
 }

@@ -438,8 +438,8 @@ export default function Bar(gt, task) {
 	}
 
 	function compute_x() {
-		let x = self.task._start.diff(gt.gantt_start, 'hours') /
-			gt.config.step * gt.config.column_width;
+		let x = (self.task._start.diff(gt.gantt_start, 'hours') /
+			gt.config.step * gt.config.column_width) + gt.config.project_group_width;
 
 		if (gt.view_is('Month')) {
 			x = self.task._start.diff(gt.gantt_start, 'days') *

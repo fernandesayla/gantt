@@ -6,14 +6,14 @@
 	<style>
 		body {
 			font-family: sans-serif;
-			background: #ccc;
+			/*background: #ccc;*/
 		}
 		.container {
-			width: 80%;
+			width: 100%;
 			margin: 0 auto;
 		}
 		.gantt-container {
-			overflow: scroll;
+			/*overflow: scroll;*/
 		}
 		/* custom class */
 		.gantt .bar-milestone .bar-progress {
@@ -26,43 +26,363 @@
 </head>
 <body>
 	<div class="container">
-		<h2>Interactive Gantt Chart entirely made in SVG!</h2>
+		<h2>Gantt Chart!</h2>
 		<div class="gantt-container">
 			<svg id="gantt" width="400" height="600"></svg>
 		</div>
 	</div>
 	<script>
-		var names = [
-			["Redesign website", [0, 7]],
-			["Write new content", [1, 4]],
-			["Apply new styles", [3, 6]],
-			["Review", [7, 7]],
-			["Deploy", [8, 9]],
-			["Go Live!", [10, 10]]
-		];
 
-		var tasks = names.map(function(name, i) {
-			var today = new Date();
-			var start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-			var end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-			start.setDate(today.getDate() + name[1][0]);
-			end.setDate(today.getDate() + name[1][1]);
+		// var today = new Date();
+
+		// var names = [
+		// 	["Redesign website", [0, 14]],
+		// 	["Write new content", [1, 8]],
+		// 	["Apply new styles", [3, 12]],
+		// 	["Review", [7, 14]],
+		// 	["Deploy", [8, 18]],
+		// 	["Go Live!", [10, 20]]
+		// ];
+
+		// var tasks = names.map(function(name, i) {
+		// 	var today = new Date();
+		// 	var start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		// 	var end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		// 	start.setDate(today.getDate() + name[1][0]);
+		// 	end.setDate(today.getDate() + name[1][1]);
+		// 	return {
+		// 		start: start,
+		// 		end: end,
+		// 		name: name[0],
+		// 		id: "Task " + i,
+		// 		progress: parseInt(Math.random() * 100, 10)
+		// 	}
+		// });
+						
+		// tasks[1].progress = 0;
+		// tasks[1].dependencies = "Task 0"
+		// tasks[2].dependencies = "Task 1"
+		// tasks[3].dependencies = "Task 2"
+		// tasks[5].dependencies = "Task 4"
+		// tasks[5].custom_class = "bar-milestone";
+
+		// console.log('tasks',tasks)
+		
+
+		let projetos = [
+			{
+				id: 1,
+				nome: "projeto 1",								
+				tarefas: [
+					{
+						id: 1,
+						sequencia: 1,					
+						percentual: 10,
+						tarefa: {
+							id: 1,
+							nome: "tarefa 1",								
+						},
+						situacao: {
+							id: 1,
+							nome: "Não Iniciado"
+						},												
+						periodos: [
+							{
+								id: 1,
+								dataInicio: "2017-06-12T12:53:03.348Z",
+								dataFim: "2017-06-30T03:00:00.000Z",
+								
+								tipo: {
+									id: 1,
+									nome: "Previsão",																				
+								},																
+							},
+							{
+								id: 2,
+								dataInicio: "2017-06-13T12:53:03.348Z",
+								dataFim: "2017-06-14T03:00:00.000Z",
+								
+								tipo: {
+									id: 2,
+									nome: "Realizado",																				
+								},
+															
+							},
+						],
+						vinculos: [ 
+							{
+								tarefaSubordinada_id: 2,
+							}
+						],
+						predecessoes: [ ],					
+					},
+					{
+						id: 2,
+						sequencia: 2,					
+						percentual: 20,
+						tarefa: {
+							id: 2,
+							nome: "tarefa 2",								
+						},
+						situacao: {
+							id: 1,
+							nome: "Não Iniciado"
+						},												
+						periodos: [
+							{
+								id: 2,
+								dataInicio: "2017-06-14T12:53:03.348Z",
+								dataFim: "2017-07-15T03:00:00.000Z",
+								
+								tipo: {
+									id: 1,
+									nome: "Previsão",										
+								},							
+							},						
+						],
+						vinculos: [ ],
+						predecessoes: [
+							{
+								tarefaPredecessao_id: 1,
+							}
+						],					
+					},
+					{
+						id: 3,
+						sequencia: 3,					
+						percentual: 30,
+						tarefa: {
+							id: 3,
+							nome: "tarefaaaaaaaaaaaaaa 3",								
+						},
+						situacao: {
+							id: 1,
+							nome: "Não Iniciado"
+						},												
+						periodos: [
+							{
+								id: 3,
+								dataInicio: "2017-06-12T12:53:03.348Z",
+								dataFim: "2017-06-30T03:00:00.000Z",
+								
+								tipo: {
+									id: 1,
+									nome: "Previsão",										
+								},							
+							},						
+						],
+						vinculos: [ ],
+						predecessoes: [
+							{
+								tarefaPredecessao_id: 2,
+							}
+						],					
+					},
+					{
+						id: 4,
+						sequencia: 4,					
+						percentual: 40,
+						tarefa: {
+							id: 4,
+							nome: "tarefa 4",								
+						},
+						situacao: {
+							id: 1,
+							nome: "Não Iniciado"
+						},												
+						periodos: [
+							{
+								id: 3,
+								dataInicio: "2017-06-12T12:53:03.348Z",
+								dataFim: "2017-06-30T03:00:00.000Z",
+								
+								tipo: {
+									id: 1,
+									nome: "Previsão",										
+								},							
+							},						
+						],
+						vinculos: [ ],
+						predecessoes: [
+							{
+								tarefaPredecessao_id: 2,
+							}
+						],					
+					}
+				]
+			},{
+				id: 2,
+				nome: "projeto 2",								
+				tarefas: [
+					{
+						id: 5,
+						sequencia: 1,					
+						percentual: 10,
+						tarefa: {
+							id: 1,
+							nome: "tarefa 1",								
+						},
+						situacao: {
+							id: 1,
+							nome: "Não Iniciado"
+						},												
+						periodos: [
+							{
+								id: 1,
+								dataInicio: "2017-06-12T12:53:03.348Z",
+								dataFim: "2017-06-30T03:00:00.000Z",
+								
+								tipo: {
+									id: 1,
+									nome: "Previsão",																				
+								},																
+							},
+							{
+								id: 2,
+								dataInicio: "2017-06-13T12:53:03.348Z",
+								dataFim: "2017-06-14T03:00:00.000Z",
+								
+								tipo: {
+									id: 2,
+									nome: "Realizado",																				
+								},
+															
+							},
+						],
+						vinculos: [ 
+							{
+								tarefaSubordinada_id: 2,
+							}
+						],
+						predecessoes: [],					
+					},
+					{
+						id: 6,
+						sequencia: 2,					
+						percentual: 20,
+						tarefa: {
+							id: 2,
+							nome: "tarefa 2",								
+						},
+						situacao: {
+							id: 1,
+							nome: "Não Iniciado"
+						},												
+						periodos: [
+							{
+								id: 2,
+								dataInicio: "2017-06-14T12:53:03.348Z",
+								dataFim: "2017-07-15T03:00:00.000Z",
+								
+								tipo: {
+									id: 1,
+									nome: "Previsão",										
+								},							
+							},						
+						],
+						vinculos: [ ],
+						predecessoes: [
+							{
+								tarefaPredecessao_id: 5,
+							}
+						],					
+					},
+					{
+						id: 7,
+						sequencia: 3,					
+						percentual: 30,
+						tarefa: {
+							id: 3,
+							nome: "tarefa 3",								
+						},
+						situacao: {
+							id: 1,
+							nome: "Não Iniciado"
+						},												
+						periodos: [
+							{
+								id: 3,
+								dataInicio: "2017-06-12T12:53:03.348Z",
+								dataFim: "2017-06-30T03:00:00.000Z",
+								
+								tipo: {
+									id: 1,
+									nome: "Previsão",										
+								},							
+							},						
+						],
+						vinculos: [ ],
+						predecessoes: [
+							{
+								tarefaPredecessao_id: 6,
+							}
+						],					
+					},
+					{
+						id: 8,
+						sequencia: 4,					
+						percentual: 40,
+						tarefa: {
+							id: 4,
+							nome: "tarefa 4",								
+						},
+						situacao: {
+							id: 1,
+							nome: "Não Iniciado"
+						},												
+						periodos: [
+							{
+								id: 3,
+								dataInicio: "2017-06-12T12:53:03.348Z",
+								dataFim: "2017-06-30T03:00:00.000Z",
+								
+								tipo: {
+									id: 1,
+									nome: "Previsão",										
+								},							
+							},						
+						],
+						vinculos: [ ],
+						predecessoes: [
+							{
+								tarefaPredecessao_id: 6,
+							},							
+						],					
+					}
+				]
+			},
+		]
+
+		let projects = [];		
+		let tasks = [];
+
+		projects = projects.concat(projetos.map(projeto =>{
+
+			tarefas = projeto.tarefas;
+
+			tasks = tasks.concat(tarefas.map((tarefa, i) => {
+							
+				let previsao = tarefa.periodos.find(periodo => periodo.tipo.id == 1)			
+				let dependencies = tarefa.predecessoes.map(vinculo => vinculo.tarefaPredecessao_id)
+						
+				return {
+					projectId: projeto.id,
+					id: tarefa.id,
+					name: tarefa.tarefa.nome,
+					start: previsao.dataInicio,
+					end: previsao.dataFim,					
+					progress: tarefa.percentual,
+					dependencies: dependencies,
+				}
+			}));
+
 			return {
-				start: start,
-				end: end,
-				name: name[0],
-				id: "Task " + i,
-				progress: parseInt(Math.random() * 100, 10)
-			}
-		});
-		tasks[1].progress = 0;
-		tasks[1].dependencies = "Task 0"
-		tasks[2].dependencies = "Task 1"
-		tasks[3].dependencies = "Task 2"
-		tasks[5].dependencies = "Task 4"
-		tasks[5].custom_class = "bar-milestone";
-
-		var gantt_chart = Gantt("#gantt", tasks, {
+				id: projeto.id,
+				name: projeto.nome,
+			}			
+		}));
+				
+		var gantt_chart = Gantt("#gantt", projects, tasks, {
 			on_click: function (task) {
 				console.log(task);
 			},
@@ -74,9 +394,12 @@
 			},
 			on_view_change: function(mode) {
 				console.log(mode);
-			}
+			},
+			view_mode: 'Month',
+			project_group_width: 200
 		});
-		console.log(gantt_chart);
+		//console.log(gantt_chart);
 	</script>
 </body>
 </html>
+
