@@ -502,9 +502,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				// eslint-disable-line
 	
 				var nextTask = self.tasks[index + 1];
-				var endProject = nextTask && task.projectId !== nextTask.projectId || !nextTask;
 	
-				if (nextTask && task._line !== nextTask._line || endProject) {
+				if (nextTask && task._line !== nextTask._line) {
 	
 					self.canvas.rect(project_group_width, row_y, row_width, row_height).addClass('grid-row').appendTo(rows);
 	
