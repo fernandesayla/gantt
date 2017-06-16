@@ -33,15 +33,15 @@ export default function Arrow(gt, from_task, to_task) {
 		}
 
 		self.start_y = gt.config.header_height + gt.config.bar.height +
-			(gt.config.padding + gt.config.bar.height) * from_task.task._index +
+			(gt.config.padding + gt.config.bar.height) * from_task.task._line +
 			gt.config.padding;
 
 		self.end_x = to_task.$bar.getX() - gt.config.padding / 2;
 		self.end_y = gt.config.header_height + gt.config.bar.height / 2 +
-			(gt.config.padding + gt.config.bar.height) * to_task.task._index +
+			(gt.config.padding + gt.config.bar.height) * to_task.task._line +
 			gt.config.padding;
 
-		const from_is_below_to = (from_task.task._index > to_task.task._index);
+		const from_is_below_to = (from_task.task._line > to_task.task._line);
 		self.curve = gt.config.arrow.curve;
 		self.clockwise = from_is_below_to ? 1 : 0;
 		self.curve_y = from_is_below_to ? -self.curve : self.curve;

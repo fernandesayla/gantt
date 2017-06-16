@@ -53,7 +53,8 @@ export default function Gantt(element, projects, tasks, config) {
 			view_mode: 'Day',
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null,
-			project_group_width: 0
+			project_group_width: 0,
+			inline: true
 		};
 		self.config = Object.assign({}, defaults, config);
 
@@ -64,6 +65,7 @@ export default function Gantt(element, projects, tasks, config) {
 
 		self.element = element;
 		self._tasks = tasks;
+		self._projects = projects;
 
 		self._bars = [];
 		self._arrows = [];
@@ -85,6 +87,7 @@ export default function Gantt(element, projects, tasks, config) {
 
 	function prepare() {
 		prepare_tasks();
+		prepare_projects();
 		prepare_dependencies();
 		prepare_dates();
 		prepare_canvas();
@@ -136,8 +139,51 @@ export default function Gantt(element, projects, tasks, config) {
 				task.id = generate_id(task);
 			}
 
+			// inline
+			if(self.config.inline) {
+				const previousTask = self._tasks[i - 1];
+				const newProject = (previousTask && task.projectId !== previousTask.projectId);
+
+				if (!previousTask) {
+					task._line = 0;
+				}else if(previousTask._end < task._start && !newProject) {
+					task._line = previousTask._line;
+				}else {
+					task._line = previousTask._line + 1;
+				}
+			}else {
+				task._line = task._index;
+			}
+
 			return task;
 		});
+	}
+
+	function prepare_projects() {
+
+		let rows = 0;
+
+		self._tasks.forEach((task, i) => {
+
+			const previousTask = self._tasks[i - 1];
+			const nextTask = self._tasks[i + 1];
+			const firstRowProject = (previousTask && task.projectId !== previousTask.projectId || !previousTask);
+			const lastRowProject = (nextTask && task.projectId !== nextTask.projectId) || !nextTask;
+
+			if(firstRowProject) {
+				let project = get_project(task.projectId);
+				project._firstRow = task._line;
+			}
+			if(lastRowProject) {
+				let project = get_project(task.projectId);
+				project._lastRow = task._line;
+				project._rows = project._lastRow - project._firstRow + 1;
+				rows += project._rows;
+			}
+
+		});
+		self._projects._rows = rows;
+
 	}
 
 	function prepare_dependencies() {
@@ -175,10 +221,10 @@ export default function Gantt(element, projects, tasks, config) {
 	function render() {
 		clear();
 		setup_groups();
-		make_grid();
 		make_dates();
 		make_bars();
 		make_arrows();
+		make_grid();
 		map_arrows_on_bars();
 		set_width();
 		set_scroll_position();
@@ -225,7 +271,7 @@ export default function Gantt(element, projects, tasks, config) {
 
 	function setup_groups() {
 
-		const groups = ['grid', 'date', 'project', 'arrow', 'progress', 'bar', 'details'];
+		const groups = ['grid', 'project', 'date', 'arrow', 'progress', 'bar', 'details'];
 		// make group layers
 		for(let group of groups) {
 			self.element_groups[group] = self.canvas.group().attr({'id': group});
@@ -282,6 +328,7 @@ export default function Gantt(element, projects, tasks, config) {
 		make_grid_background();
 		make_grid_header();
 		make_grid_rows();
+		if(self.config.project_group_width > 0) make_grid_projects();
 		make_grid_ticks();
 		make_grid_highlights();
 	}
@@ -315,47 +362,64 @@ export default function Gantt(element, projects, tasks, config) {
 		const rows = self.canvas.group().appendTo(self.element_groups.grid),
 			lines = self.canvas.group().appendTo(self.element_groups.grid),
 			row_width = self.dates.length * self.config.column_width,
-			row_height = self.config.bar.height + self.config.padding;
+			row_height = self.config.bar.height + self.config.padding,
+			project_group_width = self.config.project_group_width;
 
 		let row_y = self.config.header_height + self.config.padding / 2;
-		let projectRows = 0;
 
 		self.tasks.forEach((task, index) => { // eslint-disable-line
 
 			const nextTask = self.tasks[index + 1];
 			const endProject = (nextTask && task.projectId !== nextTask.projectId) || !nextTask;
 
-			self.canvas.rect(self.config.project_group_width, row_y, row_width, row_height)
+			if(nextTask && task._line !== nextTask._line || endProject) {
+
+				self.canvas.rect(project_group_width, row_y, row_width, row_height)
 				.addClass('grid-row')
 				.appendTo(rows);
 
-			self.canvas.line(self.config.project_group_width, row_y + row_height, row_width + self.config.project_group_width, row_y + row_height)
-				.addClass(endProject ? 'row-line-project' : 'row-line')
+				self.canvas.line(project_group_width, row_y + row_height, row_width + project_group_width, row_y + row_height)
+				.addClass('row-line')
 				.appendTo(lines);
 
-			row_y += self.config.bar.height + self.config.padding;
-			projectRows++;
+				row_y += self.config.bar.height + self.config.padding;
+			}
+		});
+	}
 
-			if(endProject) {
+	function make_grid_projects() {
 
-				self.canvas.rect(0, row_y - (row_height * projectRows), 200, row_height * projectRows)
+		const rows = self.canvas.group().appendTo(self.element_groups.project),
+			row_width = self.dates.length * self.config.column_width,
+			row_height = self.config.bar.height + self.config.padding,
+			project_group_width = self.config.project_group_width;
+
+		const header_height = self.config.header_height + self.config.padding / 2;
+		let row_y = header_height;
+
+		self._projects.forEach((project, index) => { // eslint-disable-line
+
+			row_y = header_height + (row_height * project._firstRow);
+
+			self.canvas.rect(0, row_y, project_group_width, row_height * project._rows)
 				.addClass('grid-project-row')
 				.appendTo(rows);
 
-				self.canvas.text(20, row_y - ((row_height * projectRows) / 2), 'test')
-					.addClass('upper-text')
-					.appendTo(rows);
+			self.canvas.line(0, row_y + (row_height * project._rows), row_width + project_group_width, row_y + (row_height * project._rows))
+				.addClass('row-line-project')
+				.appendTo(rows);
 
-				console.log(task.projectId, projectRows);
-				projectRows = 0;
-			}
+			self.canvas.text(40, row_y + 10, project.name)
+				.addClass('upper-text')
+				.appendTo(rows);
+
 		});
 	}
 
 	function make_grid_ticks() {
 		let tick_x = self.config.project_group_width,
 			tick_y = self.config.header_height + self.config.padding / 2,
-			tick_height = (self.config.bar.height + self.config.padding) * self.tasks.length;
+			tick_height = (self.config.bar.height + self.config.padding) * self._projects._rows;
 
 		for(let date of self.dates) {
 			let tick_class = 'tick';
@@ -506,7 +570,8 @@ export default function Gantt(element, projects, tasks, config) {
 
 	function make_bars() {
 
-		self._bars = self.tasks.map((task) => {
+		self._bars = self.tasks.map((task, i) => {
+
 			const bar = Bar(self, task);
 			self.element_groups.bar.add(bar.group);
 			return bar;
@@ -558,6 +623,10 @@ export default function Gantt(element, projects, tasks, config) {
 		return self._bars.find((bar) => {
 			return bar.task.id === id;
 		});
+	}
+
+	function get_project(id) {
+		return self._projects.find(project => project.id === id);
 	}
 
 	function generate_id(task) {

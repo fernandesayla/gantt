@@ -109,7 +109,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				view_mode: 'Day',
 				date_format: 'YYYY-MM-DD',
 				custom_popup_html: null,
-				project_group_width: 0
+				project_group_width: 0,
+				inline: true
 			};
 			self.config = Object.assign({}, defaults, config);
 	
@@ -120,6 +121,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			self.element = element;
 			self._tasks = tasks;
+			self._projects = projects;
 	
 			self._bars = [];
 			self._arrows = [];
@@ -141,6 +143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function prepare() {
 			prepare_tasks();
+			prepare_projects();
 			prepare_dependencies();
 			prepare_dates();
 			prepare_canvas();
@@ -193,8 +196,49 @@ return /******/ (function(modules) { // webpackBootstrap
 					task.id = generate_id(task);
 				}
 	
+				// inline
+				if (self.config.inline) {
+					var previousTask = self._tasks[i - 1];
+					var newProject = previousTask && task.projectId !== previousTask.projectId;
+	
+					if (!previousTask) {
+						task._line = 0;
+					} else if (previousTask._end < task._start && !newProject) {
+						task._line = previousTask._line;
+					} else {
+						task._line = previousTask._line + 1;
+					}
+				} else {
+					task._line = task._index;
+				}
+	
 				return task;
 			});
+		}
+	
+		function prepare_projects() {
+	
+			var rows = 0;
+	
+			self._tasks.forEach(function (task, i) {
+	
+				var previousTask = self._tasks[i - 1];
+				var nextTask = self._tasks[i + 1];
+				var firstRowProject = previousTask && task.projectId !== previousTask.projectId || !previousTask;
+				var lastRowProject = nextTask && task.projectId !== nextTask.projectId || !nextTask;
+	
+				if (firstRowProject) {
+					var project = get_project(task.projectId);
+					project._firstRow = task._line;
+				}
+				if (lastRowProject) {
+					var _project = get_project(task.projectId);
+					_project._lastRow = task._line;
+					_project._rows = _project._lastRow - _project._firstRow + 1;
+					rows += _project._rows;
+				}
+			});
+			self._projects._rows = rows;
 		}
 	
 		function prepare_dependencies() {
@@ -295,10 +339,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		function render() {
 			clear();
 			setup_groups();
-			make_grid();
 			make_dates();
 			make_bars();
 			make_arrows();
+			make_grid();
 			map_arrows_on_bars();
 			set_width();
 			set_scroll_position();
@@ -343,7 +387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function setup_groups() {
 	
-			var groups = ['grid', 'date', 'project', 'arrow', 'progress', 'bar', 'details'];
+			var groups = ['grid', 'project', 'date', 'arrow', 'progress', 'bar', 'details'];
 			// make group layers
 			var _iteratorNormalCompletion4 = true;
 			var _didIteratorError4 = false;
@@ -420,6 +464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			make_grid_background();
 			make_grid_header();
 			make_grid_rows();
+			if (self.config.project_group_width > 0) make_grid_projects();
 			make_grid_ticks();
 			make_grid_highlights();
 		}
@@ -448,10 +493,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			var rows = self.canvas.group().appendTo(self.element_groups.grid),
 			    lines = self.canvas.group().appendTo(self.element_groups.grid),
 			    row_width = self.dates.length * self.config.column_width,
-			    row_height = self.config.bar.height + self.config.padding;
+			    row_height = self.config.bar.height + self.config.padding,
+			    project_group_width = self.config.project_group_width;
 	
 			var row_y = self.config.header_height + self.config.padding / 2;
-			var projectRows = 0;
 	
 			self.tasks.forEach(function (task, index) {
 				// eslint-disable-line
@@ -459,29 +504,44 @@ return /******/ (function(modules) { // webpackBootstrap
 				var nextTask = self.tasks[index + 1];
 				var endProject = nextTask && task.projectId !== nextTask.projectId || !nextTask;
 	
-				self.canvas.rect(self.config.project_group_width, row_y, row_width, row_height).addClass('grid-row').appendTo(rows);
+				if (nextTask && task._line !== nextTask._line || endProject) {
 	
-				self.canvas.line(self.config.project_group_width, row_y + row_height, row_width + self.config.project_group_width, row_y + row_height).addClass(endProject ? 'row-line-project' : 'row-line').appendTo(lines);
+					self.canvas.rect(project_group_width, row_y, row_width, row_height).addClass('grid-row').appendTo(rows);
 	
-				row_y += self.config.bar.height + self.config.padding;
-				projectRows++;
+					self.canvas.line(project_group_width, row_y + row_height, row_width + project_group_width, row_y + row_height).addClass('row-line').appendTo(lines);
 	
-				if (endProject) {
-	
-					self.canvas.rect(0, row_y - row_height * projectRows, 200, row_height * projectRows).addClass('grid-project-row').appendTo(rows);
-	
-					self.canvas.text(20, row_y - row_height * projectRows / 2, 'test').addClass('upper-text').appendTo(rows);
-	
-					console.log(task.projectId, projectRows);
-					projectRows = 0;
+					row_y += self.config.bar.height + self.config.padding;
 				}
+			});
+		}
+	
+		function make_grid_projects() {
+	
+			var rows = self.canvas.group().appendTo(self.element_groups.project),
+			    row_width = self.dates.length * self.config.column_width,
+			    row_height = self.config.bar.height + self.config.padding,
+			    project_group_width = self.config.project_group_width;
+	
+			var header_height = self.config.header_height + self.config.padding / 2;
+			var row_y = header_height;
+	
+			self._projects.forEach(function (project, index) {
+				// eslint-disable-line
+	
+				row_y = header_height + row_height * project._firstRow;
+	
+				self.canvas.rect(0, row_y, project_group_width, row_height * project._rows).addClass('grid-project-row').appendTo(rows);
+	
+				self.canvas.line(0, row_y + row_height * project._rows, row_width + project_group_width, row_y + row_height * project._rows).addClass('row-line-project').appendTo(rows);
+	
+				self.canvas.text(40, row_y + 10, project.name).addClass('upper-text').appendTo(rows);
 			});
 		}
 	
 		function make_grid_ticks() {
 			var tick_x = self.config.project_group_width,
 			    tick_y = self.config.header_height + self.config.padding / 2,
-			    tick_height = (self.config.bar.height + self.config.padding) * self.tasks.length;
+			    tick_height = (self.config.bar.height + self.config.padding) * self._projects._rows;
 	
 			var _iteratorNormalCompletion5 = true;
 			var _didIteratorError5 = false;
@@ -687,7 +747,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function make_bars() {
 	
-			self._bars = self.tasks.map(function (task) {
+			self._bars = self.tasks.map(function (task, i) {
+	
 				var bar = (0, _Bar2.default)(self, task);
 				self.element_groups.bar.add(bar.group);
 				return bar;
@@ -787,6 +848,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			});
 		}
 	
+		function get_project(id) {
+			return self._projects.find(function (project) {
+				return project.id === id;
+			});
+		}
+	
 		function generate_id(task) {
 			return task.name + '_' + Math.random().toString(36).slice(2, 12);
 		}
@@ -845,7 +912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, ".gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #333; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.2; }\n  .gantt .tick.thick {\n    stroke-width: 0.4; }\n\n.gantt .today-highlight {\n  fill: #fcf8e3;\n  opacity: 0.5; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #b8c2cc;\n  stroke: #8D99A6;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-progress {\n  fill: #a3a3ff; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #8D99A6;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  font-weight: lighter;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0; }\n  .gantt #details .details-container h5 {\n    font-size: 12px;\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    font-size: 12px;\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #e8e6e6; }\n\n.gantt .grid-project-row:nth-child(even) {\n  fill: #f5f5f5; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAYA;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBAjBoB;EAkBpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cAvBgB,EAwBhB;;AAfF;EAiBE,gBAzB0B,EA0B1B;;AAlBF;EAoBE,aAxBe,EAyBf;;AArBF;EAuBE,gBAjCoB;EAkCpB,kBAAiB,EAIjB;EA5BF;IA0BG,kBAAiB,EACjB;;AA3BH;EA8BE,cArCoB;EAsCpB,aAAY,EACZ;;AAhCF;EAmCE,WAAU;EACV,aA1Ce;EA2Cf,kBAAiB,EACjB;;AAtCF;EAyCE,cArDiB;EAsDjB,gBArDkB;EAsDlB,gBAAe;EACf,kCAAiC,EACjC;;AA7CF;EA+CE,cAlDY,EAmDZ;;AAhDF;EAkDE,kBAAiB;EACjB,gBA9DkB;EA+DlB,gBAAe;EACf,oBAAmB,EAKnB;EA1DF;IAwDG,WA7Dc,EA8Dd;;AAzDH;EA4DE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EACf,qBAAoB;EACpB,sBAAqB,EAMrB;EAvEF;IAoEG,WAzEc;IA0Ed,mBAAkB,EAClB;;AAtEH;EA0EE,WA5EiB;EA6EjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AA/EF;EAkFE,gBAAe,EAkBf;EApGF;IAsFI,gBAAe,EACf;EAvFJ;IA0FI,oBAAmB;IACnB,WAAU,EACV;EA5FJ;IAiGI,gBAAe,EACf;;AAlGJ;EAuGE,gBAAe;EACf,oBAAmB,EACnB;;AAzGF;EA2GE,WAhHe,EAiHf;;AA5GF;EA8GE,WAlHe,EAmHf;;AA/GF;EAkHE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EA1IF;IAuHG,UAAS,EACT;EAxHH;IA2HG,gBAAe;IACf,kBAAiB;IACjB,oBAAmB;IACnB,YAnIc,EAoId;EA/HH;IAkIG,gBAAe;IACf,mBAAkB;IAClB,YA1Ic,EA2Id;EArIH;IAwIG,iBAAgB,EAChB;;AAzIH;EA6IE,cAAa,EACb;;AA9IF;EAiJE,cAAa,EACb;;AAlJF;EAoJE,cA7JgB,EA8JhB","file":"gantt.scss","sourcesContent":["$bar-color: #b8c2cc;\n$bar-stroke: #8D99A6;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n$light-yellow: #fcf8e3;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n$blue: #a3a3ff;\n$handle-color: #ddd;\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\n\t\tstroke: $text-color;\t\t\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.2;\n\t\t&.thick {\n\t\t\tstroke-width: 0.4;\n\t\t}\n\t}\n\t.today-highlight {\n\t\tfill: $light-yellow;\n\t\topacity: 0.5;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\t.bar-progress {\n\t\tfill: $blue;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\tfont-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\n\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\th5 {\n\t\t\tfont-size: 12px;\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\n\t\t\tfont-size: 12px;\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: #e8e6e6;\n\t}\n\t.grid-project-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n}"],"sourceRoot":""}]);
+	exports.push([module.id, ".gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #333; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.2; }\n  .gantt .tick.thick {\n    stroke-width: 0.4; }\n\n.gantt .today-highlight {\n  fill: #fcf8e3;\n  opacity: 0.5; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #23569C;\n  stroke: #8D99A6;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-progress {\n  fill: #3887f3; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #8D99A6;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  font-weight: lighter;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0; }\n  .gantt #details .details-container h5 {\n    font-size: 12px;\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    font-size: 12px;\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #f5f5f5; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAeA;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBAnBoB;EAoBpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cAzBgB,EA0BhB;;AAfF;EAiBE,gBA3B0B,EA4B1B;;AAlBF;EAoBE,aA1Be,EA2Bf;;AArBF;EAuBE,gBAnCoB;EAoCpB,kBAAiB,EAIjB;EA5BF;IA0BG,kBAAiB,EACjB;;AA3BH;EA8BE,cAvCoB;EAwCpB,aAAY,EACZ;;AAhCF;EAmCE,WAAU;EACV,aA5Ce;EA6Cf,kBAAiB,EACjB;;AAtCF;EAyCE,cAvDiB;EAwDjB,gBAvDkB;EAwDlB,gBAAe;EACf,kCAAiC,EACjC;;AA7CF;EA+CE,cAnDY,EAoDZ;;AAhDF;EAkDE,kBAAiB;EACjB,gBAhEkB;EAiElB,gBAAe;EACf,oBAAmB,EAKnB;EA1DF;IAwDG,WA/Dc,EAgEd;;AAzDH;EA4DE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EACf,qBAAoB;EACpB,sBAAqB,EAMrB;EAvEF;IAoEG,WA3Ec;IA4Ed,mBAAkB,EAClB;;AAtEH;EA0EE,WA7EiB;EA8EjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AA/EF;EAkFE,gBAAe,EAkBf;EApGF;IAsFI,gBAAe,EACf;EAvFJ;IA0FI,oBAAmB;IACnB,WAAU,EACV;EA5FJ;IAiGI,gBAAe,EACf;;AAlGJ;EAuGE,gBAAe;EACf,oBAAmB,EACnB;;AAzGF;EA2GE,WAlHe,EAmHf;;AA5GF;EA8GE,WApHe,EAqHf;;AA/GF;EAkHE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EA1IF;IAuHG,UAAS,EACT;EAxHH;IA2HG,gBAAe;IACf,kBAAiB;IACjB,oBAAmB;IACnB,YArIc,EAsId;EA/HH;IAkIG,gBAAe;IACf,mBAAkB;IAClB,YA5Ic,EA6Id;EArIH;IAwIG,iBAAgB,EAChB;;AAzIH;EA6IE,cAAa,EACb;;AA9IF;EAiJE,cA5JgB,EA6JhB","file":"gantt.scss","sourcesContent":["// $bar-color: #b8c2cc;\n$bar-color: #23569C;\n$bar-stroke: #8D99A6;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n$light-yellow: #fcf8e3;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n//$blue: #a3a3ff;\n$blue: #3887f3;\n$handle-color: #ddd;\n\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\n\t\tstroke: $text-color;\t\t\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.2;\n\t\t&.thick {\n\t\t\tstroke-width: 0.4;\n\t\t}\n\t}\n\t.today-highlight {\n\t\tfill: $light-yellow;\n\t\topacity: 0.5;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\t.bar-progress {\n\t\tfill: $blue;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\tfont-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\n\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\th5 {\n\t\t\tfont-size: 12px;\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\n\t\t\tfont-size: 12px;\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: $light-bg;\n\t}\n\t\n}"],"sourceRoot":""}]);
 	
 	// exports
 
@@ -1601,16 +1668,16 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function compute_x() {
-			var x = self.task._start.diff(gt.gantt_start, 'hours') / gt.config.step * gt.config.column_width + gt.config.project_group_width;
+			var x = self.task._start.diff(gt.gantt_start, 'hours') / gt.config.step * gt.config.column_width;
 	
 			if (gt.view_is('Month')) {
 				x = self.task._start.diff(gt.gantt_start, 'days') * gt.config.column_width / 30;
 			}
-			return x;
+			return x + gt.config.project_group_width;
 		}
 	
 		function compute_y() {
-			return gt.config.header_height + gt.config.padding + self.task._index * (self.height + gt.config.padding);
+			return gt.config.header_height + gt.config.padding + self.task._line * (self.height + gt.config.padding);
 		}
 	
 		function get_snap_position(dx) {
@@ -1756,12 +1823,12 @@ return /******/ (function(modules) { // webpackBootstrap
 				self.start_x -= 10;
 			}
 	
-			self.start_y = gt.config.header_height + gt.config.bar.height + (gt.config.padding + gt.config.bar.height) * from_task.task._index + gt.config.padding;
+			self.start_y = gt.config.header_height + gt.config.bar.height + (gt.config.padding + gt.config.bar.height) * from_task.task._line + gt.config.padding;
 	
 			self.end_x = to_task.$bar.getX() - gt.config.padding / 2;
-			self.end_y = gt.config.header_height + gt.config.bar.height / 2 + (gt.config.padding + gt.config.bar.height) * to_task.task._index + gt.config.padding;
+			self.end_y = gt.config.header_height + gt.config.bar.height / 2 + (gt.config.padding + gt.config.bar.height) * to_task.task._line + gt.config.padding;
 	
-			var from_is_below_to = from_task.task._index > to_task.task._index;
+			var from_is_below_to = from_task.task._line > to_task.task._line;
 			self.curve = gt.config.arrow.curve;
 			self.clockwise = from_is_below_to ? 1 : 0;
 			self.curve_y = from_is_below_to ? -self.curve : self.curve;

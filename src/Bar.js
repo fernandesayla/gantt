@@ -438,19 +438,19 @@ export default function Bar(gt, task) {
 	}
 
 	function compute_x() {
-		let x = (self.task._start.diff(gt.gantt_start, 'hours') /
-			gt.config.step * gt.config.column_width) + gt.config.project_group_width;
+		let x = self.task._start.diff(gt.gantt_start, 'hours') /
+			gt.config.step * gt.config.column_width;
 
 		if (gt.view_is('Month')) {
 			x = self.task._start.diff(gt.gantt_start, 'days') *
 				gt.config.column_width / 30;
 		}
-		return x;
+		return x + gt.config.project_group_width;
 	}
 
 	function compute_y() {
 		return gt.config.header_height + gt.config.padding +
-			self.task._index * (self.height + gt.config.padding);
+			self.task._line * (self.height + gt.config.padding);
 	}
 
 	function get_snap_position(dx) {
