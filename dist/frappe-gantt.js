@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function Gantt(element, projects, tasks, config) {
+	function Gantt(element, projects, config) {
 	
 		var self = {};
 	
@@ -120,9 +120,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		function reset_variables(tasks) {
 	
 			self.element = element;
-			self._tasks = tasks;
+			self._tasks = [];
+			projects.forEach(function (project) {
+				return self._tasks = self._tasks.concat(project.tasks);
+			});
 			self._projects = projects;
-	
 			self._bars = [];
 			self._arrows = [];
 			self.element_groups = {};
@@ -220,23 +222,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			var rows = 0;
 	
-			self._tasks.forEach(function (task, i) {
-	
-				var previousTask = self._tasks[i - 1];
-				var nextTask = self._tasks[i + 1];
-				var firstRowProject = previousTask && task.projectId !== previousTask.projectId || !previousTask;
-				var lastRowProject = nextTask && task.projectId !== nextTask.projectId || !nextTask;
-	
-				if (firstRowProject) {
-					var project = get_project(task.projectId);
-					project._firstRow = task._line;
-				}
-				if (lastRowProject) {
-					var _project = get_project(task.projectId);
-					_project._lastRow = task._line;
-					_project._rows = _project._lastRow - _project._firstRow + 1;
-					rows += _project._rows;
-				}
+			self._projects.forEach(function (project, i) {
+				tasks = project.tasks;
+				tasks.forEach(function (task, i) {
+					var nextTask = tasks[i + 1];
+					if (i == 0) project._firstRow = task._line;
+					if (!nextTask) project._lastRow = task._line;
+					if (task.currentTask) project._currentDate = task._start;
+				});
+				project._rows = project._lastRow - project._firstRow + 1;
+				rows += project._rows;
 			});
 			self._projects._rows = rows;
 		}
@@ -536,6 +531,22 @@ return /******/ (function(modules) { // webpackBootstrap
 				self.canvas.line(0, row_y + row_height * project._rows, row_width + project_group_width, row_y + row_height * project._rows).addClass('row-line-project').appendTo(lines);
 	
 				self.canvas.text(40, row_y + row_height * project._rows / 2, project.name).addClass('project-text').appendTo(text);
+	
+				if (view_is('Month') && project._currentDate) {
+					var x = project._currentDate.startOf('day').diff(self.gantt_start, 'days') * self.config.column_width / 30 + self.config.project_group_width;
+					self.canvas.path(Snap.format('M {x} {y} v {height}', {
+						x: x,
+						y: row_y,
+						height: row_height * project._rows
+					})).addClass('tick-current').appendTo(text);
+				}
+	
+				if (view_is('Day') && project._currentDate) {
+					var _x = project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.project_group_width;
+					var width = self.config.column_width;
+	
+					self.canvas.rect(_x, row_y, width, row_height * project._rows).addClass('today-highlight').appendTo(text);
+				}
 			});
 		}
 	
@@ -606,10 +617,10 @@ return /******/ (function(modules) { // webpackBootstrap
 				self.canvas.rect(x, y, width, height).addClass('today-highlight').appendTo(self.element_groups.grid);
 			} else {
 	
-				var _x = moment().startOf('day').diff(self.gantt_start, 'days') * self.config.column_width / 30 + self.config.project_group_width;
+				var _x2 = moment().startOf('day').diff(self.gantt_start, 'days') * self.config.column_width / 30 + self.config.project_group_width;
 	
 				self.canvas.path(Snap.format('M {x} {y} v {height}', {
-					x: _x,
+					x: _x2,
 					y: y,
 					height: height
 				})).addClass('tick-today').appendTo(self.element_groups.grid);
@@ -923,7 +934,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, ".gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #333; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.2; }\n  .gantt .tick.thick {\n    stroke-width: 0.4; }\n\n.gantt .tick-today {\n  stroke: #6be26b;\n  stroke-width: 1; }\n\n.gantt .today-highlight {\n  fill: #6be26b;\n  opacity: 0.5; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #23569C;\n  stroke: #8D99A6;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-progress {\n  fill: #3887f3; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #8D99A6;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  font-weight: lighter;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt .project-text {\n  fill: #555;\n  text-anchor: middle; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0; }\n  .gantt #details .details-container h5 {\n    font-size: 12px;\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    font-size: 12px;\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #f5f5f5; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAgBA;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBApBoB;EAqBpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cA1BgB,EA2BhB;;AAfF;EAiBE,gBA5B0B,EA6B1B;;AAlBF;EAoBE,aA1Be,EA2Bf;;AArBF;EAuBE,gBApCoB;EAqCpB,kBAAiB,EAIjB;EA5BF;IA0BG,kBAAiB,EACjB;;AA3BH;EA+BE,gBAxCmB;EAyCnB,gBAAe,EACf;;AAjCF;EAoCE,cA7CmB;EA8CnB,aAAY,EACZ;;AAtCF;EAyCE,WAAU;EACV,aAlDe;EAmDf,kBAAiB,EACjB;;AA5CF;EA+CE,cA9DiB;EA+DjB,gBA9DkB;EA+DlB,gBAAe;EACf,kCAAiC,EACjC;;AAnDF;EAqDE,cAzDY,EA0DZ;;AAtDF;EAwDE,kBAAiB;EACjB,gBAvEkB;EAwElB,gBAAe;EACf,oBAAmB,EAKnB;EAhEF;IA8DG,WArEc,EAsEd;;AA/DH;EAkEE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EACf,qBAAoB;EACpB,sBAAqB,EAMrB;EA7EF;IA0EG,WAjFc;IAkFd,mBAAkB,EAClB;;AA5EH;EAgFE,WAnFiB;EAoFjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AArFF;EAwFE,gBAAe,EAkBf;EA1GF;IA4FI,gBAAe,EACf;EA7FJ;IAgGI,oBAAmB;IACnB,WAAU,EACV;EAlGJ;IAuGI,gBAAe,EACf;;AAxGJ;EA6GE,gBAAe;EACf,oBAAmB,EACnB;;AA/GF;EAiHE,WAxHe,EAyHf;;AAlHF;EAoHE,WA1He,EA2Hf;;AArHF;EAuHE,WA9He;EA+Hf,oBAAmB,EACnB;;AAzHF;EA4HE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EApJF;IAiIG,UAAS,EACT;EAlIH;IAqIG,gBAAe;IACf,kBAAiB;IACjB,oBAAmB;IACnB,YA/Ic,EAgJd;EAzIH;IA4IG,gBAAe;IACf,mBAAkB;IAClB,YAtJc,EAuJd;EA/IH;IAkJG,iBAAgB,EAChB;;AAnJH;EAuJE,cAAa,EACb;;AAxJF;EA2JE,cAvKgB,EAwKhB","file":"gantt.scss","sourcesContent":["// $bar-color: #b8c2cc;\n$bar-color: #23569C;\n$bar-stroke: #8D99A6;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n//$light-yellow: #fcf8e3;\n$light-green: #6be26b;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n//$blue: #a3a3ff;\n$blue: #3887f3;\n$handle-color: #ddd;\n\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\n\t\tstroke: $text-color;\t\t\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.2;\n\t\t&.thick {\n\t\t\tstroke-width: 0.4;\n\t\t}\n\t}\n\n\t.tick-today {\n\t\tstroke: $light-green;\n\t\tstroke-width: 1;\t\t\n\t}\n\n\t.today-highlight {\n\t\tfill: $light-green;\n\t\topacity: 0.5;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\t.bar-progress {\n\t\tfill: $blue;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\tfont-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\t.project-text{\n\t\tfill: $text-light;\n\t\ttext-anchor: middle;\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\n\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\th5 {\n\t\t\tfont-size: 12px;\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\n\t\t\tfont-size: 12px;\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: $light-bg;\n\t}\n\t\n}"],"sourceRoot":""}]);
+	exports.push([module.id, ".gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #333; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.2; }\n  .gantt .tick.thick {\n    stroke-width: 0.4; }\n\n.gantt .tick-today, .gantt .tick-current {\n  stroke-width: 1; }\n\n.gantt .tick-today {\n  stroke: #6be26b; }\n\n.gantt .tick-current {\n  stroke: red; }\n\n.gantt .today-highlight {\n  fill: #6be26b;\n  opacity: 0.5; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #23569C;\n  stroke: #8D99A6;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-progress {\n  fill: #3887f3; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #8D99A6;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  font-weight: lighter;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt .project-text {\n  fill: #555;\n  text-anchor: middle; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0; }\n  .gantt #details .details-container h5 {\n    font-size: 12px;\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    font-size: 12px;\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #f5f5f5; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAgBA;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBApBoB;EAqBpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cA1BgB,EA2BhB;;AAfF;EAiBE,gBA5B0B,EA6B1B;;AAlBF;EAoBE,aA1Be,EA2Bf;;AArBF;EAuBE,gBApCoB;EAqCpB,kBAAiB,EAIjB;EA5BF;IA0BG,kBAAiB,EACjB;;AA3BH;EA+BE,gBAAe,EACf;;AAhCF;EAmCE,gBA5CmB,EA6CnB;;AApCF;EAuCE,YAAW,EACX;;AAxCF;EA2CE,cApDmB;EAqDnB,aAAY,EACZ;;AA7CF;EAgDE,WAAU;EACV,aAzDe;EA0Df,kBAAiB,EACjB;;AAnDF;EAsDE,cArEiB;EAsEjB,gBArEkB;EAsElB,gBAAe;EACf,kCAAiC,EACjC;;AA1DF;EA4DE,cAhEY,EAiEZ;;AA7DF;EA+DE,kBAAiB;EACjB,gBA9EkB;EA+ElB,gBAAe;EACf,oBAAmB,EAKnB;EAvEF;IAqEG,WA5Ec,EA6Ed;;AAtEH;EAyEE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EACf,qBAAoB;EACpB,sBAAqB,EAMrB;EApFF;IAiFG,WAxFc;IAyFd,mBAAkB,EAClB;;AAnFH;EAuFE,WA1FiB;EA2FjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AA5FF;EA+FE,gBAAe,EAkBf;EAjHF;IAmGI,gBAAe,EACf;EApGJ;IAuGI,oBAAmB;IACnB,WAAU,EACV;EAzGJ;IA8GI,gBAAe,EACf;;AA/GJ;EAoHE,gBAAe;EACf,oBAAmB,EACnB;;AAtHF;EAwHE,WA/He,EAgIf;;AAzHF;EA2HE,WAjIe,EAkIf;;AA5HF;EA8HE,WArIe;EAsIf,oBAAmB,EACnB;;AAhIF;EAmIE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EA3JF;IAwIG,UAAS,EACT;EAzIH;IA4IG,gBAAe;IACf,kBAAiB;IACjB,oBAAmB;IACnB,YAtJc,EAuJd;EAhJH;IAmJG,gBAAe;IACf,mBAAkB;IAClB,YA7Jc,EA8Jd;EAtJH;IAyJG,iBAAgB,EAChB;;AA1JH;EA8JE,cAAa,EACb;;AA/JF;EAkKE,cA9KgB,EA+KhB","file":"gantt.scss","sourcesContent":["// $bar-color: #b8c2cc;\n$bar-color: #23569C;\n$bar-stroke: #8D99A6;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n//$light-yellow: #fcf8e3;\n$light-green: #6be26b;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n//$blue: #a3a3ff;\n$blue: #3887f3;\n$handle-color: #ddd;\n\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\n\t\tstroke: $text-color;\t\t\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.2;\n\t\t&.thick {\n\t\t\tstroke-width: 0.4;\n\t\t}\n\t}\n\n\t.tick-today, .tick-current {\t\t\n\t\tstroke-width: 1;\t\t\n\t}\n\n\t.tick-today {\n\t\tstroke: $light-green;\t\t\n\t}\n\n\t.tick-current{\n\t\tstroke: red;\n\t}\n\n\t.today-highlight {\n\t\tfill: $light-green;\n\t\topacity: 0.5;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\t.bar-progress {\n\t\tfill: $blue;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\tfont-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\t.project-text{\n\t\tfill: $text-light;\n\t\ttext-anchor: middle;\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\n\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\th5 {\n\t\t\tfont-size: 12px;\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\n\t\t\tfont-size: 12px;\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: $light-bg;\n\t}\n\t\n}"],"sourceRoot":""}]);
 	
 	// exports
 

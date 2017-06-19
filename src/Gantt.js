@@ -12,7 +12,7 @@ import './gantt.scss';
 import Bar from './Bar';
 import Arrow from './Arrow';
 
-export default function Gantt(element, projects, tasks, config) {
+export default function Gantt(element, projects, config) {
 
 	const self = {};
 
@@ -65,9 +65,10 @@ export default function Gantt(element, projects, tasks, config) {
 	function reset_variables(tasks) {
 
 		self.element = element;
-		self._tasks = tasks;
+		self._tasks = [];
+		projects.forEach(project => 
+			self._tasks = self._tasks.concat(project.tasks));
 		self._projects = projects;
-
 		self._bars = [];
 		self._arrows = [];
 		self.element_groups = {};
@@ -162,29 +163,20 @@ export default function Gantt(element, projects, tasks, config) {
 
 	function prepare_projects() {
 
-		let rows = 0;
-
-		self._tasks.forEach((task, i) => {
-
-			const previousTask = self._tasks[i - 1];
-			const nextTask = self._tasks[i + 1];
-			const firstRowProject = (previousTask && task.projectId !== previousTask.projectId || !previousTask);
-			const lastRowProject = (nextTask && task.projectId !== nextTask.projectId) || !nextTask;
-
-			if(firstRowProject) {
-				let project = get_project(task.projectId);
-				project._firstRow = task._line;
-			}
-			if(lastRowProject) {
-				let project = get_project(task.projectId);
-				project._lastRow = task._line;
-				project._rows = project._lastRow - project._firstRow + 1;
-				rows += project._rows;
-			}
-
-		});
+		let rows = 0;	
+		
+		self._projects.forEach((project, i) => {
+			tasks = project.tasks;
+			tasks.forEach((task, i) => {								
+				const nextTask = tasks[i + 1];
+				if(i == 0) project._firstRow = task._line;				
+				if(!nextTask) project._lastRow = task._line;
+				if(task.currentTask) project._currentDate = task._start;
+			});
+			project._rows = project._lastRow - project._firstRow + 1;
+			rows += project._rows;			
+		})
 		self._projects._rows = rows;
-
 	}
 
 	function prepare_dependencies() {
@@ -414,6 +406,28 @@ export default function Gantt(element, projects, tasks, config) {
 			self.canvas.text(40, row_y + (row_height * project._rows / 2), project.name)
 				.addClass('project-text')
 				.appendTo(text);
+			
+			if(view_is('Month') && project._currentDate) {
+				const x = (project._currentDate.startOf('day').diff(self.gantt_start, 'days') *
+							self.config.column_width / 30) + self.config.project_group_width;	
+				self.canvas.path(Snap.format('M {x} {y} v {height}', {
+					x: x,
+					y: row_y,
+					height: (row_height * project._rows)
+				}))
+				.addClass('tick-current')
+				.appendTo(text);
+			}
+
+			if(view_is('Day') && project._currentDate) {
+				const x = (project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') /
+						self.config.step * self.config.column_width) + self.config.project_group_width;
+				const width = self.config.column_width;
+
+				self.canvas.rect(x, row_y, width, (row_height * project._rows))
+				.addClass('today-highlight')
+				.appendTo(text);
+			}			
 
 		});
 	}

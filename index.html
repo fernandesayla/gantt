@@ -13,7 +13,7 @@
 			margin: 0 auto;
 		}
 		.gantt-container {
-			/*overflow: scroll;*/
+			overflow: scroll;
 		}
 		/* custom class */
 		.gantt .bar-milestone .bar-progress {
@@ -70,13 +70,12 @@
 
 		let projetos = [];
 		let tarefaId = 0;
-		let duracao = 50;			
-		
+		let duracao = 40;
 
-		for(i = 1; i <= 5; i++){
+		for(i = 1; i <= 4; i++){
 			
 			let tarefas = [];			
-			let dataInicio = new Date("2017-01-01T03:00:00.000Z");
+			let dataInicio = new Date("2017-06-01T03:00:00.000Z");
 			let latencia = 0;
 
 			for(j = 1; j <= 4; j++){
@@ -88,13 +87,14 @@
 				dataFim = new Date(dataInicio);
 				dataFim.setDate(dataFim.getDate() + duracao);
 
-				latencia += duracao/2;
+				latencia += 8;
 				
 				tarefa = {
 
 					id: tarefaId,
 					sequencia: j,					
-					percentual: parseInt(Math.random() * 100, 10),
+					percentual: 20,
+					tarefaAtual: j == i ? true : false,
 					tarefa: {
 						id: j,
 						nome: "Tarefa " + j,								
@@ -152,13 +152,12 @@
 		}
 
 		let projects = [];		
-		let tasks = [];
 
 		projects = projects.concat(projetos.map(projeto =>{
 
-			tarefas = projeto.tarefas;
+			tarefas = projeto.tarefas;			
 
-			tasks = tasks.concat(tarefas.map((tarefa, i) => {
+			tasks = tarefas.map((tarefa, i) => {
 							
 				let previsao = tarefa.periodos.find(periodo => periodo.tipo.id == 1)			
 				let dependencies = tarefa.predecessoes.map(vinculo => vinculo.tarefaPredecessao_id)
@@ -171,16 +170,19 @@
 					end: previsao.dataFim,					
 					progress: tarefa.percentual,
 					dependencies: dependencies,
+					currentTask: tarefa.tarefaAtual,
+					custom_class: tarefa.tarefaAtual ? "bar-milestone" : null
 				}
-			}));
+			});
 
 			return {
 				id: projeto.id,
 				name: projeto.nome,
+				tasks: tasks,
 			}			
 		}));
 				
-		var gantt_chart = Gantt("#gantt", projects, tasks, {
+		var gantt_chart = Gantt("#gantt", projects, {
 			on_click: function (task) {
 				console.log(task);
 			},

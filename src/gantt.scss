@@ -44,9 +44,16 @@ $handle-color: #ddd;
 		}
 	}
 
-	.tick-today {
-		stroke: $light-green;
+	.tick-today, .tick-current {		
 		stroke-width: 1;		
+	}
+
+	.tick-today {
+		stroke: $light-green;		
+	}
+
+	.tick-current{
+		stroke: red;
 	}
 
 	.today-highlight {
