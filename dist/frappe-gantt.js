@@ -877,7 +877,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		init();
 	
 		return self;
-	} /* global moment, Snap */
+	} /*eslint-disable */
+	/* global moment, Snap */
 	/**
 	 * Gantt:
 	 * 	element: querySelector string, required
