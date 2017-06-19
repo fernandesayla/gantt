@@ -70,28 +70,31 @@
 
 		let projetos = [];
 		let tarefaId = 0;
-		let qtDias = 0;
+		let duracao = 50;			
+		
 
 		for(i = 1; i <= 5; i++){
 			
-			let tarefas = [];
+			let tarefas = [];			
+			let dataInicio = new Date("2017-01-01T03:00:00.000Z");
+			let latencia = 0;
 
 			for(j = 1; j <= 4; j++){
 
 				tarefaId++;
-				duracao = 30;
-				latencia = 10;
-				dataInicio = new Date("2017-01-01T03:00:00.000Z");
-				dataInicio.setDate(dataInicio.getDate() + latencia);
-
+				
+				dataInicio = new Date(dataInicio);
+				dataInicio.setDate(dataInicio.getDate() + latencia);				
 				dataFim = new Date(dataInicio);
 				dataFim.setDate(dataFim.getDate() + duracao);
+
+				latencia += duracao/2;
 				
 				tarefa = {
 
 					id: tarefaId,
 					sequencia: j,					
-					percentual: j * 5,
+					percentual: parseInt(Math.random() * 100, 10),
 					tarefa: {
 						id: j,
 						nome: "Tarefa " + j,								
