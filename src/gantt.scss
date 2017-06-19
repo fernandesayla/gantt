@@ -4,7 +4,8 @@ $bar-stroke: #8D99A6;
 $border-color: #e0e0e0;
 $light-bg: #f5f5f5;
 $light-border-color: #ebeff2;
-$light-yellow: #fcf8e3;
+//$light-yellow: #fcf8e3;
+$light-green: #6be26b;
 $text-muted: #666;
 $text-light: #555;
 $text-color: #333;
@@ -42,8 +43,14 @@ $handle-color: #ddd;
 			stroke-width: 0.4;
 		}
 	}
+
+	.tick-today {
+		stroke: $light-green;
+		stroke-width: 1;		
+	}
+
 	.today-highlight {
-		fill: $light-yellow;
+		fill: $light-green;
 		opacity: 0.5;
 	}
 
@@ -124,6 +131,10 @@ $handle-color: #ddd;
 	}
 	.lower-text {
 		fill: $text-color;
+	}
+	.project-text{
+		fill: $text-light;
+		text-anchor: middle;
 	}
 
 	#details .details-container {

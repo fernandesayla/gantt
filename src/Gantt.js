@@ -243,9 +243,9 @@ export default function Gantt(element, projects, tasks, config) {
 			self.gantt_start = self.gantt_start.clone().subtract(7, 'day');
 			self.gantt_end = self.gantt_end.clone().add(7, 'day');
 		} else if(view_is('Month')) {
-			self.gantt_start = self.gantt_start.clone().startOf('year');
+			self.gantt_start = self.gantt_start.clone().startOf('month').subtract(1, 'Month');
 			// self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
-			self.gantt_end = self.gantt_end.clone().endOf('year');
+			self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'Month');
 		} else {
 			self.gantt_start = self.gantt_start.clone().startOf('month'); // .subtract(1, 'month');
 			self.gantt_end = self.gantt_end.clone().endOf('month'); // .add(1, 'month');
@@ -328,7 +328,7 @@ export default function Gantt(element, projects, tasks, config) {
 		make_grid_background();
 		make_grid_header();
 		make_grid_rows();
-		if(self.config.project_group_width > 0) make_grid_projects();
+		if(self.config.project_group_width > 0)	make_grid_projects();
 		make_grid_ticks();
 		make_grid_highlights();
 	}
@@ -389,6 +389,8 @@ export default function Gantt(element, projects, tasks, config) {
 	function make_grid_projects() {
 
 		const rows = self.canvas.group().appendTo(self.element_groups.project),
+			lines = self.canvas.group().appendTo(self.element_groups.project),
+			text = self.canvas.group().appendTo(self.element_groups.project),
 			row_width = self.dates.length * self.config.column_width,
 			row_height = self.config.bar.height + self.config.padding,
 			project_group_width = self.config.project_group_width;
@@ -396,7 +398,7 @@ export default function Gantt(element, projects, tasks, config) {
 		const header_height = self.config.header_height + self.config.padding / 2;
 		let row_y = header_height;
 
-		self._projects.forEach((project, index) => { // eslint-disable-line
+		self._projects.forEach((project) => { // eslint-disable-line
 
 			row_y = header_height + (row_height * project._firstRow);
 
@@ -406,11 +408,11 @@ export default function Gantt(element, projects, tasks, config) {
 
 			self.canvas.line(0, row_y + (row_height * project._rows), row_width + project_group_width, row_y + (row_height * project._rows))
 				.addClass('row-line-project')
-				.appendTo(rows);
+				.appendTo(lines);
 
-			self.canvas.text(40, row_y + 10, project.name)
-				.addClass('upper-text')
-				.appendTo(rows);
+			self.canvas.text(40, row_y + (row_height * project._rows / 2), project.name)
+				.addClass('project-text')
+				.appendTo(text);
 
 		});
 	}
@@ -452,19 +454,32 @@ export default function Gantt(element, projects, tasks, config) {
 	}
 
 	function make_grid_highlights() {
-
 		// highlight today's date
+		const y = 0;
+		const height = (self.config.bar.height + self.config.padding) * self._projects._rows +
+				self.config.header_height + self.config.padding / 2;
+
 		if(view_is('Day')) {
 			const x = (moment().startOf('day').diff(self.gantt_start, 'hours') /
 					self.config.step * self.config.column_width) + self.config.project_group_width;
-			const y = 0;
 			const width = self.config.column_width;
-			const height = (self.config.bar.height + self.config.padding) * self.tasks.length +
-				self.config.header_height + self.config.padding / 2;
 
 			self.canvas.rect(x, y, width, height)
 				.addClass('today-highlight')
 				.appendTo(self.element_groups.grid);
+
+		}else {
+
+			const x = (moment().startOf('day').diff(self.gantt_start, 'days') *
+					self.config.column_width / 30) + self.config.project_group_width;
+
+			self.canvas.path(Snap.format('M {x} {y} v {height}', {
+				x: x,
+				y: y,
+				height: height
+			}))
+			.addClass('tick-today')
+			.appendTo(self.element_groups.grid);
 		}
 	}
 

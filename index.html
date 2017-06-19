@@ -70,27 +70,31 @@
 
 		let projetos = [];
 		let tarefaId = 0;
+		let qtDias = 0;
 
-		for(i = 1; i <= 3; i++){
+		for(i = 1; i <= 5; i++){
 			
 			let tarefas = [];
 
 			for(j = 1; j <= 4; j++){
 
-				tarefaId++;								
-				dataInicio = new Date("2017-01-01T00:00:00.000Z");				
-				dataInicio.setDate(dataInicio.getDate() + (j * 50));
+				tarefaId++;
+				duracao = 30;
+				latencia = 10;
+				dataInicio = new Date("2017-01-01T03:00:00.000Z");
+				dataInicio.setDate(dataInicio.getDate() + latencia);
+
 				dataFim = new Date(dataInicio);
-				dataFim.setDate(dataInicio.getDate() + ( j == 1 ? 40 : 51));
+				dataFim.setDate(dataFim.getDate() + duracao);
 				
 				tarefa = {
 
 					id: tarefaId,
 					sequencia: j,					
-					percentual: 10,
+					percentual: j * 5,
 					tarefa: {
 						id: j,
-						nome: "tarefa " + j,								
+						nome: "Tarefa " + j,								
 					},
 					situacao: {
 						id: 1,
@@ -137,7 +141,7 @@
 			projeto = 
 				{
 					id: i,
-					nome: "projeto " + i,
+					nome: "Projeto " + i,
 					tarefas: tarefas,
 				};
 
