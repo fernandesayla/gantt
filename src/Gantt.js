@@ -171,10 +171,12 @@ export default function Gantt(element, projects, config) {
 				const nextTask = tasks[i + 1];
 				if(i == 0) project._firstRow = task._line;				
 				if(!nextTask) project._lastRow = task._line;
-				if(task.currentTask) project._currentDate = task._start;
+				if(task.currentTask) project._currentDate = task._start;				
 			});
+			project._late = moment().startOf('day').diff(project._currentDate, 'days') 
 			project._rows = project._lastRow - project._firstRow + 1;
-			rows += project._rows;			
+			rows += project._rows;	
+			console.log(project)		
 		})
 		self._projects._rows = rows;
 	}
@@ -218,6 +220,7 @@ export default function Gantt(element, projects, config) {
 		make_bars();
 		make_arrows();
 		make_grid();
+		if(self.config.project_group_width > 0)	make_projects();
 		map_arrows_on_bars();
 		set_width();
 		set_scroll_position();
@@ -320,8 +323,7 @@ export default function Gantt(element, projects, config) {
 	function make_grid() {
 		make_grid_background();
 		make_grid_header();
-		make_grid_rows();
-		if(self.config.project_group_width > 0)	make_grid_projects();
+		make_grid_rows();		
 		make_grid_ticks();
 		make_grid_highlights();
 	}
@@ -379,11 +381,12 @@ export default function Gantt(element, projects, config) {
 		});
 	}
 
-	function make_grid_projects() {
+	function make_projects() {
 
 		const rows = self.canvas.group().appendTo(self.element_groups.project),
 			lines = self.canvas.group().appendTo(self.element_groups.project),
 			text = self.canvas.group().appendTo(self.element_groups.project),
+			current = self.canvas.group().appendTo(self.element_groups.project),
 			row_width = self.dates.length * self.config.column_width,
 			row_height = self.config.bar.height + self.config.padding,
 			project_group_width = self.config.project_group_width;
@@ -394,6 +397,7 @@ export default function Gantt(element, projects, config) {
 		self._projects.forEach((project) => { // eslint-disable-line
 
 			row_y = header_height + (row_height * project._firstRow);
+			const late = project._late > 0 ? '-late' : '';
 
 			self.canvas.rect(0, row_y, project_group_width, row_height * project._rows)
 				.addClass('grid-project-row')
@@ -409,24 +413,23 @@ export default function Gantt(element, projects, config) {
 			
 			if(view_is('Month') && project._currentDate) {
 				const x = (project._currentDate.startOf('day').diff(self.gantt_start, 'days') *
-							self.config.column_width / 30) + self.config.project_group_width;	
+							self.config.column_width / 30) + self.config.project_group_width;				
+
 				self.canvas.path(Snap.format('M {x} {y} v {height}', {
 					x: x,
 					y: row_y,
 					height: (row_height * project._rows)
 				}))
-				.addClass('tick-current')
-				.appendTo(text);
-			}
-
-			if(view_is('Day') && project._currentDate) {
+				.addClass('tick-current' + late)
+				.appendTo(current);
+			} else if(view_is('Day') && project._currentDate) {
 				const x = (project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') /
 						self.config.step * self.config.column_width) + self.config.project_group_width;
 				const width = self.config.column_width;
 
 				self.canvas.rect(x, row_y, width, (row_height * project._rows))
-				.addClass('today-highlight')
-				.appendTo(text);
+				.addClass('current-highlight' + late)
+				.appendTo(current);
 			}			
 
 		});

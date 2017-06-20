@@ -70,15 +70,15 @@
 
 		let projetos = [];
 		let tarefaId = 0;
-		let duracao = 40;
+		let duracao = 50;
 
-		for(i = 1; i <= 4; i++){
+		for(i = 1; i <= 6; i++){
 			
 			let tarefas = [];			
-			let dataInicio = new Date("2017-06-01T03:00:00.000Z");
+			let dataInicio = new Date("2017-05-15T03:00:00.000Z");
 			let latencia = 0;
 
-			for(j = 1; j <= 4; j++){
+			for(j = 1; j <= 5; j++){
 
 				tarefaId++;
 				
@@ -87,7 +87,7 @@
 				dataFim = new Date(dataInicio);
 				dataFim.setDate(dataFim.getDate() + duracao);
 
-				latencia += 8;
+				latencia += 12;
 				
 				tarefa = {
 
@@ -170,8 +170,7 @@
 					end: previsao.dataFim,					
 					progress: tarefa.percentual,
 					dependencies: dependencies,
-					currentTask: tarefa.tarefaAtual,
-					custom_class: tarefa.tarefaAtual ? "bar-milestone" : null
+					currentTask: tarefa.tarefaAtual,					
 				}
 			});
 
