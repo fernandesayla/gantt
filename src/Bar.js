@@ -1,4 +1,4 @@
-/* global Snap */
+/* global moment, Snap */
 /*
 	Class: Bar
 
@@ -6,6 +6,8 @@
 		gt: Gantt object
 		task: task object
 */
+
+import './gantt.scss';
 
 export default function Bar(gt, task) {
 
@@ -35,6 +37,7 @@ export default function Bar(gt, task) {
 		self.y = compute_y();
 		self.corner_radius = 3;
 		self.duration = (self.task._end.diff(self.task._start, 'hours') + 24) / gt.config.step;
+		self.durationDays = (self.task._end.diff(self.task._start, 'days') + 1);
 		self.width = gt.config.column_width * self.duration;
 		self.progress_width = gt.config.column_width * self.duration * (self.task.progress / 100) || 0;
 		self.group = gt.canvas.group().addClass('bar-wrapper').addClass(self.task.custom_class || '');
@@ -197,12 +200,55 @@ export default function Bar(gt, task) {
 			}
 		}
 
-		const start_date = self.task._start.format('MMM D');
-		const end_date = self.task._end.format('MMM D');
-		const heading = `${self.task.name}: ${start_date} - ${end_date}`;
+		// const start_date = self.task._start.format('DD/MM/YYYY');
+		// const end_date = self.task._end.format('DD/MM/YYYY');
+		const heading = `${self.task.name}`;
 
-		const line_1 = `Duration: ${self.duration} days`;
-		const line_2 = self.task.progress ? `Progress: ${self.task.progress}` : null;
+		const line_1 = `Duração: ${self.durationDays} dias`;
+		const line_2 = self.task.progress ? `Percentual: ${self.task.progress}%` : null;
+
+		let periodos = '';
+		self.task.periodos.forEach(periodo =>{
+
+			const tipo = periodo.tipo.nome;
+			const dataInicio = moment(periodo.dataInicio).format('DD/MM/YYYY');
+			const dataFim = moment(periodo.dataFim).format('DD/MM/YYYY');
+
+			periodos = periodos.concat(`
+				<p>${tipo}: ${dataInicio} - ${dataFim}</p>
+				`);
+		});
+
+		let responsaveis = '';
+		self.task.responsaveis.forEach((responsavel, i) =>{
+
+			const chave = responsavel.responsavel.chave;
+			const nome = responsavel.responsavel.nome;
+			const ramal = responsavel.responsavel.telefone;
+			const celular = responsavel.responsavel.celular;
+
+			responsaveis = responsaveis.concat(`
+				${ i !== 0 ? `<hr />` : ``}
+				<a href=https://connections.bb.com.br/profiles/html/myProfileView.do?uid=${chave} target="_blank" class="avatarContainer">
+					<img src=https://connections.bb.com.br/profiles/photo.do?uid=${chave} class="avatar" />
+				</a>
+				<p>${chave} - ${nome}</p>
+				<p>Ramal: ${ramal}</p>
+				<p>Celular: ${celular}</p>
+				`);
+		});
+
+		let uors = '';
+		self.task.uors.forEach(uor =>{
+
+			const nome = uor.uor.nomeReduzido;
+
+			uors = uors.concat(`
+				<a href="https://humanograma.intranet.bb.com.br/uor/${uor.uor_id}" target="_blank">
+					<p>${nome}</p>
+				</a>
+				`);
+		});
 
 		const html = `
 			<div class="details-container">
@@ -210,6 +256,27 @@ export default function Bar(gt, task) {
 				<p>${line_1}</p>
 				${
 					line_2 ? `<p>${line_2}</p>` : ''
+				}
+				${
+					periodos ? `
+					<br />
+					<h5>Datas:</h5>
+					${periodos}
+					` : ''
+				}
+				${
+					uors ? `
+					<br />
+					<h5>Área(s):</h5>
+					${uors}
+					` : ''
+				}
+				${
+					responsaveis ? `
+						<br />
+						<h5>Contato(s):</h5>
+						${responsaveis}
+						` : ''
 				}
 			</div>
 		`;

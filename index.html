@@ -13,7 +13,7 @@
 			margin: 0 auto;
 		}
 		.gantt-container {
-			overflow: scroll;
+			/*overflow: scroll;*/
 		}
 		/* custom class */
 		.gantt .bar-milestone .bar-progress {
@@ -70,9 +70,9 @@
 
 		let projetos = [];
 		let tarefaId = 0;
-		let duracao = 50;
+		let duracao = 100;
 
-		for(i = 1; i <= 6; i++){
+		for(i = 1; i <= 5; i++){
 			
 			let tarefas = [];			
 			let dataInicio = new Date("2017-05-15T03:00:00.000Z");
@@ -87,13 +87,13 @@
 				dataFim = new Date(dataInicio);
 				dataFim.setDate(dataFim.getDate() + duracao);
 
-				latencia += 12;
+				latencia = 100;
 				
 				tarefa = {
 
 					id: tarefaId,
 					sequencia: j,					
-					percentual: 20,
+					percentual: j < i ? 100: j > i ? 0 : 20,
 					tarefaAtual: j == i ? true : false,
 					tarefa: {
 						id: j,
@@ -135,6 +135,48 @@
 						{
 							tarefaPredecessao_id: j != 1 ? tarefaId - 1 : null,
 						},													
+					],
+					responsaveis: [
+						{
+							responsavel_id: "56805293",
+							responsavel: {
+								chave: "F6805293",
+								nome: "Marcos Andrei Ivanechtchuk",
+								celular: "061 993283558",
+								telefone: 37402
+							}
+						},
+						{
+							responsavel_id: "54103757",
+							responsavel: {
+								chave: "F4103757",
+								nome: "Henrique Fidellis Ferreira",
+								celular: "061 92014477",
+								telefone: 37404
+							}
+						}
+					],
+					uors: [
+						{
+						uor_id: 284651,
+						uor: {
+								id: 284651,
+								nome: "DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS",
+								nomeReduzido: "DISEM/DIV INFORM GER",
+								prefixo: 9951,
+								subordinada: 22
+							}
+						},
+						{
+						uor_id: 284650,
+						uor: {
+								id: 284650,
+								nome: "DISEM - DIVISAO CONTROLE",
+								nomeReduzido: "DISEM/CONTROLE",
+								prefixo: 9951,
+								subordinada: 20
+							}
+						}
 					],					
 				};
 
@@ -161,7 +203,7 @@
 							
 				let previsao = tarefa.periodos.find(periodo => periodo.tipo.id == 1)			
 				let dependencies = tarefa.predecessoes.map(vinculo => vinculo.tarefaPredecessao_id)
-						
+								
 				return {
 					projectId: projeto.id,
 					id: tarefa.id,
@@ -170,7 +212,10 @@
 					end: previsao.dataFim,					
 					progress: tarefa.percentual,
 					dependencies: dependencies,
-					currentTask: tarefa.tarefaAtual,					
+					currentTask: tarefa.tarefaAtual,
+					periodos: tarefa.periodos,
+					responsaveis: tarefa.responsaveis,
+					uors: tarefa.uors,
 				}
 			});
 
@@ -195,7 +240,7 @@
 				console.log(mode);
 			},
 			view_mode: 'Month',
-			project_group_width: 250,
+			project_group_width: 0,
 			inline: true,
 		});
 		//console.log(gantt_chart);

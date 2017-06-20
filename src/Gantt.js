@@ -13,7 +13,7 @@ import Bar from './Bar';
 import Arrow from './Arrow';
 
 export default function Gantt(element, projects, config) {
-
+	
 	const self = {};
 
 	function init() {
@@ -79,9 +79,9 @@ export default function Gantt(element, projects, config) {
 		change_view_mode(self.config.view_mode);
 	}
 
-	function change_view_mode(mode) {
-		set_scale(mode);
+	function change_view_mode(mode) {		
 		prepare();
+		set_scale(mode);
 		render();
 		// fire viewmode_change event
 		trigger_event('view_change', [mode]);
@@ -175,8 +175,7 @@ export default function Gantt(element, projects, config) {
 			});
 			project._late = moment().startOf('day').diff(project._currentDate, 'days') 
 			project._rows = project._lastRow - project._firstRow + 1;
-			rows += project._rows;	
-			console.log(project)		
+			rows += project._rows;				
 		})
 		self._projects._rows = rows;
 	}
@@ -261,8 +260,8 @@ export default function Gantt(element, projects, config) {
 					cur_date.clone().add(1, 'month') :
 					cur_date.clone().add(self.config.step, 'hours');
 			}
-			self.dates.push(cur_date);
-		}
+			self.dates.push(cur_date);			
+		}		
 	}
 
 	function setup_groups() {
@@ -276,23 +275,27 @@ export default function Gantt(element, projects, config) {
 
 	function set_scale(scale) {
 		self.config.view_mode = scale;
+		const screen_width = 1832 - self.config.project_group_width;
+		var min_width = 0;
+		self.config.column_width = screen_width / self.dates.length;
 
 		if(scale === 'Day') {
-			self.config.step = 24;
-			self.config.column_width = 38;
+			min_width = 18;
+			self.config.step = 24;			
 		} else if(scale === 'Half Day') {
-			self.config.step = 24 / 2;
-			self.config.column_width = 38;
+			min_width = 38;
+			self.config.step = 24 / 2;			
 		} else if(scale === 'Quarter Day') {
-			self.config.step = 24 / 4;
-			self.config.column_width = 38;
+			min_width = 38;
+			self.config.step = 24 / 4;			
 		} else if(scale === 'Week') {
-			self.config.step = 24 * 7;
-			self.config.column_width = 140;
+			min_width = 140;
+			self.config.step = 24 * 7;			
 		} else if(scale === 'Month') {
-			self.config.step = 24 * 30;
-			self.config.column_width = 120;
+			min_width = 20; 
+			self.config.step = 24 * 30;		
 		}
+		self.config.column_width = self.config.column_width < min_width ? min_width : self.config.column_width;
 	}
 
 	function set_width() {
@@ -332,7 +335,7 @@ export default function Gantt(element, projects, config) {
 
 		const grid_width = (self.dates.length * self.config.column_width) + self.config.project_group_width,
 			grid_height = self.config.header_height + self.config.padding +
-				(self.config.bar.height + self.config.padding) * self.tasks.length;
+				(self.config.bar.height + self.config.padding) * self._projects._rows; 				
 
 		self.canvas.rect(0, 0, grid_width, grid_height)
 			.addClass('grid-background')
@@ -454,7 +457,7 @@ export default function Gantt(element, projects, config) {
 			if(view_is('Month') && date.month() % 3 === 0) {
 				tick_class += ' thick';
 			}
-
+			
 			self.canvas.path(Snap.format('M {x} {y} v {height}', {
 				x: tick_x,
 				y: tick_y,
@@ -462,7 +465,7 @@ export default function Gantt(element, projects, config) {
 			}))
 			.addClass(tick_class)
 			.appendTo(self.element_groups.grid);
-
+			//console.log('tick',tick_x)
 			if(view_is('Month')) {
 				tick_x += date.daysInMonth() * self.config.column_width / 30;
 			} else {
@@ -503,7 +506,7 @@ export default function Gantt(element, projects, config) {
 
 	function make_dates() {
 
-		for(let date of get_dates_to_draw()) {
+		for(let date of get_dates_to_draw()) {			
 			self.canvas.text(self.config.project_group_width + date.lower_x, date.lower_y, date.lower_text)
 				.addClass('lower-text')
 				.appendTo(self.element_groups.date);
@@ -514,9 +517,9 @@ export default function Gantt(element, projects, config) {
 					.appendTo(self.element_groups.date);
 
 				// remove out-of-bound dates
-				if($upper_text.getBBox().x2 > self.element_groups.grid.getBBox().width) {
-					$upper_text.remove();
-				}
+				// if($upper_text.getBBox().x2 > self.element_groups.grid.getBBox().width) {
+				// 	$upper_text.remove();
+				// }
 			}
 		}
 	}
@@ -535,13 +538,14 @@ export default function Gantt(element, projects, config) {
 		if(!last_date) {
 			last_date = date.clone().add(1, 'year');
 		}
+		
 		const date_text = {
 			'Quarter Day_lower': date.format('HH'),
 			'Half Day_lower': date.format('HH'),
 			'Day_lower': date.date() !== last_date.date() ? date.format('D') : '',
 			'Week_lower': date.month() !== last_date.month() ?
 				date.format('D MMM') : date.format('D'),
-			'Month_lower': date.format('MMMM'),
+			'Month_lower': date.format(self.config.column_width < 60 ? 'MM' : 'MMMM'),
 			'Quarter Day_upper': date.date() !== last_date.date() ? date.format('D MMM') : '',
 			'Half Day_upper': date.date() !== last_date.date() ?
 				date.month() !== last_date.month() ?
@@ -549,8 +553,8 @@ export default function Gantt(element, projects, config) {
 			'Day_upper': date.month() !== last_date.month() ? date.format('MMMM') : '',
 			'Week_upper': date.month() !== last_date.month() ? date.format('MMMM') : '',
 			'Month_upper': date.year() !== last_date.year() ? date.format('YYYY') : ''
-		};
-
+		};		
+		
 		const base_pos = {
 			x: i * self.config.column_width,
 			lower_y: self.config.header_height,
@@ -569,7 +573,9 @@ export default function Gantt(element, projects, config) {
 			'Month_lower': self.config.column_width / 2,
 			'Month_upper': (self.config.column_width * 12) / 2
 		};
-
+		// tick_x += date.daysInMonth() * self.config.column_width / 30;
+		//console.log('date',i * self.config.column_width)
+		//console.log('new',i * (date.daysInMonth() * self.config.column_width / 30))
 		return {
 			upper_text: date_text[`${self.config.view_mode}_upper`],
 			lower_text: date_text[`${self.config.view_mode}_lower`],

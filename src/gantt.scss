@@ -8,11 +8,11 @@ $handle-color: #ddd;
 $text-muted: #666;
 $text-light: #555;
 $text-color: #333;
-//$blue: #a3a3ff;
+$grey: #b8c2cc;
 $blue: #3887f3;
 $light-blue: #3887f3;
 $light-red: tomato;
-//$light-yellow: #fcf8e3;
+$light-yellow: #fcf8e3;
 $light-green: #6be26b;
 
 
@@ -91,7 +91,7 @@ $light-green: #6be26b;
 		transition: stroke-width .3s ease;
 	}
 	.bar-progress {
-		fill: $blue;
+		fill: $grey;
 	}
 	.bar-invalid {
 		fill: transparent;
@@ -194,6 +194,18 @@ $light-green: #6be26b;
 
 	.grid-project-row {
 		fill: $light-bg;
+	}
+
+	.avatarContainer{
+		height: 64px;
+		display: flex;
+		align-items: center;
+		padding-right: 10px;
+		float: left;
+		
+	}
+	.avatar{
+		height: 50px !important;
 	}
 	
 }
