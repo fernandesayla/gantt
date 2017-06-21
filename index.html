@@ -70,7 +70,7 @@
 
 		let projetos = [];
 		let tarefaId = 0;
-		let duracao = 100;
+		let duracao = 170;
 
 		for(i = 1; i <= 5; i++){
 			
@@ -87,7 +87,7 @@
 				dataFim = new Date(dataInicio);
 				dataFim.setDate(dataFim.getDate() + duracao);
 
-				latencia = 100;
+				latencia = 170;
 				
 				tarefa = {
 
@@ -240,7 +240,7 @@
 				console.log(mode);
 			},
 			view_mode: 'Month',
-			project_group_width: 0,
+			project_group_width: projects.length > 1 ? 150 : 0,
 			inline: true,
 		});
 		//console.log(gantt_chart);
