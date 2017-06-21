@@ -62,8 +62,7 @@ export default function Gantt(element, projects, config) {
 		reset_variables(tasks);
 	}
 
-	function reset_variables(tasks) {
-
+	function reset_variables(tasks) {		
 		self.element = element;
 		self._tasks = [];
 		projects.forEach(project => 
@@ -173,7 +172,7 @@ export default function Gantt(element, projects, config) {
 				if(!nextTask) project._lastRow = task._line;
 				if(task.currentTask) project._currentDate = task._start;				
 			});
-			project._late = moment().startOf('day').diff(project._currentDate, 'days') 
+			project._late = moment().diff(project._currentDate, 'days') 			
 			project._rows = project._lastRow - project._firstRow + 1;
 			rows += project._rows;				
 		})
@@ -208,17 +207,17 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function prepare_canvas() {
-		if(self.canvas) return;
-		self.canvas = Snap(self.element).addClass('gantt');
+		if(self.canvas) return;		
+		self.canvas = Snap(self.element).addClass('gantt');		
 	}
 
 	function render() {
 		clear();
 		setup_groups();
+		make_grid();
 		make_dates();
 		make_bars();
 		make_arrows();
-		make_grid();
 		make_projects();
 		map_arrows_on_bars();
 		set_width();
@@ -335,15 +334,15 @@ export default function Gantt(element, projects, config) {
 
 		const grid_width = (self.dates.length * self.config.column_width) + self.config.project_group_width,
 			grid_height = self.config.header_height + self.config.padding +
-				(self.config.bar.height + self.config.padding) * self._projects._rows + 500; 				
+				(self.config.bar.height + self.config.padding) * self._projects._rows + 400; 				
 
 		self.canvas.rect(0, 0, grid_width, grid_height)
 			.addClass('grid-background')
 			.appendTo(self.element_groups.grid);
-
+		
 		self.canvas.attr({
 			height: grid_height + self.config.padding,
-			width: '100%'
+			width: '110%'
 		});
 	}
 
@@ -401,7 +400,7 @@ export default function Gantt(element, projects, config) {
 
 			row_y = header_height + (row_height * project._firstRow);
 			const late = project._late > 0 ? '-late' : '';
-
+			
 			if(self.config.project_group_width > 0)	{
 				self.canvas.rect(0, row_y, project_group_width, row_height * project._rows)
 					.addClass('grid-project-row')
@@ -508,8 +507,7 @@ export default function Gantt(element, projects, config) {
 
 	function make_dates() {		
 
-		for(let date of get_dates_to_draw()) {
-						
+		for(let date of get_dates_to_draw()) {			
 			self.canvas.text(self.config.project_group_width + date.lower_x, date.lower_y, date.lower_text)
 				.addClass('lower-text')
 				.appendTo(self.element_groups.date);
@@ -519,10 +517,10 @@ export default function Gantt(element, projects, config) {
 					.addClass('upper-text')
 					.appendTo(self.element_groups.date);
 
-				// remove out-of-bound dates
-				//if($upper_text.getBBox().x2 > self.element_groups.grid.getBBox().width) {
-				// 	$upper_text.remove();
-				//}
+				// remove out-of-bound dates				
+				if($upper_text.getBBox().x2 > self.element_groups.grid.getBBox().width) {
+					$upper_text.remove();
+				}
 			}
 			
 			
@@ -530,13 +528,13 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function get_dates_to_draw() {
-		let lower_x = self.config.project_group_width,
+		let lower_x = 0,
 		 	last_date = null;
 		const dates = self.dates.map((date, i) => {
 			const d = get_date_info(date, last_date, i);
 			last_date = date;			
 			d.lower_x = lower_x + self.config.column_width / 2;
-			lower_x += date.daysInMonth() * self.config.column_width / 30;
+			lower_x += date.daysInMonth() * self.config.column_width / 30;			
 			return d;
 		});
 		return dates;
@@ -544,10 +542,10 @@ export default function Gantt(element, projects, config) {
 
 	function get_date_info(date, last_date, i) {
 		if(!last_date) {
-			last_date = date.clone().add(1, 'year');
+			last_date = date.clone().add(1, 'year').add(1, 'month').add(1, 'day');
 		}
 		const min_width_month = 60;
-
+		
 		const date_text = {
 			'Quarter Day_lower': date.format('HH'),
 			'Half Day_lower': date.format('HH'),
@@ -579,7 +577,7 @@ export default function Gantt(element, projects, config) {
 			'Day_upper': (self.config.column_width * 30) / 2,
 			'Week_lower': 0,
 			'Week_upper': (self.config.column_width * 4) / 2,
-			'Month_lower': self.config.column_width / 2,
+			// 'Month_lower': self.config.column_width / 2,
 			'Month_upper': (self.config.column_width * 12) / 2
 		};
 		

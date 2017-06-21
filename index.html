@@ -70,31 +70,34 @@
 
 		let projetos = [];
 		let tarefaId = 0;
-		let duracao = 170;
+		
 
-		for(i = 1; i <= 5; i++){
+		for(i = 1; i <= 3; i++){
 			
 			let tarefas = [];			
-			let dataInicio = new Date("2017-05-15T03:00:00.000Z");
-			let latencia = 0;
+			let dataInicio = new Date("2016-11-01T03:00:00.000Z");
+			let duracao = 0;
+			let latencia = 0;			
 
-			for(j = 1; j <= 5; j++){
+			for(j = 1; j <= 8; j++){
 
 				tarefaId++;
 				
 				dataInicio = new Date(dataInicio);
 				dataInicio.setDate(dataInicio.getDate() + latencia);				
 				dataFim = new Date(dataInicio);
+				duracao = moment(dataInicio).daysInMonth() - 1;
+				// duracao = 2;
 				dataFim.setDate(dataFim.getDate() + duracao);
-
-				latencia = 170;
+				latencia = moment(dataInicio).daysInMonth() + j - 10;
+				// latencia = 1;
 				
 				tarefa = {
 
 					id: tarefaId,
 					sequencia: j,					
-					percentual: j < i ? 100: j > i ? 0 : 20,
-					tarefaAtual: j == i ? true : false,
+					percentual: j < i + 4 ? 100: j > i + 4 ? 0 : 20,
+					tarefaAtual: j == i + 4 ? true : false,
 					tarefa: {
 						id: j,
 						nome: "Tarefa " + j,								
