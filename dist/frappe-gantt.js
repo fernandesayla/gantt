@@ -628,29 +628,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				self.canvas.path(Snap.format('M {x} {y} v {height}', {
 					x: _x2,
-					y: y,
-					height: height
+					y: self.config.header_height + self.config.padding / 2,
+					height: height - (self.config.header_height + self.config.padding / 2)
 				})).addClass('tick-today').appendTo(self.element_groups.grid);
 			}
 		}
 	
 		function make_dates() {
+	
+			var grid_width = self.element_groups.grid.getBBox().width;
+	
 			var _iteratorNormalCompletion6 = true;
 			var _didIteratorError6 = false;
 			var _iteratorError6 = undefined;
 	
 			try {
-	
 				for (var _iterator6 = get_dates_to_draw()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
 					var date = _step6.value;
 	
-					self.canvas.text(self.config.project_group_width + date.lower_x, date.lower_y, date.lower_text).addClass('lower-text').appendTo(self.element_groups.date);
+	
+					date.lower_x += self.config.project_group_width;
+	
+					self.canvas.text(date.lower_x, date.lower_y, date.lower_text).addClass('lower-text').appendTo(self.element_groups.date);
 	
 					if (date.upper_text) {
 						var $upper_text = self.canvas.text(self.config.project_group_width + date.upper_x, date.upper_y, date.upper_text).addClass('upper-text').appendTo(self.element_groups.date);
 	
-						// remove out-of-bound dates				
-						if ($upper_text.getBBox().x2 > self.element_groups.grid.getBBox().width) {
+						if ($upper_text.getBBox().x2 > grid_width) {
+							self.canvas.text(date.lower_x + (grid_width - date.lower_x) / 2, date.upper_y, date.upper_text).addClass('upper-text').appendTo(self.element_groups.date);
+	
 							$upper_text.remove();
 						}
 					}
@@ -674,7 +680,15 @@ return /******/ (function(modules) { // webpackBootstrap
 		function get_dates_to_draw() {
 			var lower_x = 0,
 			    last_date = null;
+			var years = [],
+			    year = {};
+	
 			var dates = self.dates.map(function (date, i) {
+	
+				// if(!last_date || date.year() !== last_date.year()){
+				// 	year.text = date.year();
+				// 	year.start = date.month() + 1;				
+				// }
 				var d = get_date_info(date, last_date, i);
 				last_date = date;
 				d.lower_x = lower_x + self.config.column_width / 2;
@@ -719,7 +733,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				'Week_lower': 0,
 				'Week_upper': self.config.column_width * 4 / 2,
 				// 'Month_lower': self.config.column_width / 2,
-				'Month_upper': self.config.column_width * 12 / 2
+				'Month_upper': self.config.column_width * (12 - date.month()) / 2
+	
 			};
 	
 			return {

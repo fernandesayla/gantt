@@ -497,29 +497,37 @@ export default function Gantt(element, projects, config) {
 
 			self.canvas.path(Snap.format('M {x} {y} v {height}', {
 				x: x,
-				y: y,
-				height: height
+				y: self.config.header_height + self.config.padding / 2,
+				height: height - (self.config.header_height + self.config.padding / 2)
 			}))
 			.addClass('tick-today')
 			.appendTo(self.element_groups.grid);
 		}
 	}
 
-	function make_dates() {		
+	function make_dates() {
 
-		for(let date of get_dates_to_draw()) {			
-			self.canvas.text(self.config.project_group_width + date.lower_x, date.lower_y, date.lower_text)
+		const grid_width = self.element_groups.grid.getBBox().width;
+
+		for(let date of get_dates_to_draw()) {
+			
+			date.lower_x += self.config.project_group_width;
+
+			self.canvas.text(date.lower_x, date.lower_y, date.lower_text)
 				.addClass('lower-text')
 				.appendTo(self.element_groups.date);
 
 			if(date.upper_text) {
 				const $upper_text = self.canvas.text(self.config.project_group_width + date.upper_x, date.upper_y, date.upper_text)
 					.addClass('upper-text')
+					.appendTo(self.element_groups.date);				
+				
+				if($upper_text.getBBox().x2 > grid_width) {										
+					self.canvas.text(date.lower_x + ((grid_width - (date.lower_x)) / 2), date.upper_y, date.upper_text)
+					.addClass('upper-text')
 					.appendTo(self.element_groups.date);
 
-				// remove out-of-bound dates				
-				if($upper_text.getBBox().x2 > self.element_groups.grid.getBBox().width) {
-					$upper_text.remove();
+					$upper_text.remove();					
 				}
 			}
 			
@@ -530,7 +538,15 @@ export default function Gantt(element, projects, config) {
 	function get_dates_to_draw() {
 		let lower_x = 0,
 		 	last_date = null;
+		var	years = [],
+			year = {};
+
 		const dates = self.dates.map((date, i) => {
+
+			// if(!last_date || date.year() !== last_date.year()){
+			// 	year.text = date.year();
+			// 	year.start = date.month() + 1;				
+			// }
 			const d = get_date_info(date, last_date, i);
 			last_date = date;			
 			d.lower_x = lower_x + self.config.column_width / 2;
@@ -567,7 +583,7 @@ export default function Gantt(element, projects, config) {
 			lower_y: self.config.header_height,
 			upper_y: self.config.header_height - 25
 		};
-
+		
 		const x_pos = {
 			'Quarter Day_lower': (self.config.column_width * 4) / 2,
 			'Quarter Day_upper': 0,
@@ -578,7 +594,8 @@ export default function Gantt(element, projects, config) {
 			'Week_lower': 0,
 			'Week_upper': (self.config.column_width * 4) / 2,
 			// 'Month_lower': self.config.column_width / 2,
-			'Month_upper': (self.config.column_width * 12) / 2
+			'Month_upper': (self.config.column_width * (12 - date.month())) / 2
+			
 		};
 		
 		return {
