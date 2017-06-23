@@ -13,6 +13,7 @@ $blue: #3887f3;
 $light-blue: #3887f3;
 $light-red: tomato;
 $light-yellow: #fcf8e3;
+$green: #2ec12e;
 $light-green: #6be26b;
 
 
@@ -35,12 +36,13 @@ $light-green: #6be26b;
 	.row-line {
 		stroke: $light-border-color;		
 	}
-	.row-line-project {
-		stroke: $text-color;		
+	.row-line-project {		
+		stroke: $border-color;		
+		stroke-width: 1.4;
 	}
 	.tick {
 		stroke: $border-color;
-		stroke-width: 0.2;
+		stroke-width: 0.3;
 		&.thick {
 			stroke-width: 0.4;
 		}
@@ -49,14 +51,16 @@ $light-green: #6be26b;
 	.tick-today, .tick-current, .tick-current-late {		
 		stroke-width: 1;	
 		opacity: 0.8;	
+		stroke-dasharray: 7;
 	}
 
 	.tick-today {
-		stroke: $light-green;		
+		stroke: $green;		
 	}
 
 	.tick-current {
 		stroke: $light-blue;
+		
 	}
 	.tick-current-late {
 		stroke: $light-red;

@@ -443,10 +443,12 @@ export default function Gantt(element, projects, config) {
 
 	function make_grid_ticks() {
 		let tick_x = self.config.left_width,
-			tick_y = self.config.header_height + self.config.padding / 2,
 			tick_height = (self.config.bar.height + self.config.padding) * self._projects._rows;
 
 		for(let date of self.dates) {
+
+			let tick_y = self.config.header_height + self.config.padding / 2;
+
 			let tick_class = 'tick';
 			// thick tick for monday
 			if(view_is('Day') && date.day() === 1) {
@@ -457,8 +459,9 @@ export default function Gantt(element, projects, config) {
 				tick_class += ' thick';
 			}
 			// thick ticks for quarters
-			if(view_is('Month') && date.month() % 3 === 0) {
+			if(view_is('Month') && date.month() === 0) {
 				tick_class += ' thick';
+				tick_y = tick_y / 2;
 			}
 
 			self.canvas.path(Snap.format('M {x} {y} v {height}', {
