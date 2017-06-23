@@ -213,8 +213,8 @@ export default function Gantt(element, projects, config) {
 
 	function render() {
 		clear();
-		setup_groups();
-		make_grid();
+		setup_groups();		
+		make_grid();		
 		make_dates();
 		make_bars();
 		make_arrows();
@@ -269,7 +269,7 @@ export default function Gantt(element, projects, config) {
 		// make group layers
 		for(let group of groups) {
 			self.element_groups[group] = self.canvas.group().attr({'id': group});
-		}
+		}		
 	}
 
 	function set_scale(scale) {
@@ -322,12 +322,12 @@ export default function Gantt(element, projects, config) {
 		return task._start;
 	}
 
-	function make_grid() {
-		make_grid_background();
-		make_grid_header();
+	function make_grid() {				
+		make_grid_background();		
+		make_grid_header();		
 		make_grid_rows();		
-		make_grid_ticks();
-		make_grid_highlights();
+		make_grid_ticks();		
+		make_grid_highlights();		
 	}
 
 	function make_grid_background() {
@@ -342,7 +342,7 @@ export default function Gantt(element, projects, config) {
 		
 		self.canvas.attr({
 			height: grid_height + self.config.padding,
-			width: '110%'
+			width: '100%'
 		});
 	}
 
@@ -477,53 +477,60 @@ export default function Gantt(element, projects, config) {
 
 	function make_grid_highlights() {
 		// highlight today's date
+		
 		const y = 0;
 		const height = (self.config.bar.height + self.config.padding) * self._projects._rows +
 				self.config.header_height + self.config.padding / 2;
-
-		if(view_is('Day')) {
-			const x = (moment().startOf('day').diff(self.gantt_start, 'hours') /
-					self.config.step * self.config.column_width) + self.config.project_group_width;
-			const width = self.config.column_width;
-
-			self.canvas.rect(x, y, width, height)
-				.addClass('today-highlight')
-				.appendTo(self.element_groups.grid);
+		
+		if(view_is('Day')) {			
+				const x = (moment().startOf('day').diff(self.gantt_start, 'hours') /
+						self.config.step * self.config.column_width) + self.config.project_group_width;
+				const width = self.config.column_width;
+				
+			if (x <= self.element_groups.grid.getBBox().width && x >= self.config.project_group_width){
+				self.canvas.rect(x, y, width, height)
+					.addClass('today-highlight')
+					.appendTo(self.element_groups.grid);
+			}
 
 		}else {
-
+			
 			const x = (moment().startOf('day').diff(self.gantt_start, 'days') *
 					self.config.column_width / 30) + self.config.project_group_width;
-
-			self.canvas.path(Snap.format('M {x} {y} v {height}', {
-				x: x,
-				y: self.config.header_height + self.config.padding / 2,
-				height: height - (self.config.header_height + self.config.padding / 2)
-			}))
-			.addClass('tick-today')
-			.appendTo(self.element_groups.grid);
-		}
+			
+			if (x <= self.element_groups.grid.getBBox().width && x >= self.config.project_group_width){
+				self.canvas.path(Snap.format('M {x} {y} v {height}', {
+					x: x,
+					y: self.config.header_height + self.config.padding / 2,
+					height: height - (self.config.header_height + self.config.padding / 2)
+				}))
+				.addClass('tick-today')
+				.appendTo(self.element_groups.grid);
+			}
+		}		
 	}
 
 	function make_dates() {
 
-		const grid_width = self.element_groups.grid.getBBox().width;
+		
 
 		for(let date of get_dates_to_draw()) {
-			
-			date.lower_x += self.config.project_group_width;
 
+			let grid_width = self.element_groups.grid.getBBox().width;			
+			date.lower_x += self.config.project_group_width;
+			
 			self.canvas.text(date.lower_x, date.lower_y, date.lower_text)
 				.addClass('lower-text')
 				.appendTo(self.element_groups.date);
 
-			if(date.upper_text) {
+			if(date.upper_text) {				
+				
 				const $upper_text = self.canvas.text(self.config.project_group_width + date.upper_x, date.upper_y, date.upper_text)
 					.addClass('upper-text')
 					.appendTo(self.element_groups.date);				
 				
-				if($upper_text.getBBox().x2 > grid_width) {										
-					self.canvas.text(date.lower_x + ((grid_width - (date.lower_x)) / 2), date.upper_y, date.upper_text)
+				if($upper_text.getBBox().x2 > grid_width) {					
+					self.canvas.text(date.lower_x + (((grid_width) - (date.lower_x)) / 2), date.upper_y, date.upper_text)
 					.addClass('upper-text')
 					.appendTo(self.element_groups.date);
 
@@ -542,11 +549,7 @@ export default function Gantt(element, projects, config) {
 			year = {};
 
 		const dates = self.dates.map((date, i) => {
-
-			// if(!last_date || date.year() !== last_date.year()){
-			// 	year.text = date.year();
-			// 	year.start = date.month() + 1;				
-			// }
+			
 			const d = get_date_info(date, last_date, i);
 			last_date = date;			
 			d.lower_x = lower_x + self.config.column_width / 2;

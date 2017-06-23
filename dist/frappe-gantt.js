@@ -477,7 +477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			self.canvas.attr({
 				height: grid_height + self.config.padding,
-				width: '110%'
+				width: '100%'
 			});
 		}
 	
@@ -614,6 +614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function make_grid_highlights() {
 			// highlight today's date
+	
 			var y = 0;
 			var height = (self.config.bar.height + self.config.padding) * self._projects._rows + self.config.header_height + self.config.padding / 2;
 	
@@ -621,37 +622,41 @@ return /******/ (function(modules) { // webpackBootstrap
 				var x = moment().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.project_group_width;
 				var width = self.config.column_width;
 	
-				self.canvas.rect(x, y, width, height).addClass('today-highlight').appendTo(self.element_groups.grid);
+				if (x <= self.element_groups.grid.getBBox().width && x >= self.config.project_group_width) {
+					self.canvas.rect(x, y, width, height).addClass('today-highlight').appendTo(self.element_groups.grid);
+				}
 			} else {
 	
 				var _x2 = moment().startOf('day').diff(self.gantt_start, 'days') * self.config.column_width / 30 + self.config.project_group_width;
 	
-				self.canvas.path(Snap.format('M {x} {y} v {height}', {
-					x: _x2,
-					y: self.config.header_height + self.config.padding / 2,
-					height: height - (self.config.header_height + self.config.padding / 2)
-				})).addClass('tick-today').appendTo(self.element_groups.grid);
+				if (_x2 <= self.element_groups.grid.getBBox().width && _x2 >= self.config.project_group_width) {
+					self.canvas.path(Snap.format('M {x} {y} v {height}', {
+						x: _x2,
+						y: self.config.header_height + self.config.padding / 2,
+						height: height - (self.config.header_height + self.config.padding / 2)
+					})).addClass('tick-today').appendTo(self.element_groups.grid);
+				}
 			}
 		}
 	
 		function make_dates() {
-	
-			var grid_width = self.element_groups.grid.getBBox().width;
-	
 			var _iteratorNormalCompletion6 = true;
 			var _didIteratorError6 = false;
 			var _iteratorError6 = undefined;
 	
 			try {
+	
 				for (var _iterator6 = get_dates_to_draw()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
 					var date = _step6.value;
 	
 	
+					var grid_width = self.element_groups.grid.getBBox().width;
 					date.lower_x += self.config.project_group_width;
 	
 					self.canvas.text(date.lower_x, date.lower_y, date.lower_text).addClass('lower-text').appendTo(self.element_groups.date);
 	
 					if (date.upper_text) {
+	
 						var $upper_text = self.canvas.text(self.config.project_group_width + date.upper_x, date.upper_y, date.upper_text).addClass('upper-text').appendTo(self.element_groups.date);
 	
 						if ($upper_text.getBBox().x2 > grid_width) {
@@ -685,10 +690,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			var dates = self.dates.map(function (date, i) {
 	
-				// if(!last_date || date.year() !== last_date.year()){
-				// 	year.text = date.year();
-				// 	year.start = date.month() + 1;				
-				// }
 				var d = get_date_info(date, last_date, i);
 				last_date = date;
 				d.lower_x = lower_x + self.config.column_width / 2;
