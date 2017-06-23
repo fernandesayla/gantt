@@ -73,14 +73,14 @@
 		let tarefaId = 0;
 		
 
-		for(i = 1; i <= 3; i++){
+		for(i = 1; i <= 10; i++){
 			
 			let tarefas = [];			
-			let dataInicio = new Date("2016-10-01T03:00:00.000Z");
+			let dataInicio = new Date("2016-08-01T03:00:00.000Z");
 			let duracao = 0;
 			let latencia = 0;			
 
-			for(j = 1; j <= 9; j++){
+			for(j = 1; j <= 6; j++){
 
 				tarefaId++;
 				
@@ -88,17 +88,17 @@
 				dataInicio.setDate(dataInicio.getDate() + latencia);				
 				dataFim = new Date(dataInicio);
 				// duracao = moment(dataInicio).daysInMonth() - 1;
-				duracao = 60;
+				duracao = 100;
 				dataFim.setDate(dataFim.getDate() + duracao);
 				// latencia = moment(dataInicio).daysInMonth() + j;
-				latencia = 50;
+				latencia = 98 + j;
 				
 				tarefa = {
 
 					id: tarefaId,
 					sequencia: j,					
-					percentual: j < i + 4 ? 100: j > i + 4 ? 0 : 20,
-					tarefaAtual: j == i + 4 ? true : false,
+					percentual: j < i + 2 ? 100: j > i + 2 ? 0 : 20,
+					tarefaAtual: j == i + 2 ? true : false,
 					tarefa: {
 						id: j,
 						nome: "Tarefa " + j,								

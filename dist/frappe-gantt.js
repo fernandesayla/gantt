@@ -227,7 +227,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					var nextTask = tasks[i + 1];
 					if (i === 0) project._firstRow = task._line;
 					if (!nextTask) project._lastRow = task._line;
-					if (task.currentTask) project._currentDate = task._start;
+					if (task.currentTask) project._currentDate = get_date_progress(task);
 				});
 				project._late = moment().diff(project._currentDate, 'days');
 				project._rows = project._lastRow - project._firstRow + 1;
@@ -751,6 +751,11 @@ return /******/ (function(modules) { // webpackBootstrap
 				// lower_x: base_pos.x + x_pos[`${self.config.view_mode}_lower`],
 				lower_y: base_pos.lower_y
 			};
+		}
+	
+		function get_date_progress(task) {
+			var duration = (task._end.diff(task._start, 'hours') + 24) / self.config.step;
+			return task._start.clone().add(duration * task.progress / 100, 'days');
 		}
 	
 		function make_arrows() {
