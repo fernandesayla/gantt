@@ -109,7 +109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				view_mode: 'Day',
 				date_format: 'YYYY-MM-DD',
 				custom_popup_html: null,
-				project_group_width: 0,
+				left_width: 0,
 				inline: true
 			};
 			self.config = Object.assign({}, defaults, config);
@@ -413,7 +413,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function set_scale(scale) {
 			self.config.view_mode = scale;
-			var screen_width = 1832 - self.config.project_group_width;
+			var screen_width = 1832 - self.config.left_width;
 			var min_width = 0;
 			self.config.column_width = screen_width / self.dates.length;
 	
@@ -438,7 +438,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function set_width() {
 			var cur_width = self.canvas.node.getBoundingClientRect().width;
-			var actual_width = parseFloat(self.canvas.select('#grid .grid-row').attr('width')) + self.config.project_group_width;
+			var actual_width = parseFloat(self.canvas.select('#grid .grid-row').attr('width')) + self.config.left_width;
 	
 			if (cur_width < actual_width) {
 				self.canvas.attr('width', actual_width);
@@ -470,7 +470,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function make_grid_background() {
 	
-			var grid_width = self.dates.length * self.config.column_width + self.config.project_group_width,
+			var grid_width = self.dates.length * self.config.column_width + self.config.left_width,
 			    grid_height = self.config.header_height + self.config.padding + (self.config.bar.height + self.config.padding) * self._projects._rows + 400;
 	
 			self.canvas.rect(0, 0, grid_width, grid_height).addClass('grid-background').appendTo(self.element_groups.grid);
@@ -484,7 +484,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function make_grid_header() {
 			var header_width = self.dates.length * self.config.column_width,
 			    header_height = self.config.header_height + 10;
-			self.canvas.rect(self.config.project_group_width, 0, header_width, header_height).addClass('grid-header').appendTo(self.element_groups.grid);
+			self.canvas.rect(self.config.left_width, 0, header_width, header_height).addClass('grid-header').appendTo(self.element_groups.grid);
 		}
 	
 		function make_grid_rows() {
@@ -493,7 +493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			    lines = self.canvas.group().appendTo(self.element_groups.grid),
 			    row_width = self.dates.length * self.config.column_width,
 			    row_height = self.config.bar.height + self.config.padding,
-			    project_group_width = self.config.project_group_width;
+			    left_width = self.config.left_width;
 	
 			var row_y = self.config.header_height + self.config.padding / 2;
 	
@@ -504,9 +504,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				if (nextTask && task._line !== nextTask._line) {
 	
-					self.canvas.rect(project_group_width, row_y, row_width, row_height).addClass('grid-row').appendTo(rows);
+					self.canvas.rect(left_width, row_y, row_width, row_height).addClass('grid-row').appendTo(rows);
 	
-					self.canvas.line(project_group_width, row_y + row_height, row_width + project_group_width, row_y + row_height).addClass('row-line').appendTo(lines);
+					self.canvas.line(left_width, row_y + row_height, row_width + left_width, row_y + row_height).addClass('row-line').appendTo(lines);
 	
 					row_y += self.config.bar.height + self.config.padding;
 				}
@@ -521,7 +521,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			    current = self.canvas.group().appendTo(self.element_groups.project),
 			    row_width = self.dates.length * self.config.column_width,
 			    row_height = self.config.bar.height + self.config.padding,
-			    project_group_width = self.config.project_group_width;
+			    left_width = self.config.left_width;
 	
 			var header_height = self.config.header_height + self.config.padding / 2;
 			var row_y = header_height;
@@ -533,16 +533,16 @@ return /******/ (function(modules) { // webpackBootstrap
 				    late = project._late > 0 ? '-late' : '';
 				row_y = header_height + row_height * project._firstRow;
 	
-				if (self.config.project_group_width > 0) {
-					self.canvas.rect(0, row_y, project_group_width, height).addClass('grid-project-row').appendTo(rows);
+				if (self.config.left_width > 0) {
+					self.canvas.rect(0, row_y, left_width, height).addClass('grid-project-row').appendTo(rows);
 	
-					self.canvas.line(0, row_y + height, row_width + project_group_width, row_y + height).addClass('row-line-project').appendTo(lines);
+					self.canvas.line(0, row_y + height, row_width + left_width, row_y + height).addClass('row-line-project').appendTo(lines);
 	
-					self.canvas.text(self.config.project_group_width / 2, row_y + height / 2, project.name).addClass('project-text').appendTo(text);
+					self.canvas.text(self.config.left_width / 2, row_y + height / 2, project.name).addClass('project-text').appendTo(text);
 				}
 	
 				if (view_is('Month') && project._currentDate) {
-					var x = project._currentDate.startOf('day').diff(self.gantt_start, 'days') * self.config.column_width / 30 + self.config.project_group_width;
+					var x = project._currentDate.startOf('day').diff(self.gantt_start, 'days') * self.config.column_width / 30 + self.config.left_width;
 	
 					self.canvas.path(Snap.format('M {x} {y} v {height}', {
 						x: x,
@@ -550,7 +550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						height: height
 					})).addClass('tick-current' + late).appendTo(current);
 				} else if (view_is('Day') && project._currentDate) {
-					var _x = project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.project_group_width;
+					var _x = project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.left_width;
 					var width = self.config.column_width;
 	
 					self.canvas.rect(_x, row_y, width, height).addClass('current-highlight' + late).appendTo(current);
@@ -559,7 +559,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function make_grid_ticks() {
-			var tick_x = self.config.project_group_width,
+			var tick_x = self.config.left_width,
 			    tick_y = self.config.header_height + self.config.padding / 2,
 			    tick_height = (self.config.bar.height + self.config.padding) * self._projects._rows;
 	
@@ -621,17 +621,17 @@ return /******/ (function(modules) { // webpackBootstrap
 			var height = (self.config.bar.height + self.config.padding) * self._projects._rows + header_height;
 	
 			if (view_is('Day')) {
-				var x = moment().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.project_group_width;
+				var x = moment().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.left_width;
 				var width = self.config.column_width;
 	
-				if (x <= self.element_groups.grid.getBBox().width && x >= self.config.project_group_width) {
+				if (x <= self.element_groups.grid.getBBox().width && x >= self.config.left_width) {
 					self.canvas.rect(x, y, width, height).addClass('today-highlight').appendTo(self.element_groups.grid);
 				}
 			} else {
 	
-				var _x2 = moment().startOf('day').diff(self.gantt_start, 'days') * self.config.column_width / 30 + self.config.project_group_width;
+				var _x2 = moment().startOf('day').diff(self.gantt_start, 'days') * self.config.column_width / 30 + self.config.left_width;
 	
-				if (_x2 <= self.element_groups.grid.getBBox().width && _x2 >= self.config.project_group_width) {
+				if (_x2 <= self.element_groups.grid.getBBox().width && _x2 >= self.config.left_width) {
 					self.canvas.path(Snap.format('M {x} {y} v {height}', {
 						x: _x2,
 						y: header_height,
@@ -652,8 +652,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 					var grid_width = self.element_groups.grid.getBBox().width;
-					date.lower_x += self.config.project_group_width;
-					date.upper_x += self.config.project_group_width;
+					date.lower_x += self.config.left_width;
+					date.upper_x += self.config.left_width;
 	
 					self.canvas.text(date.lower_x, date.lower_y, date.lower_text).addClass('lower-text').appendTo(self.element_groups.date);
 	
@@ -1473,8 +1473,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				var nome = responsavel.responsavel.nome;
 				var ramal = responsavel.responsavel.telefone;
 				var celular = responsavel.responsavel.celular;
-	
-				responsaveis = responsaveis.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=https://connections.bb.com.br/profiles/html/myProfileView.do?uid=' + chave + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=https://connections.bb.com.br/profiles/photo.do?uid=' + chave + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + chave + ' - ' + nome + '</p>\n\t\t\t\t<p>Ramal: ' + ramal + '</p>\n\t\t\t\t<p>Celular: ' + celular + '</p>\n\t\t\t\t');
+				var link = 'https://connections.bb.com.br/profiles/html/myProfileView.do?uid=' + chave;
+				responsaveis = responsaveis.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=' + link + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=https://connections.bb.com.br/profiles/photo.do?uid=' + chave + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + chave + ' - ' + nome + '</p>\n\t\t\t\t<p>Ramal: ' + ramal + '</p>\n\t\t\t\t<p>Celular: ' + celular + '</p>\n\t\t\t\t');
 			});
 	
 			var uors = '';
@@ -1747,7 +1747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (gt.view_is('Month')) {
 				x = self.task._start.diff(gt.gantt_start, 'days') * gt.config.column_width / 30;
 			}
-			return x + gt.config.project_group_width;
+			return x + gt.config.left_width;
 		}
 	
 		function compute_y() {

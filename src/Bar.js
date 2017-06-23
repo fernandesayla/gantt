@@ -226,10 +226,10 @@ export default function Bar(gt, task) {
 			const nome = responsavel.responsavel.nome;
 			const ramal = responsavel.responsavel.telefone;
 			const celular = responsavel.responsavel.celular;
-
+			const link = `https://connections.bb.com.br/profiles/html/myProfileView.do?uid=${chave}`;
 			responsaveis = responsaveis.concat(`
 				${ i !== 0 ? `<hr />` : ``}
-				<a href=https://connections.bb.com.br/profiles/html/myProfileView.do?uid=${chave} target="_blank" class="avatarContainer">
+				<a href=${link} target="_blank" class="avatarContainer">
 					<img src=https://connections.bb.com.br/profiles/photo.do?uid=${chave} class="avatar" />
 				</a>
 				<p>${chave} - ${nome}</p>
@@ -512,7 +512,7 @@ export default function Bar(gt, task) {
 			x = self.task._start.diff(gt.gantt_start, 'days') *
 				gt.config.column_width / 30;
 		}
-		return x + gt.config.project_group_width;
+		return x + gt.config.left_width;
 	}
 
 	function compute_y() {
