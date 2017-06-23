@@ -114,10 +114,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			};
 			self.config = Object.assign({}, defaults, config);
 	
-			reset_variables(tasks);
+			reset_variables();
 		}
 	
-		function reset_variables(tasks) {
+		function reset_variables() {
 			self.element = element;
 			self._tasks = [];
 			projects.forEach(function (project) {
@@ -222,10 +222,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			var rows = 0;
 	
 			self._projects.forEach(function (project, i) {
-				tasks = project.tasks;
+				var tasks = project.tasks;
 				tasks.forEach(function (task, i) {
 					var nextTask = tasks[i + 1];
-					if (i == 0) project._firstRow = task._line;
+					if (i === 0) project._firstRow = task._line;
 					if (!nextTask) project._lastRow = task._line;
 					if (task.currentTask) project._currentDate = task._start;
 				});
@@ -477,7 +477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			self.canvas.attr({
 				height: grid_height + self.config.padding,
-				width: '100%'
+				width: '110%'
 			});
 		}
 	
@@ -529,15 +529,16 @@ return /******/ (function(modules) { // webpackBootstrap
 			self._projects.forEach(function (project) {
 				// eslint-disable-line
 	
+				var height = row_height * project._rows,
+				    late = project._late > 0 ? '-late' : '';
 				row_y = header_height + row_height * project._firstRow;
-				var late = project._late > 0 ? '-late' : '';
 	
 				if (self.config.project_group_width > 0) {
-					self.canvas.rect(0, row_y, project_group_width, row_height * project._rows).addClass('grid-project-row').appendTo(rows);
+					self.canvas.rect(0, row_y, project_group_width, height).addClass('grid-project-row').appendTo(rows);
 	
-					self.canvas.line(0, row_y + row_height * project._rows, row_width + project_group_width, row_y + row_height * project._rows).addClass('row-line-project').appendTo(lines);
+					self.canvas.line(0, row_y + height, row_width + project_group_width, row_y + height).addClass('row-line-project').appendTo(lines);
 	
-					self.canvas.text(self.config.project_group_width / 2, row_y + row_height * project._rows / 2, project.name).addClass('project-text').appendTo(text);
+					self.canvas.text(self.config.project_group_width / 2, row_y + height / 2, project.name).addClass('project-text').appendTo(text);
 				}
 	
 				if (view_is('Month') && project._currentDate) {
@@ -546,13 +547,13 @@ return /******/ (function(modules) { // webpackBootstrap
 					self.canvas.path(Snap.format('M {x} {y} v {height}', {
 						x: x,
 						y: row_y,
-						height: row_height * project._rows
+						height: height
 					})).addClass('tick-current' + late).appendTo(current);
 				} else if (view_is('Day') && project._currentDate) {
 					var _x = project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.project_group_width;
 					var width = self.config.column_width;
 	
-					self.canvas.rect(_x, row_y, width, row_height * project._rows).addClass('current-highlight' + late).appendTo(current);
+					self.canvas.rect(_x, row_y, width, height).addClass('current-highlight' + late).appendTo(current);
 				}
 			});
 		}
@@ -616,7 +617,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			// highlight today's date
 	
 			var y = 0;
-			var height = (self.config.bar.height + self.config.padding) * self._projects._rows + self.config.header_height + self.config.padding / 2;
+			var header_height = self.config.header_height + self.config.padding / 2;
+			var height = (self.config.bar.height + self.config.padding) * self._projects._rows + header_height;
 	
 			if (view_is('Day')) {
 				var x = moment().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.project_group_width;
@@ -632,8 +634,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				if (_x2 <= self.element_groups.grid.getBBox().width && _x2 >= self.config.project_group_width) {
 					self.canvas.path(Snap.format('M {x} {y} v {height}', {
 						x: _x2,
-						y: self.config.header_height + self.config.padding / 2,
-						height: height - (self.config.header_height + self.config.padding / 2)
+						y: header_height,
+						height: height - header_height
 					})).addClass('tick-today').appendTo(self.element_groups.grid);
 				}
 			}
@@ -645,22 +647,24 @@ return /******/ (function(modules) { // webpackBootstrap
 			var _iteratorError6 = undefined;
 	
 			try {
-	
 				for (var _iterator6 = get_dates_to_draw()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
 					var date = _step6.value;
 	
 	
 					var grid_width = self.element_groups.grid.getBBox().width;
 					date.lower_x += self.config.project_group_width;
+					date.upper_x += self.config.project_group_width;
 	
 					self.canvas.text(date.lower_x, date.lower_y, date.lower_text).addClass('lower-text').appendTo(self.element_groups.date);
 	
 					if (date.upper_text) {
 	
-						var $upper_text = self.canvas.text(self.config.project_group_width + date.upper_x, date.upper_y, date.upper_text).addClass('upper-text').appendTo(self.element_groups.date);
+						var $upper_text = self.canvas.text(date.upper_x, date.upper_y, date.upper_text).addClass('upper-text').appendTo(self.element_groups.date);
+	
+						date.lower_x += (grid_width - date.lower_x) / 2;
 	
 						if ($upper_text.getBBox().x2 > grid_width) {
-							self.canvas.text(date.lower_x + (grid_width - date.lower_x) / 2, date.upper_y, date.upper_text).addClass('upper-text').appendTo(self.element_groups.date);
+							self.canvas.text(date.lower_x, date.upper_y, date.upper_text).addClass('upper-text').appendTo(self.element_groups.date);
 	
 							$upper_text.remove();
 						}
@@ -685,8 +689,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		function get_dates_to_draw() {
 			var lower_x = 0,
 			    last_date = null;
-			var years = [],
-			    year = {};
 	
 			var dates = self.dates.map(function (date, i) {
 	
@@ -897,11 +899,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			});
 		}
 	
-		function get_project(id) {
-			return self._projects.find(function (project) {
-				return project.id === id;
-			});
-		}
+		// function get_project(id) {
+		// 	return self._projects.find(project => project.id === id);
+		// }
 	
 		function generate_id(task) {
 			return task.name + '_' + Math.random().toString(36).slice(2, 12);
@@ -916,7 +916,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		init();
 	
 		return self;
-	} /*eslint-disable */
+	}
 	/* global moment, Snap */
 	/**
 	 * Gantt:

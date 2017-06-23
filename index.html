@@ -86,11 +86,11 @@
 				dataInicio = new Date(dataInicio);
 				dataInicio.setDate(dataInicio.getDate() + latencia);				
 				dataFim = new Date(dataInicio);
-				duracao = moment(dataInicio).daysInMonth() - 1;
-				// duracao = 60;
+				// duracao = moment(dataInicio).daysInMonth() - 1;
+				duracao = 60;
 				dataFim.setDate(dataFim.getDate() + duracao);
-				latencia = moment(dataInicio).daysInMonth() + j;
-				// latencia = 100;
+				// latencia = moment(dataInicio).daysInMonth() + j;
+				latencia = 50;
 				
 				tarefa = {
 
