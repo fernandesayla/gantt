@@ -263,7 +263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							}
 						}]
 					};
-					// self.tasks.push(task);
+					self.tasks.push(task);
 				}
 	
 				project._rows = project._lastRow - project._firstRow + 1;
