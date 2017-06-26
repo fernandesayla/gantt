@@ -124,6 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				return self._tasks = self._tasks.concat(project.tasks);
 			});
 			self._projects = projects;
+			self._projects._rows = self._tasks.length;
 			self._bars = [];
 			self._arrows = [];
 			self.element_groups = {};
@@ -222,14 +223,49 @@ return /******/ (function(modules) { // webpackBootstrap
 			var rows = 0;
 	
 			self._projects.forEach(function (project, i) {
+	
 				var tasks = project.tasks;
+	
 				tasks.forEach(function (task, i) {
 					var nextTask = tasks[i + 1];
 					if (i === 0) project._firstRow = task._line;
-					if (!nextTask) project._lastRow = task._line;
+					if (!nextTask) {
+						project._lastRow = task._line;
+						project._lastDate = get_max_date(project.tasks);
+					}
 					if (task.currentTask) project._currentDate = get_date_progress(task);
 				});
+	
 				project._late = moment().diff(project._currentDate, 'days');
+	
+				if (project._late > 0) {
+	
+					var start = moment(project._lastDate, self.config.date_format).clone().add(1, 'days');
+					var end = moment(project._lastDate, self.config.date_format).clone().add(project._late, 'days');
+	
+					var task = {
+						id: self.tasks.length + 1,
+						name: 'Projeção de Término',
+						projectId: project.id,
+						_start: start,
+						_end: end,
+						_line: project._lastRow,
+						custom_class: 'late',
+						dependencies: [],
+						responsaveis: [],
+						uors: [],
+						periodos: [{
+							dataInicio: start,
+							dataFim: end,
+	
+							tipo: {
+								nome: 'Previsão'
+							}
+						}]
+					};
+					// self.tasks.push(task);
+				}
+	
 				project._rows = project._lastRow - project._firstRow + 1;
 				rows += project._rows;
 			});
@@ -361,8 +397,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				// self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
 				self.gantt_end = self.gantt_end.clone().endOf('month');
 			} else {
-				self.gantt_start = self.gantt_start.clone().startOf('month'); // .subtract(1, 'month');
-				self.gantt_end = self.gantt_end.clone().endOf('month'); // .add(1, 'month');
+				self.gantt_start = self.gantt_start.clone().subtract(3, 'days'); // .startOf('month');
+				self.gantt_end = self.gantt_end.clone().add(3, 'days'); // .endOf('month');
 			}
 		}
 	
@@ -458,6 +494,13 @@ return /******/ (function(modules) { // webpackBootstrap
 				return curr._start.isSameOrBefore(acc._start) ? curr : acc;
 			});
 			return task._start;
+		}
+	
+		function get_max_date(tasks) {
+			var task = tasks.reduce(function (acc, curr) {
+				return curr._end.isSameOrAfter(acc._end) ? curr : acc;
+			});
+			return task.end;
 		}
 	
 		function make_grid() {
@@ -772,7 +815,6 @@ return /******/ (function(modules) { // webpackBootstrap
 					arrows = task.dependencies.map(function (dep) {
 						var dependency = get_task(dep);
 						if (!dependency) return;
-	
 						var arrow = (0, _Arrow2.default)(self, // gt
 						self._bars[dependency._index], // from_task
 						self._bars[task._index] // to_task
@@ -805,7 +847,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function make_bars() {
-	
 			self._bars = self.tasks.map(function (task, i) {
 	
 				var bar = (0, _Bar2.default)(self, task);
@@ -970,7 +1011,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, ".gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.3; }\n  .gantt .tick.thick {\n    stroke-width: 0.4; }\n\n.gantt .tick-today, .gantt .tick-current, .gantt .tick-current-late {\n  stroke-width: 1;\n  opacity: 0.8;\n  stroke-dasharray: 7; }\n\n.gantt .tick-today {\n  stroke: #2ec12e; }\n\n.gantt .tick-current {\n  stroke: #3887f3; }\n\n.gantt .tick-current-late {\n  stroke: tomato; }\n\n.gantt .today-highlight, .gantt .current-highlight, .gantt .current-highlight-late {\n  opacity: 0.5; }\n\n.gantt .today-highlight {\n  fill: #6be26b; }\n\n.gantt .current-highlight {\n  fill: #3887f3; }\n\n.gantt .current-highlight-late {\n  fill: tomato; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #485f7d;\n  stroke: #8D99A6;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-progress {\n  fill: #b8c2cc; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #8D99A6;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  font-weight: lighter;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt .project-text {\n  fill: #555;\n  text-anchor: middle; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0; }\n  .gantt #details .details-container h5 {\n    font-size: 12px;\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    font-size: 12px;\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #f5f5f5; }\n\n.gantt .avatarContainer {\n  height: 64px;\n  display: flex;\n  align-items: center;\n  padding-right: 10px;\n  float: left; }\n\n.gantt .avatar {\n  height: 50px !important; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAmBA;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBAvBoB;EAwBpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cA7BgB,EA8BhB;;AAfF;EAiBE,gBA/B0B,EAgC1B;;AAlBF;EAoBE,gBApCoB;EAqCpB,kBAAiB,EACjB;;AAtBF;EAwBE,gBAxCoB;EAyCpB,kBAAiB,EAIjB;EA7BF;IA2BG,kBAAiB,EACjB;;AA5BH;EAgCE,gBAAe;EACf,aAAY;EACZ,oBAAmB,EACnB;;AAnCF;EAsCE,gBA1Ca,EA2Cb;;AAvCF;EA0CE,gBAjDkB,EAmDlB;;AA5CF;EA8CE,eApDgB,EAqDhB;;AA/CF;EAkDE,aAAY,EACZ;;AAnDF;EAsDE,cAzDmB,EA0DnB;;AAvDF;EA0DE,cAjEkB,EAkElB;;AA3DF;EA8DE,aApEgB,EAqEhB;;AA/DF;EAkEE,WAAU;EACV,aA/Ee;EAgFf,kBAAiB,EACjB;;AArEF;EAwEE,cA1FiB;EA2FjB,gBA1FkB;EA2FlB,gBAAe;EACf,kCAAiC,EACjC;;AA5EF;EA8EE,cAvFY,EAwFZ;;AA/EF;EAiFE,kBAAiB;EACjB,gBAnGkB;EAoGlB,gBAAe;EACf,oBAAmB,EAKnB;EAzFF;IAuFG,WAlGc,EAmGd;;AAxFH;EA2FE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EACf,qBAAoB;EACpB,sBAAqB,EAMrB;EAtGF;IAmGG,WA9Gc;IA+Gd,mBAAkB,EAClB;;AArGH;EAyGE,WAtHiB;EAuHjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AA9GF;EAiHE,gBAAe,EAkBf;EAnIF;IAqHI,gBAAe,EACf;EAtHJ;IAyHI,oBAAmB;IACnB,WAAU,EACV;EA3HJ;IAgII,gBAAe,EACf;;AAjIJ;EAsIE,gBAAe;EACf,oBAAmB,EACnB;;AAxIF;EA0IE,WArJe,EAsJf;;AA3IF;EA6IE,WAvJe,EAwJf;;AA9IF;EAgJE,WA3Je;EA4Jf,oBAAmB,EACnB;;AAlJF;EAqJE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EA7KF;IA0JG,UAAS,EACT;EA3JH;IA8JG,gBAAe;IACf,kBAAiB;IACjB,oBAAmB;IACnB,YA5Kc,EA6Kd;EAlKH;IAqKG,gBAAe;IACf,mBAAkB;IAClB,YAnLc,EAoLd;EAxKH;IA2KG,iBAAgB,EAChB;;AA5KH;EAgLE,cAAa,EACb;;AAjLF;EAoLE,cAnMgB,EAoMhB;;AArLF;EAwLE,aAAY;EACZ,cAAa;EACb,oBAAmB;EACnB,oBAAmB;EACnB,YAAW,EAEX;;AA9LF;EAgME,wBAAuB,EACvB","file":"gantt.scss","sourcesContent":["// $bar-color: #b8c2cc;\n$bar-color: #485f7d;\n$bar-stroke: #8D99A6;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n$handle-color: #ddd;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n$grey: #b8c2cc;\n$blue: #3887f3;\n$light-blue: #3887f3;\n$light-red: tomato;\n$light-yellow: #fcf8e3;\n$green: #2ec12e;\n$light-green: #6be26b;\n\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\t\t\n\t\tstroke: $border-color;\t\t\n\t\tstroke-width: 1.4;\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.3;\n\t\t&.thick {\n\t\t\tstroke-width: 0.4;\n\t\t}\n\t}\n\n\t.tick-today, .tick-current, .tick-current-late {\t\t\n\t\tstroke-width: 1;\t\n\t\topacity: 0.8;\t\n\t\tstroke-dasharray: 7;\n\t}\n\n\t.tick-today {\n\t\tstroke: $green;\t\t\n\t}\n\n\t.tick-current {\n\t\tstroke: $light-blue;\n\t\t\n\t}\n\t.tick-current-late {\n\t\tstroke: $light-red;\n\t}\n\n\t.today-highlight, .current-highlight, .current-highlight-late{\n\t\topacity: 0.5;\n\t}\n\n\t.today-highlight {\n\t\tfill: $light-green;\t\t\n\t}\n\n\t.current-highlight {\n\t\tfill: $light-blue;\n\t}\n\n\t.current-highlight-late {\n\t\tfill: $light-red;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\t.bar-progress {\n\t\tfill: $grey;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\tfont-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\t.project-text{\n\t\tfill: $text-light;\n\t\ttext-anchor: middle;\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\n\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\th5 {\n\t\t\tfont-size: 12px;\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\n\t\t\tfont-size: 12px;\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: $light-bg;\n\t}\n\n\t.avatarContainer{\n\t\theight: 64px;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tpadding-right: 10px;\n\t\tfloat: left;\n\t\t\n\t}\n\t.avatar{\n\t\theight: 50px !important;\n\t}\n\t\n}"],"sourceRoot":""}]);
+	exports.push([module.id, ".gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.3; }\n  .gantt .tick.thick {\n    stroke-width: 0.4; }\n\n.gantt .tick-today, .gantt .tick-current, .gantt .tick-current-late {\n  stroke-width: 1;\n  opacity: 0.8;\n  stroke-dasharray: 7; }\n\n.gantt .tick-today {\n  stroke: #2ec12e; }\n\n.gantt .tick-current {\n  stroke: #82b1f3; }\n\n.gantt .tick-current-late {\n  stroke: #f1aa9e; }\n\n.gantt .today-highlight, .gantt .current-highlight, .gantt .current-highlight-late {\n  opacity: 0.5; }\n\n.gantt .today-highlight {\n  fill: #b9f3b9; }\n\n.gantt .current-highlight {\n  fill: #82b1f3; }\n\n.gantt .current-highlight-late {\n  fill: #f1aa9e; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #485f7d;\n  stroke: #8D99A6;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-progress {\n  fill: #b8c2cc; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #8D99A6;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  font-weight: lighter;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt .project-text {\n  fill: #555;\n  text-anchor: middle; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0; }\n  .gantt #details .details-container h5 {\n    font-size: 12px;\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    font-size: 12px;\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #f5f5f5; }\n\n.gantt .avatarContainer {\n  height: 64px;\n  display: flex;\n  align-items: center;\n  padding-right: 10px;\n  float: left; }\n\n.gantt .avatar {\n  height: 50px !important; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAmBA;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBAvBoB;EAwBpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cA7BgB,EA8BhB;;AAfF;EAiBE,gBA/B0B,EAgC1B;;AAlBF;EAoBE,gBApCoB;EAqCpB,kBAAiB,EACjB;;AAtBF;EAwBE,gBAxCoB;EAyCpB,kBAAiB,EAIjB;EA7BF;IA2BG,kBAAiB,EACjB;;AA5BH;EAgCE,gBAAe;EACf,aAAY;EACZ,oBAAmB,EACnB;;AAnCF;EAsCE,gBA1Ca,EA2Cb;;AAvCF;EA0CE,gBAjDkB,EAmDlB;;AA5CF;EA8CE,gBApDiB,EAqDjB;;AA/CF;EAkDE,aAAY,EACZ;;AAnDF;EAsDE,cAzDmB,EA0DnB;;AAvDF;EA0DE,cAjEkB,EAkElB;;AA3DF;EA8DE,cApEiB,EAqEjB;;AA/DF;EAkEE,WAAU;EACV,aA/Ee;EAgFf,kBAAiB,EACjB;;AArEF;EAwEE,cA1FiB;EA2FjB,gBA1FkB;EA2FlB,gBAAe;EACf,kCAAiC,EACjC;;AA5EF;EA8EE,cAvFY,EAwFZ;;AA/EF;EAiFE,kBAAiB;EACjB,gBAnGkB;EAoGlB,gBAAe;EACf,oBAAmB,EAKnB;EAzFF;IAuFG,WAlGc,EAmGd;;AAxFH;EA2FE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EACf,qBAAoB;EACpB,sBAAqB,EAMrB;EAtGF;IAmGG,WA9Gc;IA+Gd,mBAAkB,EAClB;;AArGH;EAyGE,WAtHiB;EAuHjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AA9GF;EAiHE,gBAAe,EAkBf;EAnIF;IAqHI,gBAAe,EACf;EAtHJ;IAyHI,oBAAmB;IACnB,WAAU,EACV;EA3HJ;IAgII,gBAAe,EACf;;AAjIJ;EAsIE,gBAAe;EACf,oBAAmB,EACnB;;AAxIF;EA0IE,WArJe,EAsJf;;AA3IF;EA6IE,WAvJe,EAwJf;;AA9IF;EAgJE,WA3Je;EA4Jf,oBAAmB,EACnB;;AAlJF;EAqJE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EA7KF;IA0JG,UAAS,EACT;EA3JH;IA8JG,gBAAe;IACf,kBAAiB;IACjB,oBAAmB;IACnB,YA5Kc,EA6Kd;EAlKH;IAqKG,gBAAe;IACf,mBAAkB;IAClB,YAnLc,EAoLd;EAxKH;IA2KG,iBAAgB,EAChB;;AA5KH;EAgLE,cAAa,EACb;;AAjLF;EAoLE,cAnMgB,EAoMhB;;AArLF;EAwLE,aAAY;EACZ,cAAa;EACb,oBAAmB;EACnB,oBAAmB;EACnB,YAAW,EAEX;;AA9LF;EAgME,wBAAuB,EACvB","file":"gantt.scss","sourcesContent":["// $bar-color: #b8c2cc;\n$bar-color: #485f7d;\n$bar-stroke: #8D99A6;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n$handle-color: #ddd;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n$grey: #b8c2cc;\n$blue: #3887f3;\n$light-blue: #82b1f3;\n$light-red: #f1aa9e;\n$light-yellow: #fcf8e3;\n$green: #2ec12e;\n$light-green: #b9f3b9;\n\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\t\t\n\t\tstroke: $border-color;\t\t\n\t\tstroke-width: 1.4;\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.3;\n\t\t&.thick {\n\t\t\tstroke-width: 0.4;\n\t\t}\n\t}\n\n\t.tick-today, .tick-current, .tick-current-late {\t\t\n\t\tstroke-width: 1;\t\n\t\topacity: 0.8;\t\n\t\tstroke-dasharray: 7;\n\t}\n\n\t.tick-today {\n\t\tstroke: $green;\t\t\n\t}\n\n\t.tick-current {\n\t\tstroke: $light-blue;\n\t\t\n\t}\n\t.tick-current-late {\n\t\tstroke: $light-red;\n\t}\n\n\t.today-highlight, .current-highlight, .current-highlight-late{\n\t\topacity: 0.5;\n\t}\n\n\t.today-highlight {\n\t\tfill: $light-green;\t\t\n\t}\n\n\t.current-highlight {\n\t\tfill: $light-blue;\n\t}\n\n\t.current-highlight-late {\n\t\tfill: $light-red;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\t.bar-progress {\n\t\tfill: $grey;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\tfont-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\t.project-text{\n\t\tfill: $text-light;\n\t\ttext-anchor: middle;\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\n\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\th5 {\n\t\t\tfont-size: 12px;\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\n\t\t\tfont-size: 12px;\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: $light-bg;\n\t}\n\n\t.avatarContainer{\n\t\theight: 64px;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tpadding-right: 10px;\n\t\tfloat: left;\n\t\t\n\t}\n\t.avatar{\n\t\theight: 50px !important;\n\t}\t\n\t\n}"],"sourceRoot":""}]);
 	
 	// exports
 

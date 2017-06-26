@@ -68,6 +68,7 @@ export default function Gantt(element, projects, config) {
 		projects.forEach(project =>
 			self._tasks = self._tasks.concat(project.tasks));
 		self._projects = projects;
+		self._projects._rows = self._tasks.length;
 		self._bars = [];
 		self._arrows = [];
 		self.element_groups = {};
@@ -165,21 +166,56 @@ export default function Gantt(element, projects, config) {
 		let rows = 0;
 
 		self._projects.forEach((project, i) => {
+
 			const tasks = project.tasks;
+
 			tasks.forEach((task, i) => {
 				const nextTask = tasks[i + 1];
 				if(i === 0) project._firstRow = task._line;
-				if(!nextTask) project._lastRow = task._line;
+				if(!nextTask) {
+					project._lastRow = task._line;
+					project._lastDate = get_max_date(project.tasks);
+				}
 				if(task.currentTask) project._currentDate = get_date_progress(task);
 			});
+
 			project._late = moment().diff(project._currentDate, 'days');
+
+			if(project._late > 0) {
+
+				const start = moment(project._lastDate, self.config.date_format).clone().add(1, 'days');
+				const end = moment(project._lastDate, self.config.date_format).clone().add(project._late, 'days');
+
+				const task = {
+					id: self.tasks.length + 1,
+					name: 'Projeção de Término',
+					projectId: project.id,
+					_start: start,
+					_end: end,
+					_line: project._lastRow,
+					custom_class: 'late',
+					dependencies: [],
+					responsaveis: [],
+					uors: [],
+					periodos: [
+						{
+							dataInicio: start,
+							dataFim: end,
+
+							tipo: {
+								nome: 'Previsão'
+							}
+						}
+					]
+				};
+				// self.tasks.push(task);
+			}
+
 			project._rows = project._lastRow - project._firstRow + 1;
 			rows += project._rows;
 		});
 		self._projects._rows = rows;
 	}
-
-
 
 	function prepare_dependencies() {
 
@@ -243,8 +279,8 @@ export default function Gantt(element, projects, config) {
 			// self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
 			self.gantt_end = self.gantt_end.clone().endOf('month');
 		} else {
-			self.gantt_start = self.gantt_start.clone().startOf('month'); // .subtract(1, 'month');
-			self.gantt_end = self.gantt_end.clone().endOf('month'); // .add(1, 'month');
+			self.gantt_start = self.gantt_start.clone().subtract(3, 'days');// .startOf('month');
+			self.gantt_end = self.gantt_end.clone().add(3, 'days'); // .endOf('month');
 		}
 	}
 
@@ -323,6 +359,13 @@ export default function Gantt(element, projects, config) {
 			return curr._start.isSameOrBefore(acc._start) ? curr : acc;
 		});
 		return task._start;
+	}
+
+	function get_max_date(tasks) {
+		const task = tasks.reduce((acc, curr) => {
+			return curr._end.isSameOrAfter(acc._end) ? curr : acc;
+		});
+		return task.end;
 	}
 
 	function make_grid() {
@@ -627,7 +670,6 @@ export default function Gantt(element, projects, config) {
 			arrows = task.dependencies.map(dep => {
 				const dependency = get_task(dep);
 				if(!dependency) return;
-
 				const arrow = Arrow(
 					self, // gt
 					self._bars[dependency._index], // from_task
@@ -641,7 +683,6 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function make_bars() {
-
 		self._bars = self.tasks.map((task, i) => {
 
 			const bar = Bar(self, task);
