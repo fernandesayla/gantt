@@ -51,7 +51,7 @@ export default function Gantt(element, projects, config) {
 				curve: 5
 			},
 			padding: 18,
-			view_mode: 'Day',
+			view_mode: 'Month',
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null,
 			left_width: 0,
@@ -187,9 +187,9 @@ export default function Gantt(element, projects, config) {
 				const end = moment(project._lastDate, self.config.date_format).clone().add(project._late, 'days');
 
 				const task = {
+					projectId: project.id,
 					id: self.tasks.length + 1,
 					name: 'Projeção de Término',
-					projectId: project.id,
 					_start: start,
 					_end: end,
 					_line: project._lastRow,
@@ -413,8 +413,7 @@ export default function Gantt(element, projects, config) {
 		self.tasks.forEach((task, index) => { // eslint-disable-line
 
 			const nextTask = self.tasks[index + 1];
-
-			if(nextTask && task._line !== nextTask._line) {
+			if(task._index && (!nextTask || task._line !== nextTask._line)) {
 
 				self.canvas.rect(left_width, row_y, row_width, row_height)
 				.addClass('grid-row')

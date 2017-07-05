@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Simple Gantt</title>
+	<title>Gantt</title>
 	<style>
 		body {
 			font-family: sans-serif;
@@ -35,60 +35,24 @@
 </head>
 <body>
 	<div class="container">
-		<h2>Gantt Chart!</h2>		
+		<h2>Programa 1</h2>		
 		<div class="gantt-container">
 			<svg id="gantt" width="400" height="600"></svg>
 		</div>
 	</div>
 	<script>
 
-		// var today = new Date();
-
-		// var names = [
-		// 	["Redesign website", [0, 14]],
-		// 	["Write new content", [1, 8]],
-		// 	["Apply new styles", [3, 12]],
-		// 	["Review", [7, 14]],
-		// 	["Deploy", [8, 18]],
-		// 	["Go Live!", [10, 20]]
-		// ];
-
-		// var tasks = names.map(function(name, i) {
-		// 	var today = new Date();
-		// 	var start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-		// 	var end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-		// 	start.setDate(today.getDate() + name[1][0]);
-		// 	end.setDate(today.getDate() + name[1][1]);
-		// 	return {
-		// 		start: start,
-		// 		end: end,
-		// 		name: name[0],
-		// 		id: "Task " + i,
-		// 		progress: parseInt(Math.random() * 100, 10)
-		// 	}
-		// });
-						
-		// tasks[1].progress = 0;
-		// tasks[1].dependencies = "Task 0"
-		// tasks[2].dependencies = "Task 1"
-		// tasks[3].dependencies = "Task 2"
-		// tasks[5].dependencies = "Task 4"
-		// tasks[5].custom_class = "bar-milestone";
-
-		// console.log('tasks',tasks)
-
 		let projetos = [];
-		let tarefaId = 0;
-		
+		let tarefaId = 0;		
 
-		for(i = 1; i <= 5; i++){
+		for(i = 1; i <= 3; i++){
 			
 			let tarefas = [];			
 			let dataInicio = new Date("2017-06-10T03:00:00.000Z");
 			let duracao = 0;
 			let latencia = 0;			
 
-			for(j = 1; j <= 6; j++){
+			for(j = 1; j <= 4; j++){
 
 				tarefaId++;
 				
@@ -109,7 +73,7 @@
 					tarefaAtual: j == i + 2 ? true : false,
 					tarefa: {
 						id: j,
-						nome: j == 2 ? "Tarefaaaaaaaaaaaaaaa " + j : "Tarefa " + j,								
+						nome: j == 2 ? "Tarefa " + j : "Tarefa " + j,								
 					},
 					situacao: {
 						id: 1,
@@ -239,24 +203,57 @@
 		}));
 				
 		var gantt_chart = Gantt("#gantt", projects, {
-			on_click: function (task) {
-				console.log(task);
-			},
-			on_date_change: function(task, start, end) {
-				console.log(task, start, end);
-			},
-			on_progress_change: function(task, progress) {
-				console.log(task, progress);
-			},
-			on_view_change: function(mode) {
-				console.log(mode);
-			},
-			view_mode: 'Month',
-			left_width: projects.length > 1 ? 150 : 0,
-			inline: true,
+			// on_click: function (task) {
+			// 	console.log(task);
+			// },
+			// on_date_change: function(task, start, end) {
+			// 	console.log(task, start, end);
+			// },
+			// on_progress_change: function(task, progress) {
+			// 	console.log(task, progress);
+			// },
+			// on_view_change: function(mode) {
+			// 	console.log(mode);
+			// },
+			// view_mode: 'Month',
+			// left_width: projects.length > 1 ? 150 : 0,
+			// inline: true,
 		});
 		//console.log(gantt_chart);
 	</script>
 </body>
 </html>
+<!--
+		// var today = new Date();
 
+		// var names = [
+		// 	["Redesign website", [0, 14]],
+		// 	["Write new content", [1, 8]],
+		// 	["Apply new styles", [3, 12]],
+		// 	["Review", [7, 14]],
+		// 	["Deploy", [8, 18]],
+		// 	["Go Live!", [10, 20]]
+		// ];
+
+		// var tasks = names.map(function(name, i) {
+		// 	var today = new Date();
+		// 	var start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		// 	var end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		// 	start.setDate(today.getDate() + name[1][0]);
+		// 	end.setDate(today.getDate() + name[1][1]);
+		// 	return {
+		// 		start: start,
+		// 		end: end,
+		// 		name: name[0],
+		// 		id: "Task " + i,
+		// 		progress: parseInt(Math.random() * 100, 10)
+		// 	}
+		// });
+						
+		// tasks[1].progress = 0;
+		// tasks[1].dependencies = "Task 0"
+		// tasks[2].dependencies = "Task 1"
+		// tasks[3].dependencies = "Task 2"
+		// tasks[5].dependencies = "Task 4"
+		// tasks[5].custom_class = "bar-milestone";
+-->
