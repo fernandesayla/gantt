@@ -13,7 +13,7 @@ import Arrow from './Arrow';
 import moment from 'moment';
 
 export default function Gantt(element, projects, config) {
-
+	console.log('*************************', Snap);
 	const self = {};
 
 	function init() {
