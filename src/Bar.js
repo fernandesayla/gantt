@@ -1,3 +1,4 @@
+/* global Snap */
 /*
 	Class: Bar
 
@@ -6,7 +7,6 @@
 		task: task object
 */
 
-import Snap from 'snapsvg';
 import moment from 'moment';
 import './gantt.scss';
 
