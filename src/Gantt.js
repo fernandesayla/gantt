@@ -1,4 +1,3 @@
-/* global Snap */
 /**
  * Gantt:
  * 	element: querySelector string, required
@@ -11,6 +10,7 @@ import './gantt.scss';
 import Bar from './Bar';
 import Arrow from './Arrow';
 import moment from 'moment';
+import Snap from 'snapsvg';
 
 export default function Gantt(element, projects, config) {
 	console.log('*************************', Snap);
