@@ -71,13 +71,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Arrow2 = _interopRequireDefault(_Arrow);
 	
-	var _moment = __webpack_require__(7);
-	
-	var _moment2 = _interopRequireDefault(_moment);
-	
 	var _snapsvg = __webpack_require__(125);
 	
 	var _snapsvg2 = _interopRequireDefault(_snapsvg);
+	
+	var _moment = __webpack_require__(7);
+	
+	var _moment2 = _interopRequireDefault(_moment);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -972,15 +972,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		init();
 	
 		return self;
-	}
-	/* global Snap */
-	/**
-	 * Gantt:
-	 * 	element: querySelector string, required
-	 * 	tasks: array of tasks, required
-	 *   task: { id, name, start, end, progress, dependencies, custom_class }
-	 * 	config: configuration options, optional
-	 */
+	} /**
+	   * Gantt:
+	   * 	element: querySelector string, required
+	   * 	tasks: array of tasks, required
+	   *   task: { id, name, start, end, progress, dependencies, custom_class }
+	   * 	config: configuration options, optional
+	   */
 	module.exports = exports['default'];
 
 /***/ },
@@ -1342,7 +1340,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = Bar;
 	
+	var _snapsvg = __webpack_require__(125);
+	
+	var _snapsvg2 = _interopRequireDefault(_snapsvg);
+	
+	var _moment = __webpack_require__(7);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
 	__webpack_require__(1);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function Bar(gt, task) {
 	
@@ -1381,7 +1389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function prepare_plugins() {
-			Snap.plugin(function (Snap, Element, Paper, global, Fragment) {
+			_snapsvg2.default.plugin(function (Snap, Element, Paper, global, Fragment) {
 				Element.prototype.getX = function () {
 					return +this.attr('x');
 				};
@@ -1461,7 +1469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				render_details();
 	
-				var f = gt.canvas.filter(Snap.filter.shadow(0, 1, 1, '#666', 0.6));
+				var f = gt.canvas.filter(_snapsvg2.default.filter.shadow(0, 1, 1, '#666', 0.6));
 				self.details_box.attr({
 					filter: f
 				});
@@ -1488,7 +1496,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			self.details_box.clear();
 	
 			var html = get_details_html();
-			var foreign_object = Snap.parse('<foreignObject width="5000" height="2000">\n\t\t\t\t<body xmlns="http://www.w3.org/1999/xhtml">\n\t\t\t\t\t' + html + '\n\t\t\t\t</body>\n\t\t\t\t</foreignObject>');
+			var foreign_object = _snapsvg2.default.parse('<foreignObject width="5000" height="2000">\n\t\t\t\t<body xmlns="http://www.w3.org/1999/xhtml">\n\t\t\t\t\t' + html + '\n\t\t\t\t</body>\n\t\t\t\t</foreignObject>');
 			self.details_box.append(foreign_object);
 		}
 	
@@ -1516,8 +1524,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			self.task.periodos.forEach(function (periodo) {
 	
 				var tipo = periodo.tipo.nome;
-				var dataInicio = moment(periodo.dataInicio).format('DD/MM/YYYY');
-				var dataFim = moment(periodo.dataFim).format('DD/MM/YYYY');
+				var dataInicio = (0, _moment2.default)(periodo.dataInicio).format('DD/MM/YYYY');
+				var dataFim = (0, _moment2.default)(periodo.dataFim).format('DD/MM/YYYY');
 	
 				periodos = periodos.concat('\n\t\t\t\t<p>' + tipo + ': ' + dataInicio + ' - ' + dataFim + '</p>\n\t\t\t\t');
 			});
@@ -1906,20 +1914,19 @@ return /******/ (function(modules) { // webpackBootstrap
 		init();
 	
 		return self;
-	} /* global moment, Snap */
-	/*
-		Class: Bar
-
-		Opts:
-			gt: Gantt object
-			task: task object
-	*/
+	} /*
+	  	Class: Bar
+	  
+	  	Opts:
+	  		gt: Gantt object
+	  		task: task object
+	  */
 
 	module.exports = exports['default'];
 
 /***/ },
 /* 6 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1927,16 +1934,12 @@ return /******/ (function(modules) { // webpackBootstrap
 		value: true
 	});
 	exports.default = Arrow;
-	/* global Snap */
-	/*
-		Class: Arrow
-		from_task ---> to_task
 	
-		Opts:
-			gantt (Gantt object)
-			from_task (Bar object)
-			to_task (Bar object)
-	*/
+	var _snapsvg = __webpack_require__(125);
+	
+	var _snapsvg2 = _interopRequireDefault(_snapsvg);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function Arrow(gt, from_task, to_task) {
 	
@@ -1972,7 +1975,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			self.curve_y = from_is_below_to ? -self.curve : self.curve;
 			self.offset = from_is_below_to ? self.end_y + gt.config.arrow.curve : self.end_y - gt.config.arrow.curve;
 	
-			self.path = Snap.format('M {start_x} {start_y} V {offset} ' + 'a {curve} {curve} 0 0 {clockwise} {curve} {curve_y} ' + 'L {end_x} {end_y} m -5 -5 l 5 5 l -5 5', {
+			self.path = _snapsvg2.default.format('M {start_x} {start_y} V {offset} ' + 'a {curve} {curve} 0 0 {clockwise} {curve} {curve_y} ' + 'L {end_x} {end_y} m -5 -5 l 5 5 l -5 5', {
 				start_x: self.start_x,
 				start_y: self.start_y,
 				end_x: self.end_x,
@@ -1984,7 +1987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			});
 	
 			if (to_task.$bar.getX() < from_task.$bar.getX() + gt.config.padding) {
-				self.path = Snap.format('M {start_x} {start_y} v {down_1} ' + 'a {curve} {curve} 0 0 1 -{curve} {curve} H {left} ' + 'a {curve} {curve} 0 0 {clockwise} -{curve} {curve_y} V {down_2} ' + 'a {curve} {curve} 0 0 {clockwise} {curve} {curve_y} ' + 'L {end_x} {end_y} m -5 -5 l 5 5 l -5 5', {
+				self.path = _snapsvg2.default.format('M {start_x} {start_y} v {down_1} ' + 'a {curve} {curve} 0 0 1 -{curve} {curve} H {left} ' + 'a {curve} {curve} 0 0 {clockwise} -{curve} {curve_y} V {down_2} ' + 'a {curve} {curve} 0 0 {clockwise} {curve} {curve_y} ' + 'L {end_x} {end_y} m -5 -5 l 5 5 l -5 5', {
 					start_x: self.start_x,
 					start_y: self.start_y,
 					end_x: self.end_x,
@@ -2014,7 +2017,16 @@ return /******/ (function(modules) { // webpackBootstrap
 		init();
 	
 		return self;
-	}
+	} /*
+	  	Class: Arrow
+	  	from_task ---> to_task
+	  
+	  	Opts:
+	  		gantt (Gantt object)
+	  		from_task (Bar object)
+	  		to_task (Bar object)
+	  */
+
 	module.exports = exports['default'];
 
 /***/ },
@@ -17837,7 +17849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 125 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// Snap.svg 0.4.0
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;// Snap.svg 0.4.0
 	// 
 	// Copyright (c) 2013 – 2015 Adobe Systems Incorporated. All rights reserved.
 	// 

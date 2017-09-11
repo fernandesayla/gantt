@@ -1,4 +1,3 @@
-/* global moment, Snap */
 /*
 	Class: Bar
 
@@ -7,6 +6,8 @@
 		task: task object
 */
 
+import Snap from 'snapsvg';
+import moment from 'moment';
 import './gantt.scss';
 
 export default function Bar(gt, task) {
