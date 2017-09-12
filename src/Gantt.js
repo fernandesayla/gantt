@@ -193,7 +193,7 @@ export default function Gantt(element, projects, config) {
 					_start: start,
 					_end: end,
 					_line: project._lastRow,
-					custom_class: 'late',
+					custom_class: 'bar-late',
 					dependencies: [],
 					responsaveis: [],
 					uors: [],
