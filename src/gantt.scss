@@ -1,6 +1,6 @@
 // $bar-color: #b8c2cc;
-$bar-color: #485f7d;
-$bar-stroke: #8D99A6;
+$bar-color: #1976d2;
+$bar-stroke: #1976d2;
 $border-color: #e0e0e0;
 $light-bg: #f5f5f5;
 $light-border-color: #ebeff2;
@@ -13,7 +13,7 @@ $blue: #3887f3;
 $light-blue: #82b1f3;
 $light-red: #f1aa9e;
 $light-yellow: #fcf8e3;
-$green: #2ec12e;
+$green: #43a047;
 $light-green: #b9f3b9;
 
 
@@ -104,7 +104,7 @@ $light-green: #b9f3b9;
 	}	
 
 	.bar-progress {
-		fill: $grey;
+		fill: $green;
 	}
 	.bar-invalid {
 		fill: transparent;
