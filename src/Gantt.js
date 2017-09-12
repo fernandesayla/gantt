@@ -55,7 +55,8 @@ export default function Gantt(element, projects, config) {
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null,
 			left_width: 0,
-			inline: true
+			inline: true,
+			projection: false
 		};
 		self.config = Object.assign({}, defaults, config);
 
@@ -176,7 +177,7 @@ export default function Gantt(element, projects, config) {
 					project._lastRow = task._line;
 					project._lastDate = get_max_date(project.tasks);
 				}
-				if(task.currentTask) project._currentDate = get_date_progress(task);
+				if(task.currentTask && self.config.projection) project._currentDate = get_date_progress(task);
 			});
 
 			project._late = moment().diff(project._currentDate, 'days');

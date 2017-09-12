@@ -118,7 +118,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				date_format: 'YYYY-MM-DD',
 				custom_popup_html: null,
 				left_width: 0,
-				inline: true
+				inline: true,
+				projection: false
 			};
 			self.config = Object.assign({}, defaults, config);
 	
@@ -241,7 +242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						project._lastRow = task._line;
 						project._lastDate = get_max_date(project.tasks);
 					}
-					if (task.currentTask) project._currentDate = get_date_progress(task);
+					if (task.currentTask && self.config.projection) project._currentDate = get_date_progress(task);
 				});
 	
 				project._late = (0, _moment2.default)().diff(project._currentDate, 'days');
@@ -1928,7 +1929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	
