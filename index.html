@@ -15,196 +15,190 @@
 		.gantt-container {
 			/*overflow: scroll;*/
 		}
-		/* custom class */
-		.gantt .bar-milestone .bar-progress {
-			fill: tomato !important;
-		}
+		
 
-		.gantt .late .bar{	
-			fill: #f1b4a9;
-			stroke: tomato;
-			/*stroke-dasharray: 7;*/
-			stroke-width: 0.8;
-			opacity: 0.8;
-		}
-
-	</style>	
-	
+	</style>
+	<script src="node_modules/moment/min/moment.min.js"></script>
+	<script src="node_modules/snapsvg/dist/snap.svg-min.js"></script>
 	<script src="dist/frappe-gantt.js"></script>
 </head>
 <body>
-	<div class="container">
-		<h2>Programa 1</h2>		
+	<div class="container">			
 		<div class="gantt-container">
 			<svg id="gantt" width="400" height="600"></svg>
 		</div>
 	</div>
 	<script>
 
-		// let projetos = [];
-		// let tarefaId = 0;		
+	function getProjects(){
+		
+			let projetos = [];
+			let tarefaId = 0;		
 
-		// for(i = 1; i <= 3; i++){
-			
-		// 	let tarefas = [];			
-		// 	let dataInicio = new Date("2017-06-10T03:00:00.000Z");
-		// 	let duracao = 0;
-		// 	let latencia = 0;			
-
-		// 	for(j = 1; j <= 5; j++){
-
-		// 		tarefaId++;
+			for(i = 1; i <= 3; i++){
 				
-		// 		dataInicio = new Date(dataInicio);
-		// 		dataInicio.setDate(dataInicio.getDate() + latencia);				
-		// 		dataFim = new Date(dataInicio);
-		// 		duracao = moment(dataInicio).daysInMonth() - 1;
-		// 		duracao = 60;
-		// 		dataFim.setDate(dataFim.getDate() + duracao);
-		// 		// latencia = moment(dataInicio).daysInMonth() + j;
-		// 		latencia = j + 30;
-				
-		// 		tarefa = {
+				let tarefas = [];			
+				let dataInicio = new Date("2017-06-10T03:00:00.000Z");
+				let duracao = 0;
+				let latencia = 0;			
 
-		// 			id: tarefaId,
-		// 			sequencia: j,					
-		// 			percentual: j < i + 2 ? 100: j > i + 2 ? 0 : 20,
-		// 			tarefaAtual: j == i + 2 ? true : false,
-		// 			tarefa: {
-		// 				id: j,
-		// 				nome: j == 2 ? "Tarefa " + j : "Tarefa " + j,								
-		// 			},
-		// 			situacao: {
-		// 				id: 1,
-		// 				nome: "Não Iniciado"
-		// 			},												
-		// 			periodos: [
-		// 				{
-		// 					id: 1,
-		// 					dataInicio: dataInicio,
-		// 					dataFim: dataFim,
-							
-		// 					tipo: {
-		// 						id: 1,
-		// 						nome: "Previsão",																				
-		// 					},																
-		// 				},
-		// 				{
-		// 					id: 2,
-		// 					dataInicio: "2017-06-13T12:53:03.348Z",
-		// 					dataFim: "2017-06-14T03:00:00.000Z",
-							
-		// 					tipo: {
-		// 						id: 2,
-		// 						nome: "Realizado",																				
-		// 					},
-														
-		// 				},
-		// 			],
-		// 			vinculos: [ 
-		// 				{
-		// 					tarefaSubordinada_id: 2,
-		// 				}
-		// 			],
-		// 			predecessoes: [
-		// 				{
-		// 					tarefaPredecessao_id: j != 1 ? tarefaId - 1 : null,
-		// 				},													
-		// 			],
-		// 			responsaveis: [
-		// 				{
-		// 					responsavel_id: "56805293",
-		// 					responsavel: {
-		// 						chave: "F6805293",
-		// 						nome: "Marcos Andrei Ivanechtchuk",
-		// 						celular: "061 993283558",
-		// 						telefone: 37402
-		// 					}
-		// 				},
-		// 				{
-		// 					responsavel_id: "54103757",
-		// 					responsavel: {
-		// 						chave: "F4103757",
-		// 						nome: "Henrique Fidellis Ferreira",
-		// 						celular: "061 92014477",
-		// 						telefone: 37404
-		// 					}
-		// 				}
-		// 			],
-		// 			uors: [
-		// 				{
-		// 				uor_id: 284651,
-		// 				uor: {
-		// 						id: 284651,
-		// 						nome: "DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS",
-		// 						nomeReduzido: "DISEM/DIV INFORM GER",
-		// 						prefixo: 9951,
-		// 						subordinada: 22
-		// 					}
-		// 				},
-		// 				{
-		// 				uor_id: 284650,
-		// 				uor: {
-		// 						id: 284650,
-		// 						nome: "DISEM - DIVISAO CONTROLE",
-		// 						nomeReduzido: "DISEM/CONTROLE",
-		// 						prefixo: 9951,
-		// 						subordinada: 20
-		// 					}
-		// 				}
-		// 			],					
-		// 		};
+				for(j = 1; j <= 5; j++){
 
-		// 		tarefas.push(tarefa);
-		// 	};			
+					tarefaId++;
+					
+					dataInicio = new Date(dataInicio);
+					dataInicio.setDate(dataInicio.getDate() + latencia);				
+					dataFim = new Date(dataInicio);
+					duracao = moment(dataInicio).daysInMonth() - 1;
+					duracao = 30;
+					dataFim.setDate(dataFim.getDate() + duracao);
+					// latencia = moment(dataInicio).daysInMonth() + j;
+					latencia = j*3 + 20;
+					
+					tarefa = {
 
-		// 	projeto = 
-		// 		{
-		// 			id: i,
-		// 			nome: "Projeto " + i,
-		// 			tarefas: tarefas,
-		// 		};
-
-		// 	projetos.push(projeto)
-		// }
-
-		// let projects = [];		
-
-		// projects = projects.concat(projetos.map(projeto =>{
-
-		// 	tarefas = projeto.tarefas;			
-
-		// 	tasks = tarefas.map((tarefa, i) => {
-							
-		// 		let previsao = tarefa.periodos.find(periodo => periodo.tipo.id == 1)			
-		// 		let dependencies = tarefa.predecessoes.map(vinculo => vinculo.tarefaPredecessao_id)
+						id: tarefaId,
+						sequencia: j,					
+						percentual: j < i + 2 ? 100: j > i + 2 ? 0 : 20,
+						tarefaAtual: j == i + 2 ? true : false,
+						tarefa: {
+							id: j,
+							nome: j == 2 ? "Tarefa " + j : "Tarefa " + j,								
+						},
+						situacao: {
+							id: 1,
+							nome: "Não Iniciado"
+						},												
+						periodos: [
+							{
+								id: 1,
+								dataInicio: dataInicio,
+								dataFim: dataFim,
 								
-		// 		return {
-		// 			projectId: projeto.id,
-		// 			id: tarefa.id,
-		// 			name: tarefa.tarefa.nome,
-		// 			start: previsao.dataInicio,
-		// 			end: previsao.dataFim,					
-		// 			progress: tarefa.percentual,
-		// 			dependencies: dependencies,
-		// 			currentTask: tarefa.tarefaAtual,
-		// 			periodos: tarefa.periodos,
-		// 			responsaveis: tarefa.responsaveis,
-		// 			uors: tarefa.uors,
-		// 		}
-		// 	});
+								tipo: {
+									id: 1,
+									nome: "Previsão",																				
+								},																
+							},
+							{
+								id: 2,
+								dataInicio: "2017-06-13T12:53:03.348Z",
+								dataFim: "2017-06-14T03:00:00.000Z",
+								
+								tipo: {
+									id: 2,
+									nome: "Realizado",																				
+								},
+															
+							},
+						],
+						vinculos: [ 
+							{
+								tarefaSubordinada_id: 2,
+							}
+						],
+						predecessoes: [
+							{
+								tarefaPredecessao_id: j != 1 ? tarefaId - 1 : null,
+							},													
+						],
+						responsaveis: [
+							{
+								responsavel_id: "56805293",
+								responsavel: {
+									chave: "F6805293",
+									nome: "Marcos Andrei Ivanechtchuk",
+									celular: "061 993283558",
+									telefone: 37402
+								}
+							},
+							{
+								responsavel_id: "54103757",
+								responsavel: {
+									chave: "F4103757",
+									nome: "Henrique Fidellis Ferreira",
+									celular: "061 92014477",
+									telefone: 37404
+								}
+							}
+						],
+						uors: [
+							{
+							uor_id: 284651,
+							uor: {
+									id: 284651,
+									nome: "DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS",
+									nomeReduzido: "DISEM/DIV INFORM GER",
+									prefixo: 9951,
+									subordinada: 22
+								}
+							},
+							{
+							uor_id: 284650,
+							uor: {
+									id: 284650,
+									nome: "DISEM - DIVISAO CONTROLE",
+									nomeReduzido: "DISEM/CONTROLE",
+									prefixo: 9951,
+									subordinada: 20
+								}
+							}
+						],					
+					};
 
-		// 	return {
-		// 		id: projeto.id,
-		// 		name: projeto.nome,
-		// 		tasks: tasks,
-		// 	}			
-		// }));
-		// console.log('projects', JSON.stringify(projects))
+					tarefas.push(tarefa);
+				};			
 
-		projects = [{"id":1,"name":"Projeto 1","tasks":[{"projectId":1,"id":1,"name":"Tarefa 1","start":"2017-06-10T03:00:00.000Z","end":"2017-08-09T03:00:00.000Z","progress":100,"dependencies":[null],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-06-10T03:00:00.000Z","dataFim":"2017-08-09T03:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":1,"id":2,"name":"Tarefa 2","start":"2017-07-11T03:00:00.000Z","end":"2017-09-09T03:00:00.000Z","progress":100,"dependencies":[1],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-07-11T03:00:00.000Z","dataFim":"2017-09-09T03:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":1,"id":3,"name":"Tarefa 3","start":"2017-08-12T03:00:00.000Z","end":"2017-10-11T03:00:00.000Z","progress":20,"dependencies":[2],"currentTask":true,"periodos":[{"id":1,"dataInicio":"2017-08-12T03:00:00.000Z","dataFim":"2017-10-11T03:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":1,"id":4,"name":"Tarefa 4","start":"2017-09-14T03:00:00.000Z","end":"2017-11-13T02:00:00.000Z","progress":0,"dependencies":[3],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-09-14T03:00:00.000Z","dataFim":"2017-11-13T02:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":1,"id":5,"name":"Tarefa 5","start":"2017-10-18T02:00:00.000Z","end":"2017-12-17T02:00:00.000Z","progress":0,"dependencies":[4],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-10-18T02:00:00.000Z","dataFim":"2017-12-17T02:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]}]},{"id":2,"name":"Projeto 2","tasks":[{"projectId":2,"id":6,"name":"Tarefa 1","start":"2017-06-10T03:00:00.000Z","end":"2017-08-09T03:00:00.000Z","progress":100,"dependencies":[null],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-06-10T03:00:00.000Z","dataFim":"2017-08-09T03:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":2,"id":7,"name":"Tarefa 2","start":"2017-07-11T03:00:00.000Z","end":"2017-09-09T03:00:00.000Z","progress":100,"dependencies":[6],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-07-11T03:00:00.000Z","dataFim":"2017-09-09T03:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":2,"id":8,"name":"Tarefa 3","start":"2017-08-12T03:00:00.000Z","end":"2017-10-11T03:00:00.000Z","progress":100,"dependencies":[7],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-08-12T03:00:00.000Z","dataFim":"2017-10-11T03:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":2,"id":9,"name":"Tarefa 4","start":"2017-09-14T03:00:00.000Z","end":"2017-11-13T02:00:00.000Z","progress":20,"dependencies":[8],"currentTask":true,"periodos":[{"id":1,"dataInicio":"2017-09-14T03:00:00.000Z","dataFim":"2017-11-13T02:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":2,"id":10,"name":"Tarefa 5","start":"2017-10-18T02:00:00.000Z","end":"2017-12-17T02:00:00.000Z","progress":0,"dependencies":[9],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-10-18T02:00:00.000Z","dataFim":"2017-12-17T02:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]}]},{"id":3,"name":"Projeto 3","tasks":[{"projectId":3,"id":11,"name":"Tarefa 1","start":"2017-06-10T03:00:00.000Z","end":"2017-08-09T03:00:00.000Z","progress":100,"dependencies":[null],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-06-10T03:00:00.000Z","dataFim":"2017-08-09T03:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":3,"id":12,"name":"Tarefa 2","start":"2017-07-11T03:00:00.000Z","end":"2017-09-09T03:00:00.000Z","progress":100,"dependencies":[11],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-07-11T03:00:00.000Z","dataFim":"2017-09-09T03:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":3,"id":13,"name":"Tarefa 3","start":"2017-08-12T03:00:00.000Z","end":"2017-10-11T03:00:00.000Z","progress":100,"dependencies":[12],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-08-12T03:00:00.000Z","dataFim":"2017-10-11T03:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":3,"id":14,"name":"Tarefa 4","start":"2017-09-14T03:00:00.000Z","end":"2017-11-13T02:00:00.000Z","progress":100,"dependencies":[13],"currentTask":false,"periodos":[{"id":1,"dataInicio":"2017-09-14T03:00:00.000Z","dataFim":"2017-11-13T02:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]},{"projectId":3,"id":15,"name":"Tarefa 5","start":"2017-10-18T02:00:00.000Z","end":"2017-12-17T02:00:00.000Z","progress":20,"dependencies":[14],"currentTask":true,"periodos":[{"id":1,"dataInicio":"2017-10-18T02:00:00.000Z","dataFim":"2017-12-17T02:00:00.000Z","tipo":{"id":1,"nome":"Previsão"}},{"id":2,"dataInicio":"2017-06-13T12:53:03.348Z","dataFim":"2017-06-14T03:00:00.000Z","tipo":{"id":2,"nome":"Realizado"}}],"responsaveis":[{"responsavel_id":"56805293","responsavel":{"chave":"F6805293","nome":"Marcos Andrei Ivanechtchuk","celular":"061 993283558","telefone":37402}},{"responsavel_id":"54103757","responsavel":{"chave":"F4103757","nome":"Henrique Fidellis Ferreira","celular":"061 92014477","telefone":37404}}],"uors":[{"uor_id":284651,"uor":{"id":284651,"nome":"DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS","nomeReduzido":"DISEM/DIV INFORM GER","prefixo":9951,"subordinada":22}},{"uor_id":284650,"uor":{"id":284650,"nome":"DISEM - DIVISAO CONTROLE","nomeReduzido":"DISEM/CONTROLE","prefixo":9951,"subordinada":20}}]}]}];
+				projeto = 
+					{
+						id: i,
+						nome: "Projeto " + i,
+						tarefas: tarefas,
+					};
 
-		var gantt_chart = Gantt("#gantt", projects, {
+				projetos.push(projeto)
+			}
+
+			let projects = [];		
+
+			projects = projects.concat(projetos.map(projeto =>{
+
+				tarefas = projeto.tarefas;			
+
+				tasks = tarefas.map((tarefa, i) => {
+								
+					let previsao = tarefa.periodos.find(periodo => periodo.tipo.id == 1)			
+					let dependencies = tarefa.predecessoes.map(vinculo => vinculo.tarefaPredecessao_id)
+									
+					return {
+						projectId: projeto.id,
+						id: tarefa.id,
+						name: tarefa.tarefa.nome,
+						start: previsao.dataInicio,
+						end: previsao.dataFim,					
+						progress: tarefa.percentual,
+						dependencies: dependencies,
+						currentTask: tarefa.tarefaAtual,
+						periodos: tarefa.periodos,
+						responsaveis: tarefa.responsaveis,
+						uors: tarefa.uors,
+					}
+				});
+
+				return {
+					id: projeto.id,
+					name: projeto.nome,
+					tasks: tasks,
+				}			
+			}));
+
+			return projects;
+		}
+
+
+		//console.log('const projects = ', JSON.stringify(getProjects()))
+		
+		var gantt_chart = Gantt("#gantt", getProjects(), {
 			on_click: function (task) {
 				console.log(task);
 			},
@@ -218,46 +212,12 @@
 				console.log(mode);
 			},
 			view_mode: 'Month',
-			left_width: projects.length > 1 ? 150 : 0,
+			left_width: 150,
 			inline: true,
 		});
+		
 		//console.log(gantt_chart);
-
 		
 	</script>
 </body>
 </html>
-<!--
-		// var today = new Date();
-
-		// var names = [
-		// 	["Redesign website", [0, 14]],
-		// 	["Write new content", [1, 8]],
-		// 	["Apply new styles", [3, 12]],
-		// 	["Review", [7, 14]],
-		// 	["Deploy", [8, 18]],
-		// 	["Go Live!", [10, 20]]
-		// ];
-
-		// var tasks = names.map(function(name, i) {
-		// 	var today = new Date();
-		// 	var start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-		// 	var end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-		// 	start.setDate(today.getDate() + name[1][0]);
-		// 	end.setDate(today.getDate() + name[1][1]);
-		// 	return {
-		// 		start: start,
-		// 		end: end,
-		// 		name: name[0],
-		// 		id: "Task " + i,
-		// 		progress: parseInt(Math.random() * 100, 10)
-		// 	}
-		// });
-						
-		// tasks[1].progress = 0;
-		// tasks[1].dependencies = "Task 0"
-		// tasks[2].dependencies = "Task 1"
-		// tasks[3].dependencies = "Task 2"
-		// tasks[5].dependencies = "Task 4"
-		// tasks[5].custom_class = "bar-milestone";
--->

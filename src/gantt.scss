@@ -94,6 +94,7 @@ $light-green: #b9f3b9;
 		stroke-width: 0;
 		transition: stroke-width .3s ease;
 	}
+
 	.bar-progress {
 		fill: $grey;
 	}
@@ -211,5 +212,13 @@ $light-green: #b9f3b9;
 	.avatar{
 		height: 50px !important;
 	}	
-	
+
+	.late .bar{	
+		fill: #f1b4a9;
+		stroke: tomato;
+		// stroke-dasharray: 7;
+		stroke-width: 0.8;
+		opacity: 0.8;
+	}	
 }
+
