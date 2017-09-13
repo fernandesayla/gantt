@@ -523,7 +523,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function make_grid_background() {
 	
 			var grid_width = self.dates.length * self.config.column_width + self.config.left_menu_width,
-			    grid_height = self.config.header_height + self.config.padding + (self.config.bar.height + self.config.padding) * self._projects._rows + 400;
+			    grid_height = self.config.header_height + self.config.padding + (self.config.bar.height + self.config.padding) * self._projects._rows /* + 400 */;
 	
 			self.canvas.rect(0, 0, grid_width, grid_height).addClass('grid-background').appendTo(self.element_groups.grid);
 	
@@ -1929,7 +1929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	

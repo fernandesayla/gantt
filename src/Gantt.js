@@ -381,7 +381,7 @@ export default function Gantt(element, projects, config) {
 
 		const grid_width = (self.dates.length * self.config.column_width) + self.config.left_menu_width,
 			grid_height = self.config.header_height + self.config.padding +
-				(self.config.bar.height + self.config.padding) * self._projects._rows + 400;
+				(self.config.bar.height + self.config.padding) * self._projects._rows /* + 400 */;
 
 		self.canvas.rect(0, 0, grid_width, grid_height)
 			.addClass('grid-background')
