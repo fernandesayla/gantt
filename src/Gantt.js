@@ -396,6 +396,7 @@ export default function Gantt(element, projects, config) {
 	function make_grid_header() {
 		const header_width = self.dates.length * self.config.column_width,
 			header_height = self.config.header_height + 10;
+		console.log('xxxxxxxx', self.config.left_menu_width);
 		self.canvas.rect(self.config.left_menu_width, 0, header_width, header_height)
 			.addClass('grid-header')
 			.appendTo(self.element_groups.grid);
@@ -701,7 +702,6 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function bind_grid_click() {
-		console.log('grid', self.element_groups.grid);
 		self.element_groups.grid.click(() => {
 			unselect_all();
 			self.element_groups.details
@@ -712,7 +712,6 @@ export default function Gantt(element, projects, config) {
 
 	function unselect_all() {
 		self.canvas.selectAll('.bar-wrapper').forEach(el => {
-			console.log('unselect_all', el);
 			el.removeClass('active');
 		});
 	}
