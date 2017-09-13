@@ -58,6 +58,9 @@ export default function Gantt(element, projects, config) {
 			inline: true,
 			projection: false
 		};
+
+		if(!config.left_menu_width && projects.length > 1) config.left_menu_width = 150;
+
 		self.config = Object.assign({}, defaults, config);
 
 		reset_variables();
@@ -389,7 +392,7 @@ export default function Gantt(element, projects, config) {
 
 		self.canvas.attr({
 			height: grid_height + self.config.padding,
-			width: '110%'
+			width: '100%'
 		});
 	}
 
