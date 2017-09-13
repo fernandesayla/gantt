@@ -396,7 +396,6 @@ export default function Gantt(element, projects, config) {
 	function make_grid_header() {
 		const header_width = self.dates.length * self.config.column_width,
 			header_height = self.config.header_height + 10;
-		console.log('xxxxxxxx', self.config);
 		self.canvas.rect(self.config.left_menu_width, 0, header_width, header_height)
 			.addClass('grid-header')
 			.appendTo(self.element_groups.grid);

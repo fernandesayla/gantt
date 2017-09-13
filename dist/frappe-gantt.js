@@ -536,7 +536,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		function make_grid_header() {
 			var header_width = self.dates.length * self.config.column_width,
 			    header_height = self.config.header_height + 10;
-			console.log('xxxxxxxx', self.config);
 			self.canvas.rect(self.config.left_menu_width, 0, header_width, header_height).addClass('grid-header').appendTo(self.element_groups.grid);
 		}
 	
@@ -1930,7 +1929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	
