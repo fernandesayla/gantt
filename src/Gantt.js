@@ -251,16 +251,27 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function render() {
+		console.log('clear');
 		clear();
+		console.log('setup_groups');
 		setup_groups();
+		console.log('make_grid');
 		make_grid();
+		console.log('make_dates');
 		make_dates();
+		console.log('make_bars');
 		make_bars();
+		console.log('make_arrows');
 		make_arrows();
+		console.log('make_projects');
 		make_projects();
+		console.log('map_arrows_on_bars');
 		map_arrows_on_bars();
+		console.log('set_width');
 		set_width();
+		console.log('set_scroll_position');
 		set_scroll_position();
+		console.log('bind_grid_click');
 		bind_grid_click();
 	}
 
@@ -701,7 +712,7 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function bind_grid_click() {
-		console.log('bind_grid_click');
+		console.log('bind_grid_click *******************');
 		self.element_groups.grid.click(() => {
 			unselect_all();
 			self.element_groups.details
@@ -711,7 +722,7 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function unselect_all() {
-		console.log('**********************************************unselect_all');
+		console.log('unselect_all');
 		self.canvas.selectAll('.bar-wrapper').forEach(el => {
 			el.removeClass('active');
 		});
