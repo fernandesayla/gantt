@@ -513,7 +513,7 @@ export default function Bar(gt, task) {
 			x = self.task._start.diff(gt.gantt_start, 'days') *
 				gt.config.column_width / 30;
 		}
-		return x + gt.config.left_width;
+		return x + gt.config.left_menu_width;
 	}
 
 	function compute_y() {

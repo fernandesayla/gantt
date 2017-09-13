@@ -54,7 +54,7 @@ export default function Gantt(element, projects, config) {
 			view_mode: 'Month',
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null,
-			left_width: 0,
+			left_menu_width: 0,
 			inline: true,
 			projection: false
 		};
@@ -313,7 +313,7 @@ export default function Gantt(element, projects, config) {
 
 	function set_scale(scale) {
 		self.config.view_mode = scale;
-		const screen_width = 1832 - self.config.left_width;
+		const screen_width = 1832 - self.config.left_menu_width;
 		let min_width = 0;
 		self.config.column_width = screen_width / self.dates.length;
 
@@ -339,7 +339,7 @@ export default function Gantt(element, projects, config) {
 	function set_width() {
 		const cur_width = self.canvas.node.getBoundingClientRect().width;
 		const actual_width = parseFloat(self.canvas.select('#grid .grid-row')
-							.attr('width')) + self.config.left_width;
+							.attr('width')) + self.config.left_menu_width;
 
 		if(cur_width < actual_width) {
 			self.canvas.attr('width', actual_width);
@@ -379,7 +379,7 @@ export default function Gantt(element, projects, config) {
 
 	function make_grid_background() {
 
-		const grid_width = (self.dates.length * self.config.column_width) + self.config.left_width,
+		const grid_width = (self.dates.length * self.config.column_width) + self.config.left_menu_width,
 			grid_height = self.config.header_height + self.config.padding +
 				(self.config.bar.height + self.config.padding) * self._projects._rows + 400;
 
@@ -396,7 +396,7 @@ export default function Gantt(element, projects, config) {
 	function make_grid_header() {
 		const header_width = self.dates.length * self.config.column_width,
 			header_height = self.config.header_height + 10;
-		self.canvas.rect(self.config.left_width, 0, header_width, header_height)
+		self.canvas.rect(self.config.left_menu_width, 0, header_width, header_height)
 			.addClass('grid-header')
 			.appendTo(self.element_groups.grid);
 	}
@@ -407,7 +407,7 @@ export default function Gantt(element, projects, config) {
 			lines = self.canvas.group().appendTo(self.element_groups.grid),
 			row_width = self.dates.length * self.config.column_width,
 			row_height = self.config.bar.height + self.config.padding,
-			left_width = self.config.left_width;
+			left_menu_width = self.config.left_menu_width;
 
 		let row_y = self.config.header_height + self.config.padding / 2;
 
@@ -416,11 +416,11 @@ export default function Gantt(element, projects, config) {
 			const nextTask = self.tasks[index + 1];
 			if(task._index && (!nextTask || task._line !== nextTask._line)) {
 
-				self.canvas.rect(left_width, row_y, row_width, row_height)
+				self.canvas.rect(left_menu_width, row_y, row_width, row_height)
 				.addClass('grid-row')
 				.appendTo(rows);
 
-				self.canvas.line(left_width, row_y + row_height, row_width + left_width, row_y + row_height)
+				self.canvas.line(left_menu_width, row_y + row_height, row_width + left_menu_width, row_y + row_height)
 				.addClass('row-line')
 				.appendTo(lines);
 
@@ -437,7 +437,7 @@ export default function Gantt(element, projects, config) {
 			current = self.canvas.group().appendTo(self.element_groups.project),
 			row_width = self.dates.length * self.config.column_width,
 			row_height = self.config.bar.height + self.config.padding,
-			left_width = self.config.left_width;
+			left_menu_width = self.config.left_menu_width;
 
 		const header_height = self.config.header_height + self.config.padding / 2;
 		let row_y = header_height;
@@ -448,23 +448,23 @@ export default function Gantt(element, projects, config) {
 				late = project._late > 0 ? '-late' : '';
 			row_y = header_height + (row_height * project._firstRow);
 
-			if(self.config.left_width > 0)	{
-				self.canvas.rect(0, row_y, left_width, height)
+			if(self.config.left_menu_width > 0)	{
+				self.canvas.rect(0, row_y, left_menu_width, height)
 					.addClass('grid-project-row')
 					.appendTo(rows);
 
-				self.canvas.line(0, row_y + height, row_width + left_width, row_y + height)
+				self.canvas.line(0, row_y + height, row_width + left_menu_width, row_y + height)
 					.addClass('row-line-project')
 					.appendTo(lines);
 
-				self.canvas.text(self.config.left_width / 2, row_y + (height / 2), project.name)
+				self.canvas.text(self.config.left_menu_width / 2, row_y + (height / 2), project.name)
 					.addClass('project-text')
 					.appendTo(text);
 			}
 
 			if(view_is('Month') && project._currentDate) {
 				const x = (project._currentDate.startOf('day').diff(self.gantt_start, 'days') *
-							self.config.column_width / 30) + self.config.left_width;
+							self.config.column_width / 30) + self.config.left_menu_width;
 
 				self.canvas.path(Snap.format('M {x} {y} v {height}', {
 					x: x,
@@ -475,7 +475,7 @@ export default function Gantt(element, projects, config) {
 				.appendTo(current);
 			} else if(view_is('Day') && project._currentDate) {
 				const x = (project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') /
-						self.config.step * self.config.column_width) + self.config.left_width;
+						self.config.step * self.config.column_width) + self.config.left_menu_width;
 				const width = self.config.column_width;
 
 				self.canvas.rect(x, row_y, width, height)
@@ -487,7 +487,7 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function make_grid_ticks() {
-		let tick_x = self.config.left_width,
+		let tick_x = self.config.left_menu_width,
 			tick_height = (self.config.bar.height + self.config.padding) * self._projects._rows;
 
 		for(let date of self.dates) {
@@ -535,10 +535,10 @@ export default function Gantt(element, projects, config) {
 
 		if(view_is('Day')) {
 			const x = (moment().startOf('day').diff(self.gantt_start, 'hours') /
-						self.config.step * self.config.column_width) + self.config.left_width;
+						self.config.step * self.config.column_width) + self.config.left_menu_width;
 			const width = self.config.column_width;
 
-			if (x <= self.element_groups.grid.getBBox().width && x >= self.config.left_width) {
+			if (x <= self.element_groups.grid.getBBox().width && x >= self.config.left_menu_width) {
 				self.canvas.rect(x, y, width, height)
 					.addClass('today-highlight')
 					.appendTo(self.element_groups.grid);
@@ -547,9 +547,9 @@ export default function Gantt(element, projects, config) {
 		}else {
 
 			const x = (moment().startOf('day').diff(self.gantt_start, 'days') *
-					self.config.column_width / 30) + self.config.left_width;
+					self.config.column_width / 30) + self.config.left_menu_width;
 
-			if (x <= self.element_groups.grid.getBBox().width && x >= self.config.left_width) {
+			if (x <= self.element_groups.grid.getBBox().width && x >= self.config.left_menu_width) {
 				self.canvas.path(Snap.format('M {x} {y} v {height}', {
 					x: x,
 					y: header_height,
@@ -565,8 +565,8 @@ export default function Gantt(element, projects, config) {
 		for(let date of get_dates_to_draw()) {
 
 			let grid_width = self.element_groups.grid.getBBox().width;
-			date.lower_x += self.config.left_width;
-			date.upper_x += self.config.left_width;
+			date.lower_x += self.config.left_menu_width;
+			date.upper_x += self.config.left_menu_width;
 
 			self.canvas.text(date.lower_x, date.lower_y, date.lower_text)
 				.addClass('lower-text')
