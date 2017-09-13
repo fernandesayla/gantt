@@ -4,10 +4,6 @@
 	<meta charset="UTF-8">
 	<title>Gantt</title>
 	<style>
-		body {
-			font-family: sans-serif;
-			/*background: #ccc;*/
-		}
 		.container {
 			width: 100%;
 			margin: 0 auto;
@@ -35,14 +31,14 @@
 			let projetos = [];
 			let tarefaId = 0;		
 
-			for(i = 1; i <= 3; i++){
+			for(i = 1; i <= 1; i++){
 				
 				let tarefas = [];			
-				let dataInicio = new Date("2017-06-10T03:00:00.000Z");
+				let dataInicio = new Date("2017-09-01T03:00:00.000Z");
 				let duracao = 0;
 				let latencia = 0;			
 
-				for(j = 1; j <= 5; j++){
+				for(j = 1; j <= 15; j++){
 
 					tarefaId++;
 					
@@ -50,10 +46,10 @@
 					dataInicio.setDate(dataInicio.getDate() + latencia);				
 					dataFim = new Date(dataInicio);
 					duracao = moment(dataInicio).daysInMonth() - 1;
-					duracao = 30;
+					duracao = 35;
 					dataFim.setDate(dataFim.getDate() + duracao);
 					// latencia = moment(dataInicio).daysInMonth() + j;
-					latencia = j*3 + 20;
+					latencia = j;
 					
 					tarefa = {
 
@@ -196,7 +192,7 @@
 		}
 
 
-		//console.log('const projects = ', JSON.stringify(getProjects()))
+		console.log('const projects = ', JSON.stringify(getProjects()))
 		
 		var gantt_chart = Gantt("#gantt", getProjects(), {
 			on_click: function (task) {
@@ -212,7 +208,6 @@
 				console.log(mode);
 			},
 			view_mode: 'Month',
-			left_menu_width: 150,
 			inline: true,
 			projection: false,
 		});
