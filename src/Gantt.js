@@ -17,6 +17,7 @@ export default function Gantt(element, projects, config) {
 	const self = {};
 
 	function init() {
+		console.log('init');
 		set_defaults();
 
 		// expose methods
