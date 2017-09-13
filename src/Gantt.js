@@ -701,6 +701,7 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function bind_grid_click() {
+		console.log('grid', self.element_groups.grid);
 		self.element_groups.grid.click(() => {
 			unselect_all();
 			self.element_groups.details
@@ -711,6 +712,7 @@ export default function Gantt(element, projects, config) {
 
 	function unselect_all() {
 		self.canvas.selectAll('.bar-wrapper').forEach(el => {
+			console.log('unselect_all', el);
 			el.removeClass('active');
 		});
 	}
