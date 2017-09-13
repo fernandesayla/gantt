@@ -701,15 +701,17 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function bind_grid_click() {
+		console.log('bind_grid_click');
 		self.element_groups.grid.click(() => {
 			unselect_all();
 			self.element_groups.details
-				.selectAll('.details-wrapper')
-				.forEach(el => el.addClass('hide'));
+			.selectAll('.details-wrapper')
+			.forEach(el => el.addClass('hide'));
 		});
 	}
 
 	function unselect_all() {
+		console.log('**********************************************unselect_all');
 		self.canvas.selectAll('.bar-wrapper').forEach(el => {
 			el.removeClass('active');
 		});

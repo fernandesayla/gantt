@@ -897,6 +897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function bind_grid_click() {
+			console.log('bind_grid_click');
 			self.element_groups.grid.click(function () {
 				unselect_all();
 				self.element_groups.details.selectAll('.details-wrapper').forEach(function (el) {
@@ -906,6 +907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function unselect_all() {
+			console.log('**********************************************unselect_all');
 			self.canvas.selectAll('.bar-wrapper').forEach(function (el) {
 				el.removeClass('active');
 			});
@@ -1929,7 +1931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	
