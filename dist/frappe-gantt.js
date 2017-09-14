@@ -110,10 +110,11 @@ return /******/ (function(modules) { // webpackBootstrap
 				bar: {
 					height: 20
 				},
+				row: {},
 				arrow: {
 					curve: 5
 				},
-				padding: 18,
+				padding: 21,
 				view_mode: 'Month',
 				date_format: 'YYYY-MM-DD',
 				custom_popup_html: null,
@@ -122,9 +123,11 @@ return /******/ (function(modules) { // webpackBootstrap
 				projection: false
 			};
 	
-			if (!config.left_menu_width && projects.length > 1) config.left_menu_width = 150;
+			if (!config.left_menu_width && projects.length > 1) config.left_menu_width = 200;
 	
 			self.config = Object.assign({}, defaults, config);
+	
+			self.config.row.height = self.config.bar.height + self.config.padding;
 	
 			reset_variables();
 		}
@@ -462,26 +465,26 @@ return /******/ (function(modules) { // webpackBootstrap
 		function set_scale(scale) {
 			self.config.view_mode = scale;
 			var screen_width = 1832 - self.config.left_menu_width;
-			var min_width = 0;
+			var min_column_width = 0;
 			self.config.column_width = screen_width / self.dates.length;
 	
 			if (scale === 'Day') {
-				min_width = 18;
+				min_column_width = 18;
 				self.config.step = 24;
 			} else if (scale === 'Half Day') {
-				min_width = 38;
+				min_column_width = 38;
 				self.config.step = 24 / 2;
 			} else if (scale === 'Quarter Day') {
-				min_width = 38;
+				min_column_width = 38;
 				self.config.step = 24 / 4;
 			} else if (scale === 'Week') {
-				min_width = 140;
+				min_column_width = 140;
 				self.config.step = 24 * 7;
 			} else if (scale === 'Month') {
-				min_width = 20;
+				min_column_width = 20;
 				self.config.step = 24 * 30;
 			}
-			self.config.column_width = self.config.column_width < min_width ? min_width : self.config.column_width;
+			self.config.column_width = self.config.column_width < min_column_width ? min_column_width : self.config.column_width;
 		}
 	
 		function set_width() {
@@ -526,7 +529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function make_grid_background() {
 	
 			var grid_width = self.dates.length * self.config.column_width + self.config.left_menu_width,
-			    grid_height = self.config.header_height + self.config.padding + (self.config.bar.height + self.config.padding) * self._projects._rows /* + 400 */;
+			    grid_height = self.config.header_height + self.config.padding + self.config.row.height * self._projects._rows /* + 400 */;
 	
 			self.canvas.rect(0, 0, grid_width, grid_height).addClass('grid-background').appendTo(self.element_groups.grid);
 	
@@ -547,7 +550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			var rows = self.canvas.group().appendTo(self.element_groups.grid),
 			    lines = self.canvas.group().appendTo(self.element_groups.grid),
 			    row_width = self.dates.length * self.config.column_width,
-			    row_height = self.config.bar.height + self.config.padding,
+			    row_height = self.config.row.height,
 			    left_menu_width = self.config.left_menu_width;
 	
 			var row_y = self.config.header_height + self.config.padding / 2;
@@ -562,7 +565,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					self.canvas.line(left_menu_width, row_y + row_height, row_width + left_menu_width, row_y + row_height).addClass('row-line').appendTo(lines);
 	
-					row_y += self.config.bar.height + self.config.padding;
+					row_y += self.config.row.height;
 				}
 			});
 		}
@@ -574,7 +577,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			    text = self.canvas.group().appendTo(self.element_groups.project),
 			    current = self.canvas.group().appendTo(self.element_groups.project),
 			    row_width = self.dates.length * self.config.column_width,
-			    row_height = self.config.bar.height + self.config.padding,
+			    row_height = self.config.row.height,
 			    left_menu_width = self.config.left_menu_width;
 	
 			var header_height = self.config.header_height + self.config.padding / 2;
@@ -614,7 +617,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function make_grid_ticks() {
 			var tick_x = self.config.left_menu_width,
-			    tick_height = (self.config.bar.height + self.config.padding) * self._projects._rows;
+			    tick_height = self.config.row.height * self._projects._rows;
 	
 			var _iteratorNormalCompletion5 = true;
 			var _didIteratorError5 = false;
@@ -675,7 +678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			var y = 0;
 			var header_height = self.config.header_height + self.config.padding / 2;
-			var height = (self.config.bar.height + self.config.padding) * self._projects._rows + header_height;
+			var height = self.config.row.height * self._projects._rows + header_height;
 	
 			if (view_is('Day')) {
 				var x = (0, _moment2.default)().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.left_menu_width;
@@ -762,14 +765,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (!last_date) {
 				last_date = date.clone().add(1, 'year').add(1, 'month').add(1, 'day');
 			}
-			var min_width_month = 60;
+			var min_column_width_month = 60;
 	
 			var date_text = {
 				'Quarter Day_lower': date.format('HH'),
 				'Half Day_lower': date.format('HH'),
 				'Day_lower': date.date() !== last_date.date() ? date.format('D') : '',
 				'Week_lower': date.month() !== last_date.month() ? date.format('D MMM') : date.format('D'),
-				'Month_lower': date.format(self.config.column_width < min_width_month ? 'MM' : 'MMMM'),
+				'Month_lower': date.format(self.config.column_width < min_column_width_month ? 'MM' : 'MMMM'),
 				'Quarter Day_upper': date.date() !== last_date.date() ? date.format('D MMM') : '',
 				'Half Day_upper': date.date() !== last_date.date() ? date.month() !== last_date.month() ? date.format('D MMM') : date.format('D') : '',
 				'Day_upper': date.month() !== last_date.month() ? date.format('MMMM') : '',
@@ -1020,7 +1023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "body {\n  font-family: sans-serif !important; }\n\n.gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.6; }\n  .gantt .tick.thick {\n    stroke-width: 0.8; }\n\n.gantt .tick-today, .gantt .tick-current, .gantt .tick-current-late {\n  stroke-width: 1;\n  opacity: 0.8;\n  stroke-dasharray: 7; }\n\n.gantt .tick-today {\n  stroke: #43a047; }\n\n.gantt .tick-current {\n  stroke: #82b1f3; }\n\n.gantt .tick-current-late {\n  stroke: #f1aa9e; }\n\n.gantt .today-highlight, .gantt .current-highlight, .gantt .current-highlight-late {\n  opacity: 0.5; }\n\n.gantt .today-highlight {\n  fill: #b9f3b9; }\n\n.gantt .current-highlight {\n  fill: #82b1f3; }\n\n.gantt .current-highlight-late {\n  fill: #f1aa9e; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #1976d2;\n  stroke: #1976d2;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-late .bar {\n  fill: #f1b4a9 !important;\n  stroke: tomato;\n  stroke-width: 0.8;\n  opacity: 0.8; }\n\n.gantt .bar-progress {\n  fill: #43a047; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #1976d2;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt .project-text {\n  fill: #555;\n  text-anchor: middle; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0; }\n  .gantt #details .details-container h5 {\n    font-size: 12px;\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    font-size: 12px;\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #f5f5f5; }\n\n.gantt .avatarContainer {\n  height: 64px;\n  display: flex;\n  align-items: center;\n  padding-right: 10px;\n  float: left; }\n\n.gantt .avatar {\n  height: 50px !important; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAmBA;EACE,mCAAkC,EACnC;;AAED;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBA3BoB;EA4BpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cAjCgB,EAkChB;;AAfF;EAiBE,gBAnC0B,EAoC1B;;AAlBF;EAoBE,gBAxCoB;EAyCpB,kBAAiB,EACjB;;AAtBF;EAwBE,gBA5CoB;EA6CpB,kBAAiB,EAIjB;EA7BF;IA2BG,kBAAiB,EACjB;;AA5BH;EAgCE,gBAAe;EACf,aAAY;EACZ,oBAAmB,EACnB;;AAnCF;EAsCE,gBA9Ca,EA+Cb;;AAvCF;EA0CE,gBArDkB,EAuDlB;;AA5CF;EA8CE,gBAxDiB,EAyDjB;;AA/CF;EAkDE,aAAY,EACZ;;AAnDF;EAsDE,cA7DmB,EA8DnB;;AAvDF;EA0DE,cArEkB,EAsElB;;AA3DF;EA8DE,cAxEiB,EAyEjB;;AA/DF;EAkEE,WAAU;EACV,aAnFe;EAoFf,kBAAiB,EACjB;;AArEF;EAwEE,cA9FiB;EA+FjB,gBA9FkB;EA+FlB,gBAAe;EACf,kCAAiC,EACjC;;AA5EF;EA+EE,yBAAwB;EACxB,eAAc;EAEd,kBAAiB;EACjB,aAAY,EACZ;;AApFF;EAuFE,cA/Fa,EAgGb;;AAxFF;EA0FE,kBAAiB;EACjB,gBAhHkB;EAiHlB,gBAAe;EACf,oBAAmB,EAKnB;EAlGF;IAgGG,WA/Gc,EAgHd;;AAjGH;EAoGE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EAEf,sBAAqB,EAMrB;EA/GF;IA4GG,WA3Hc;IA4Hd,mBAAkB,EAClB;;AA9GH;EAkHE,WAnIiB;EAoIjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AAvHF;EA0HE,gBAAe,EAkBf;EA5IF;IA8HI,gBAAe,EACf;EA/HJ;IAkII,oBAAmB;IACnB,WAAU,EACV;EApIJ;IAyII,gBAAe,EACf;;AA1IJ;EA+IE,gBAAe;EACf,oBAAmB,EACnB;;AAjJF;EAmJE,WAlKe,EAmKf;;AApJF;EAsJE,WApKe,EAqKf;;AAvJF;EAyJE,WAxKe;EAyKf,oBAAmB,EACnB;;AA3JF;EA8JE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EAtLF;IAmKG,UAAS,EACT;EApKH;IAuKG,gBAAe;IACf,kBAAiB;IACjB,oBAAmB;IACnB,YAzLc,EA0Ld;EA3KH;IA8KG,gBAAe;IACf,mBAAkB;IAClB,YAhMc,EAiMd;EAjLH;IAoLG,iBAAgB,EAChB;;AArLH;EAyLE,cAAa,EACb;;AA1LF;EA6LE,cAhNgB,EAiNhB;;AA9LF;EAiME,aAAY;EACZ,cAAa;EACb,oBAAmB;EACnB,oBAAmB;EACnB,YAAW,EAEX;;AAvMF;EAyME,wBAAuB,EACvB","file":"gantt.scss","sourcesContent":["// $bar-color: #b8c2cc;\n$bar-color: #1976d2;\n$bar-stroke: #1976d2;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n$handle-color: #ddd;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n$grey: #b8c2cc;\n$blue: #3887f3;\n$light-blue: #82b1f3;\n$light-red: #f1aa9e;\n$light-yellow: #fcf8e3;\n$green: #43a047;\n$light-green: #b9f3b9;\n\n\nbody {\n  font-family: sans-serif !important; \n}\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\t\t\n\t\tstroke: $border-color;\t\t\n\t\tstroke-width: 1.4;\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.6;\n\t\t&.thick {\n\t\t\tstroke-width: 0.8;\n\t\t}\n\t}\n\n\t.tick-today, .tick-current, .tick-current-late {\t\t\n\t\tstroke-width: 1;\t\n\t\topacity: 0.8;\t\n\t\tstroke-dasharray: 7;\n\t}\n\n\t.tick-today {\n\t\tstroke: $green;\t\t\n\t}\n\n\t.tick-current {\n\t\tstroke: $light-blue;\n\t\t\n\t}\n\t.tick-current-late {\n\t\tstroke: $light-red;\n\t}\n\n\t.today-highlight, .current-highlight, .current-highlight-late{\n\t\topacity: 0.5;\n\t}\n\n\t.today-highlight {\n\t\tfill: $light-green;\t\t\n\t}\n\n\t.current-highlight {\n\t\tfill: $light-blue;\n\t}\n\n\t.current-highlight-late {\n\t\tfill: $light-red;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\n\t.bar-late .bar {\t\n\t\tfill: #f1b4a9 !important;\n\t\tstroke: tomato;\n\t\t// stroke-dasharray: 7;\n\t\tstroke-width: 0.8;\n\t\topacity: 0.8;\n\t}\t\n\n\t.bar-progress {\n\t\tfill: $green;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\t// font-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\t.project-text{\n\t\tfill: $text-light;\n\t\ttext-anchor: middle;\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\n\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\th5 {\n\t\t\tfont-size: 12px;\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\n\t\t\tfont-size: 12px;\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: $light-bg;\n\t}\n\n\t.avatarContainer{\n\t\theight: 64px;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tpadding-right: 10px;\n\t\tfloat: left;\n\t\t\n\t}\n\t.avatar{\n\t\theight: 50px !important;\n\t}\t\n\n}\n\n"],"sourceRoot":""}]);
+	exports.push([module.id, "body {\n  font-family: sans-serif; }\n\n.gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.6; }\n  .gantt .tick.thick {\n    stroke-width: 0.8; }\n\n.gantt .tick-today, .gantt .tick-current, .gantt .tick-current-late {\n  stroke-width: 1;\n  opacity: 0.8;\n  stroke-dasharray: 7; }\n\n.gantt .tick-today {\n  stroke: #43a047; }\n\n.gantt .tick-current {\n  stroke: #82b1f3; }\n\n.gantt .tick-current-late {\n  stroke: #f1aa9e; }\n\n.gantt .today-highlight, .gantt .current-highlight, .gantt .current-highlight-late {\n  opacity: 0.5; }\n\n.gantt .today-highlight {\n  fill: #b9f3b9; }\n\n.gantt .current-highlight {\n  fill: #82b1f3; }\n\n.gantt .current-highlight-late {\n  fill: #f1aa9e; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #1976d2;\n  stroke: #1976d2;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-late .bar {\n  fill: #f1b4a9 !important;\n  stroke: tomato;\n  stroke-width: 0.8;\n  opacity: 0.8; }\n\n.gantt .bar-progress {\n  fill: #43a047; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #1976d2;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt .project-text {\n  fill: #555;\n  text-anchor: middle; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0; }\n  .gantt #details .details-container h5 {\n    font-size: 12px;\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    font-size: 12px;\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #f5f5f5; }\n\n.gantt .avatarContainer {\n  height: 64px;\n  display: flex;\n  align-items: center;\n  padding-right: 10px;\n  float: left; }\n\n.gantt .avatar {\n  height: 50px !important; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAmBA;EACE,wBAAuB,EACxB;;AAED;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBA3BoB;EA4BpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cAjCgB,EAkChB;;AAfF;EAiBE,gBAnC0B,EAoC1B;;AAlBF;EAoBE,gBAxCoB;EAyCpB,kBAAiB,EACjB;;AAtBF;EAwBE,gBA5CoB;EA6CpB,kBAAiB,EAIjB;EA7BF;IA2BG,kBAAiB,EACjB;;AA5BH;EAgCE,gBAAe;EACf,aAAY;EACZ,oBAAmB,EACnB;;AAnCF;EAsCE,gBA9Ca,EA+Cb;;AAvCF;EA0CE,gBArDkB,EAuDlB;;AA5CF;EA8CE,gBAxDiB,EAyDjB;;AA/CF;EAkDE,aAAY,EACZ;;AAnDF;EAsDE,cA7DmB,EA8DnB;;AAvDF;EA0DE,cArEkB,EAsElB;;AA3DF;EA8DE,cAxEiB,EAyEjB;;AA/DF;EAkEE,WAAU;EACV,aAnFe;EAoFf,kBAAiB,EACjB;;AArEF;EAwEE,cA9FiB;EA+FjB,gBA9FkB;EA+FlB,gBAAe;EACf,kCAAiC,EACjC;;AA5EF;EA+EE,yBAAwB;EACxB,eAAc;EAEd,kBAAiB;EACjB,aAAY,EACZ;;AApFF;EAuFE,cA/Fa,EAgGb;;AAxFF;EA0FE,kBAAiB;EACjB,gBAhHkB;EAiHlB,gBAAe;EACf,oBAAmB,EAKnB;EAlGF;IAgGG,WA/Gc,EAgHd;;AAjGH;EAoGE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EAEf,sBAAqB,EAMrB;EA/GF;IA4GG,WA3Hc;IA4Hd,mBAAkB,EAClB;;AA9GH;EAkHE,WAnIiB;EAoIjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AAvHF;EA0HE,gBAAe,EAkBf;EA5IF;IA8HI,gBAAe,EACf;EA/HJ;IAkII,oBAAmB;IACnB,WAAU,EACV;EApIJ;IAyII,gBAAe,EACf;;AA1IJ;EA+IE,gBAAe;EACf,oBAAmB,EACnB;;AAjJF;EAmJE,WAlKe,EAmKf;;AApJF;EAsJE,WApKe,EAqKf;;AAvJF;EAyJE,WAxKe;EAyKf,oBAAmB,EACnB;;AA3JF;EA8JE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EAtLF;IAmKG,UAAS,EACT;EApKH;IAuKG,gBAAe;IACf,kBAAiB;IACjB,oBAAmB;IACnB,YAzLc,EA0Ld;EA3KH;IA8KG,gBAAe;IACf,mBAAkB;IAClB,YAhMc,EAiMd;EAjLH;IAoLG,iBAAgB,EAChB;;AArLH;EAyLE,cAAa,EACb;;AA1LF;EA6LE,cAhNgB,EAiNhB;;AA9LF;EAiME,aAAY;EACZ,cAAa;EACb,oBAAmB;EACnB,oBAAmB;EACnB,YAAW,EAEX;;AAvMF;EAyME,wBAAuB,EACvB","file":"gantt.scss","sourcesContent":["// $bar-color: #b8c2cc;\n$bar-color: #1976d2;\n$bar-stroke: #1976d2;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n$handle-color: #ddd;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n$grey: #b8c2cc;\n$blue: #3887f3;\n$light-blue: #82b1f3;\n$light-red: #f1aa9e;\n$light-yellow: #fcf8e3;\n$green: #43a047;\n$light-green: #b9f3b9;\n\n\nbody {\n  font-family: sans-serif; \n}\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\t\t\n\t\tstroke: $border-color;\t\t\n\t\tstroke-width: 1.4;\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.6;\n\t\t&.thick {\n\t\t\tstroke-width: 0.8;\n\t\t}\n\t}\n\n\t.tick-today, .tick-current, .tick-current-late {\t\t\n\t\tstroke-width: 1;\t\n\t\topacity: 0.8;\t\n\t\tstroke-dasharray: 7;\n\t}\n\n\t.tick-today {\n\t\tstroke: $green;\t\t\n\t}\n\n\t.tick-current {\n\t\tstroke: $light-blue;\n\t\t\n\t}\n\t.tick-current-late {\n\t\tstroke: $light-red;\n\t}\n\n\t.today-highlight, .current-highlight, .current-highlight-late{\n\t\topacity: 0.5;\n\t}\n\n\t.today-highlight {\n\t\tfill: $light-green;\t\t\n\t}\n\n\t.current-highlight {\n\t\tfill: $light-blue;\n\t}\n\n\t.current-highlight-late {\n\t\tfill: $light-red;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\n\t.bar-late .bar {\t\n\t\tfill: #f1b4a9 !important;\n\t\tstroke: tomato;\n\t\t// stroke-dasharray: 7;\n\t\tstroke-width: 0.8;\n\t\topacity: 0.8;\n\t}\t\n\n\t.bar-progress {\n\t\tfill: $green;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\t// font-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\t.project-text{\n\t\tfill: $text-light;\n\t\ttext-anchor: middle;\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\t\t\n\t\t\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\th5 {\n\t\t\tfont-size: 12px;\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\n\t\t\tfont-size: 12px;\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: $light-bg;\n\t}\n\n\t.avatarContainer{\n\t\theight: 64px;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tpadding-right: 10px;\n\t\tfloat: left;\n\t\t\n\t}\n\t.avatar{\n\t\theight: 50px !important;\n\t}\t\n\n}\n\n"],"sourceRoot":""}]);
 	
 	// exports
 
@@ -1502,6 +1505,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			var html = get_details_html();
 			var foreign_object = _snapSvg2.default.parse('<foreignObject width="5000" height="2000">\n\t\t\t\t<body xmlns="http://www.w3.org/1999/xhtml">\n\t\t\t\t\t' + html + '\n\t\t\t\t</body>\n\t\t\t\t</foreignObject>');
 			self.details_box.append(foreign_object);
+			// console.log(self.details_box.node.getBoundingClientRect());
+			console.log(self.details_box.node.getElementsByClassName('details-container')[0].children);
 		}
 	
 		function get_details_html() {
@@ -1541,7 +1546,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				var nome = responsavel.responsavel.nome;
 				var ramal = responsavel.responsavel.telefone;
 				var celular = responsavel.responsavel.celular;
-				var link = 'https://connections.bb.com.br/profiles/html/myProfileView.do?uid=' + chave;
+				var link = 'https://humanograma.intranet.bb.com.br/' + chave;
 				responsaveis = responsaveis.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=' + link + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=https://connections.bb.com.br/profiles/photo.do?uid=' + chave + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + chave + ' - ' + nome + '</p>\n\t\t\t\t<p>Ramal: ' + ramal + '</p>\n\t\t\t\t<p>Celular: ' + celular + '</p>\n\t\t\t\t');
 			});
 	
@@ -1558,9 +1563,17 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function get_details_position() {
+	
+			// const width = gt.element_groups.grid.getBBox().width;
+			// const height = gt.element_groups.grid.getBBox().height;
+			var x = self.$bar.getEndX() + 2;
+			var y = self.$bar.getY() - 10;
+			// console.log('details_box', self.details_box.getBBox());
+			// console.log('width', width);
+			// console.log('height', height);
 			return {
-				x: self.$bar.getEndX() + 2,
-				y: self.$bar.getY() - 10
+				x: x,
+				y: y
 			};
 		}
 	

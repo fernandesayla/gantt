@@ -18,7 +18,7 @@ $light-green: #b9f3b9;
 
 
 body {
-  font-family: sans-serif !important; 
+  font-family: sans-serif; 
 }
 
 .gantt {
@@ -181,8 +181,8 @@ body {
 	#details .details-container {
 		background: #fff;
 		display: inline-block;
-		padding: 12px;
-
+		padding: 12px;		
+		
 		h5, p {
 			margin: 0;
 		}

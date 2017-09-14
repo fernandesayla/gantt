@@ -186,6 +186,8 @@ export default function Bar(gt, task) {
 				</body>
 				</foreignObject>`);
 		self.details_box.append(foreign_object);
+		// console.log(self.details_box.node.getBoundingClientRect());
+		console.log(self.details_box.node.getElementsByClassName('details-container')[0].children);
 	}
 
 	function get_details_html() {
@@ -227,7 +229,7 @@ export default function Bar(gt, task) {
 			const nome = responsavel.responsavel.nome;
 			const ramal = responsavel.responsavel.telefone;
 			const celular = responsavel.responsavel.celular;
-			const link = `https://connections.bb.com.br/profiles/html/myProfileView.do?uid=${chave}`;
+			const link = `https://humanograma.intranet.bb.com.br/${chave}`;
 			responsaveis = responsaveis.concat(`
 				${ i !== 0 ? `<hr />` : ``}
 				<a href=${link} target="_blank" class="avatarContainer">
@@ -285,9 +287,17 @@ export default function Bar(gt, task) {
 	}
 
 	function get_details_position() {
+
+		// const width = gt.element_groups.grid.getBBox().width;
+		// const height = gt.element_groups.grid.getBBox().height;
+		const x = self.$bar.getEndX() + 2;
+		const y = self.$bar.getY() - 10;
+		// console.log('details_box', self.details_box.getBBox());
+		// console.log('width', width);
+		// console.log('height', height);
 		return {
-			x: self.$bar.getEndX() + 2,
-			y: self.$bar.getY() - 10
+			x: x,
+			y: y
 		};
 	}
 
