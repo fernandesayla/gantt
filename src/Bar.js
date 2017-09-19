@@ -176,8 +176,9 @@ export default function Bar(gt, task) {
 	}
 
 	function render_details() {
-		const {x, y} = get_details_position();
-		self.details_box.transform(`t${x},${y}`);
+
+		// const { x, y } = get_details_position();
+		// self.details_box.transform(`t${x},${y}`);
 		self.details_box.clear();
 
 		const html = get_details_html();
@@ -187,8 +188,10 @@ export default function Bar(gt, task) {
 					${html}
 				</body>
 				</foreignObject>`);
+
 		self.details_box.append(foreign_object);
-		// console.log(self.details_box.node.getElementsByClassName('details-container')[0].children);
+		const { x, y } = get_details_position();
+		self.details_box.transform(`t${x},${y}`);
 	}
 
 	function get_details_html() {
@@ -255,7 +258,7 @@ export default function Bar(gt, task) {
 		});
 
 		const html = `
-			<div class="details-container">
+			<div class="details-container" height="auto">
 				<h5>${heading}</h5>
 				<p>${line_1}</p>
 				${
@@ -289,15 +292,16 @@ export default function Bar(gt, task) {
 
 	function get_details_position() {
 
+		let details_height = self.details_box.node.getElementsByClassName('details-container')[0].clientHeight;
+		details_height = details_height * 0.45;
+
 		const width = gt.element_groups.grid.getBBox().width;
 		const height = gt.element_groups.grid.getBBox().height;
 		// const x = self.$bar.getEndX() + 2;
-		const y_end = self.$bar.getY() + self.details_height;
+		const y_end = self.$bar.getY() + details_height;
 		const x_end = self.$bar.getEndX() + self.details_width;
 		const x = (x_end > width) ? self.$bar.getEndX() - (x_end - width) : self.$bar.getEndX();
 		const y = (y_end > height) ? self.$bar.getY() - (y_end - height) : self.$bar.getY();
-
-		// if(y_end > height) y = y - (y_end - height);
 
 		return {
 			x: x + 2,

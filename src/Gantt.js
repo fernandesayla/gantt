@@ -402,7 +402,6 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function make_grid_header() {
-		console.log('make_grid_header');
 		const header_width = self.dates.length * self.config.column_width,
 			header_height = self.config.header_height + 10;
 		self.canvas.rect(self.config.left_menu_width, 0, header_width, header_height)
@@ -528,7 +527,6 @@ export default function Gantt(element, projects, config) {
 				tick_x += date.daysInMonth() * self.config.column_width / 30;
 			} else {
 				tick_x += self.config.column_width;
-				console.log('tick_x', tick_x);
 			}
 		}
 	}

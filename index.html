@@ -87,6 +87,17 @@
           //   },
 
           // },
+          // {
+          //   id: 3,
+          //   dataInicio: '2017-06-13T12:53:03.348Z',
+          //   dataFim: '2017-06-14T03:00:00.000Z',
+
+          //   tipo: {
+          //     id: 2,
+          //     nome: 'Realizado',
+          //   },
+
+          // },
         ],
         vinculos: [
           {
@@ -117,18 +128,36 @@
           //     telefone: '061 34937402',
           //   },
           // },
+          // {
+          //   responsavel_id: '54103757',
+          //   responsavel: {
+          //     chave: 'F4103757',
+          //     nome: 'Henrique Fidellis Ferreira',
+          //     celular: '061 92014477',
+          //     telefone: '061 34937402',
+          //   },
+          // },
+          // {
+          //   responsavel_id: '54103757',
+          //   responsavel: {
+          //     chave: 'F4103757',
+          //     nome: 'Henrique Fidellis Ferreira',
+          //     celular: '061 92014477',
+          //     telefone: '061 34937402',
+          //   },
+          // },
         ],
         uors: [
-          {
-            uor_id: 284651,
-            uor: {
-              id: 284651,
-              nome: 'DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS',
-              nomeReduzido: 'DISEM/DIV INFORM GER',
-              prefixo: 9951,
-              subordinada: 22,
-            },
-          },
+          // {
+          //   uor_id: 284651,
+          //   uor: {
+          //     id: 284651,
+          //     nome: 'DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS',
+          //     nomeReduzido: 'DISEM/DIV INFORM GER',
+          //     prefixo: 9951,
+          //     subordinada: 22,
+          //   },
+          // },
           // {
           //   uor_id: 284650,
           //   uor: {
@@ -201,16 +230,16 @@
 		
 		var gantt_chart = Gantt("#gantt", getProjects(), {
 			on_click: function (task) {
-				console.log(task);
+				// console.log(task);
 			},
 			on_date_change: function(task, start, end) {
-				console.log(task, start, end);
+				console.log(start._d, end._d);
 			},
 			on_progress_change: function(task, progress) {
-				console.log(task, progress);
+				// console.log(task, progress);
 			},
 			on_view_change: function(mode) {
-				console.log(mode);
+				// console.log(mode);
 			},
 			view_mode: 'Month',
 			inline: true,
