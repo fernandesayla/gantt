@@ -408,7 +408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				self.gantt_start = self.gantt_start.clone().subtract(7, 'day');
 				self.gantt_end = self.gantt_end.clone().add(7, 'day');
 			} else if (view_is('Month')) {
-				self.gantt_start = self.gantt_start.clone().startOf('month').subtract(1, 'Month');
+				self.gantt_start = self.gantt_start.clone().startOf('month').subtract(0, 'Month');
 				// self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
 				self.gantt_end = self.gantt_end.clone().endOf('month');
 			} else {
@@ -426,7 +426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				if (!cur_date) {
 					cur_date = self.gantt_start.clone();
 				} else {
-					cur_date = view_is('Month') ? cur_date.clone().add(1, 'month') : cur_date.clone().add(self.config.step, 'hours');
+					cur_date = view_is('Month') ? cur_date.clone().add(1, 'month').endOf('month') : cur_date.clone().add(self.config.step, 'hours');
 				}
 				self.dates.push(cur_date);
 			}
@@ -527,7 +527,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function make_grid_background() {
-	
 			var grid_width = self.dates.length * self.config.column_width + self.config.left_menu_width,
 			    grid_height = self.config.header_height + self.config.padding + self.config.row.height * self._projects._rows /* + 400 */;
 	
@@ -535,11 +534,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			self.canvas.attr({
 				height: grid_height + self.config.padding,
-				width: '100%'
+				width: '102%'
 			});
 		}
 	
 		function make_grid_header() {
+			console.log('make_grid_header');
 			var header_width = self.dates.length * self.config.column_width,
 			    header_height = self.config.header_height + 10;
 			self.canvas.rect(self.config.left_menu_width, 0, header_width, header_height).addClass('grid-header').appendTo(self.element_groups.grid);
@@ -556,13 +556,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			var row_y = self.config.header_height + self.config.padding / 2;
 	
 			self.tasks.forEach(function (task, index) {
-				// eslint-disable-line
-	
+				// eslint-disable-line			
 				var nextTask = self.tasks[index + 1];
-				if (task._index && (!nextTask || task._line !== nextTask._line)) {
+				if (!nextTask || task._line !== nextTask._line) {
 	
 					self.canvas.rect(left_menu_width, row_y, row_width, row_height).addClass('grid-row').appendTo(rows);
-	
 					self.canvas.line(left_menu_width, row_y + row_height, row_width + left_menu_width, row_y + row_height).addClass('row-line').appendTo(lines);
 	
 					row_y += self.config.row.height;
@@ -616,8 +614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function make_grid_ticks() {
-			var tick_x = self.config.left_menu_width,
-			    tick_height = self.config.row.height * self._projects._rows;
+			var tick_x = self.config.left_menu_width;
 	
 			var _iteratorNormalCompletion5 = true;
 			var _didIteratorError5 = false;
@@ -628,6 +625,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					var date = _step5.value;
 	
 	
+					var tick_height = self.config.row.height * self._projects._rows;
 					var tick_y = self.config.header_height + self.config.padding / 2;
 	
 					var tick_class = 'tick';
@@ -643,8 +641,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					if (view_is('Month') && date.month() === 0) {
 						tick_class += ' thick';
 						tick_y = tick_y / 2;
+						tick_height = tick_height + tick_y;
 					}
-	
 					self.canvas.path(_snapSvg2.default.format('M {x} {y} v {height}', {
 						x: tick_x,
 						y: tick_y,
@@ -655,6 +653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						tick_x += date.daysInMonth() * self.config.column_width / 30;
 					} else {
 						tick_x += self.config.column_width;
+						console.log('tick_x', tick_x);
 					}
 				}
 			} catch (err) {
@@ -755,7 +754,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				var d = get_date_info(date, last_date, i);
 				last_date = date;
 				d.lower_x = lower_x + self.config.column_width / 2;
-				lower_x += date.daysInMonth() * self.config.column_width / 30;
+				lower_x += view_is('Month') ? date.daysInMonth() * self.config.column_width / 30 : self.config.column_width;
+	
 				return d;
 			});
 			return dates;
@@ -1373,6 +1373,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		function set_defaults() {
 			self.action_completed = false;
 			self.task = task;
+			self.details_width = 241;
+			self.details_height = 318;
 		}
 	
 		function prepare() {
@@ -1505,8 +1507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			var html = get_details_html();
 			var foreign_object = _snapSvg2.default.parse('<foreignObject width="5000" height="2000">\n\t\t\t\t<body xmlns="http://www.w3.org/1999/xhtml">\n\t\t\t\t\t' + html + '\n\t\t\t\t</body>\n\t\t\t\t</foreignObject>');
 			self.details_box.append(foreign_object);
-			// console.log(self.details_box.node.getBoundingClientRect());
-			console.log(self.details_box.node.getElementsByClassName('details-container')[0].children);
+			// console.log(self.details_box.node.getElementsByClassName('details-container')[0].children);
 		}
 	
 		function get_details_html() {
@@ -1547,7 +1548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				var ramal = responsavel.responsavel.telefone;
 				var celular = responsavel.responsavel.celular;
 				var link = 'https://humanograma.intranet.bb.com.br/' + chave;
-				responsaveis = responsaveis.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=' + link + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=https://connections.bb.com.br/profiles/photo.do?uid=' + chave + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + chave + ' - ' + nome + '</p>\n\t\t\t\t<p>Ramal: ' + ramal + '</p>\n\t\t\t\t<p>Celular: ' + celular + '</p>\n\t\t\t\t');
+				responsaveis = responsaveis.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=' + link + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=https://connections.bb.com.br/profiles/photo.do?uid=' + chave + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + chave + ' - ' + nome + '</p>\n\t\t\t\t<p>Telefone: ' + ramal + '</p>\n\t\t\t\t<p>Celular: ' + celular + '</p>\n\t\t\t\t');
 			});
 	
 			var uors = '';
@@ -1564,16 +1565,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function get_details_position() {
 	
-			// const width = gt.element_groups.grid.getBBox().width;
-			// const height = gt.element_groups.grid.getBBox().height;
-			var x = self.$bar.getEndX() + 2;
-			var y = self.$bar.getY() - 10;
-			// console.log('details_box', self.details_box.getBBox());
-			// console.log('width', width);
-			// console.log('height', height);
+			var width = gt.element_groups.grid.getBBox().width;
+			var height = gt.element_groups.grid.getBBox().height;
+			// const x = self.$bar.getEndX() + 2;
+			var y_end = self.$bar.getY() + self.details_height;
+			var x_end = self.$bar.getEndX() + self.details_width;
+			var x = x_end > width ? self.$bar.getEndX() - (x_end - width) : self.$bar.getEndX();
+			var y = y_end > height ? self.$bar.getY() - (y_end - height) : self.$bar.getY();
+	
+			// if(y_end > height) y = y - (y_end - height);
+	
 			return {
-				x: x,
-				y: y
+				x: x + 2,
+				y: y - 10
 			};
 		}
 	

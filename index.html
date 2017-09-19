@@ -33,25 +33,23 @@
   let i;
   let j;
 
-  for (i = 1; i <= 2; i++) {
+  for (i = 1; i <= 1; i++) {
 
     const tarefas = [];
-    let dataInicio = new Date('2017-09-01T03:00:00.000Z');
-    let duracao = 0;
-    let latencia = 0;
+    let dataInicio = new Date('2017-09-02T03:00:00.000Z');
+    let duracao = 30;
+    let latencia = 10;
 
-    for (j = 1; j <= 10; j++) {
+    for (j = 1; j <= 20; j++) {
 
       tarefaId += 1;
 
       dataInicio = new Date(dataInicio);
       dataInicio.setDate(dataInicio.getDate() + latencia);
       const dataFim = new Date(dataInicio);
-      duracao = moment(dataInicio).daysInMonth() - 1;
-      duracao = 30;
+      // duracao = moment(dataInicio).daysInMonth() - 1;      
       dataFim.setDate(dataFim.getDate() + duracao);
       // latencia = moment(dataInicio).daysInMonth() + j;
-      latencia = 1;
 
       const tarefa = {
 
@@ -78,17 +76,17 @@
               nome: 'Previsão',
             },
           },
-          {
-            id: 2,
-            dataInicio: '2017-06-13T12:53:03.348Z',
-            dataFim: '2017-06-14T03:00:00.000Z',
+          // {
+          //   id: 2,
+          //   dataInicio: '2017-06-13T12:53:03.348Z',
+          //   dataFim: '2017-06-14T03:00:00.000Z',
 
-            tipo: {
-              id: 2,
-              nome: 'Realizado',
-            },
+          //   tipo: {
+          //     id: 2,
+          //     nome: 'Realizado',
+          //   },
 
-          },
+          // },
         ],
         vinculos: [
           {
@@ -107,18 +105,18 @@
               chave: 'F6805293',
               nome: 'Marcos Andrei Ivanechtchuk',
               celular: '061 993283558',
-              telefone: 37402,
+              telefone: '061 34937403',
             },
           },
-          {
-            responsavel_id: '54103757',
-            responsavel: {
-              chave: 'F4103757',
-              nome: 'Henrique Fidellis Ferreira',
-              celular: '061 92014477',
-              telefone: 37404,
-            },
-          },
+          // {
+          //   responsavel_id: '54103757',
+          //   responsavel: {
+          //     chave: 'F4103757',
+          //     nome: 'Henrique Fidellis Ferreira',
+          //     celular: '061 92014477',
+          //     telefone: '061 34937402',
+          //   },
+          // },
         ],
         uors: [
           {
@@ -131,16 +129,16 @@
               subordinada: 22,
             },
           },
-          {
-            uor_id: 284650,
-            uor: {
-              id: 284650,
-              nome: 'DISEM - DIVISAO CONTROLE',
-              nomeReduzido: 'DISEM/CONTROLE',
-              prefixo: 9951,
-              subordinada: 20,
-            },
-          },
+          // {
+          //   uor_id: 284650,
+          //   uor: {
+          //     id: 284650,
+          //     nome: 'DISEM - DIVISAO CONTROLE',
+          //     nomeReduzido: 'DISEM/CONTROLE',
+          //     prefixo: 9951,
+          //     subordinada: 20,
+          //   },
+          // },
         ],
       };
 
@@ -217,6 +215,7 @@
 			view_mode: 'Month',
 			inline: true,
 			projection: false,
+      left_menu_width: 0,
 			// bar: {
 			// 	height: 15
 			// },

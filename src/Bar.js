@@ -24,6 +24,8 @@ export default function Bar(gt, task) {
 	function set_defaults() {
 		self.action_completed = false;
 		self.task = task;
+		self.details_width = 241;
+		self.details_height = 318;
 	}
 
 	function prepare() {
@@ -186,8 +188,7 @@ export default function Bar(gt, task) {
 				</body>
 				</foreignObject>`);
 		self.details_box.append(foreign_object);
-		// console.log(self.details_box.node.getBoundingClientRect());
-		console.log(self.details_box.node.getElementsByClassName('details-container')[0].children);
+		// console.log(self.details_box.node.getElementsByClassName('details-container')[0].children);
 	}
 
 	function get_details_html() {
@@ -236,7 +237,7 @@ export default function Bar(gt, task) {
 					<img src=https://connections.bb.com.br/profiles/photo.do?uid=${chave} class="avatar" />
 				</a>
 				<p>${chave} - ${nome}</p>
-				<p>Ramal: ${ramal}</p>
+				<p>Telefone: ${ramal}</p>
 				<p>Celular: ${celular}</p>
 				`);
 		});
@@ -288,16 +289,19 @@ export default function Bar(gt, task) {
 
 	function get_details_position() {
 
-		// const width = gt.element_groups.grid.getBBox().width;
-		// const height = gt.element_groups.grid.getBBox().height;
-		const x = self.$bar.getEndX() + 2;
-		const y = self.$bar.getY() - 10;
-		// console.log('details_box', self.details_box.getBBox());
-		// console.log('width', width);
-		// console.log('height', height);
+		const width = gt.element_groups.grid.getBBox().width;
+		const height = gt.element_groups.grid.getBBox().height;
+		// const x = self.$bar.getEndX() + 2;
+		const y_end = self.$bar.getY() + self.details_height;
+		const x_end = self.$bar.getEndX() + self.details_width;
+		const x = (x_end > width) ? self.$bar.getEndX() - (x_end - width) : self.$bar.getEndX();
+		const y = (y_end > height) ? self.$bar.getY() - (y_end - height) : self.$bar.getY();
+
+		// if(y_end > height) y = y - (y_end - height);
+
 		return {
-			x: x,
-			y: y
+			x: x + 2,
+			y: y - 10
 		};
 	}
 

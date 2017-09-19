@@ -283,7 +283,7 @@ export default function Gantt(element, projects, config) {
 			self.gantt_start = self.gantt_start.clone().subtract(7, 'day');
 			self.gantt_end = self.gantt_end.clone().add(7, 'day');
 		} else if(view_is('Month')) {
-			self.gantt_start = self.gantt_start.clone().startOf('month').subtract(1, 'Month');
+			self.gantt_start = self.gantt_start.clone().startOf('month').subtract(0, 'Month');
 			// self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
 			self.gantt_end = self.gantt_end.clone().endOf('month');
 		} else {
@@ -302,7 +302,7 @@ export default function Gantt(element, projects, config) {
 				cur_date = self.gantt_start.clone();
 			} else {
 				cur_date = view_is('Month') ?
-					cur_date.clone().add(1, 'month') :
+					cur_date.clone().add(1, 'month').endOf('month') :
 					cur_date.clone().add(self.config.step, 'hours');
 			}
 			self.dates.push(cur_date);
@@ -387,7 +387,6 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function make_grid_background() {
-
 		const grid_width = (self.dates.length * self.config.column_width) + self.config.left_menu_width,
 			grid_height = self.config.header_height + self.config.padding +
 				(self.config.row.height) * self._projects._rows /* + 400 */;
@@ -398,11 +397,12 @@ export default function Gantt(element, projects, config) {
 
 		self.canvas.attr({
 			height: grid_height + self.config.padding,
-			width: '100%'
+			width: '102%'
 		});
 	}
 
 	function make_grid_header() {
+		console.log('make_grid_header');
 		const header_width = self.dates.length * self.config.column_width,
 			header_height = self.config.header_height + 10;
 		self.canvas.rect(self.config.left_menu_width, 0, header_width, header_height)
@@ -420,15 +420,13 @@ export default function Gantt(element, projects, config) {
 
 		let row_y = self.config.header_height + self.config.padding / 2;
 
-		self.tasks.forEach((task, index) => { // eslint-disable-line
-
+		self.tasks.forEach((task, index) => { // eslint-disable-line			
 			const nextTask = self.tasks[index + 1];
-			if(task._index && (!nextTask || task._line !== nextTask._line)) {
+			if((!nextTask || task._line !== nextTask._line)) {
 
 				self.canvas.rect(left_menu_width, row_y, row_width, row_height)
 				.addClass('grid-row')
 				.appendTo(rows);
-
 				self.canvas.line(left_menu_width, row_y + row_height, row_width + left_menu_width, row_y + row_height)
 				.addClass('row-line')
 				.appendTo(lines);
@@ -496,11 +494,11 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function make_grid_ticks() {
-		let tick_x = self.config.left_menu_width,
-			tick_height = (self.config.row.height) * self._projects._rows;
+		let tick_x = self.config.left_menu_width;
 
 		for(let date of self.dates) {
 
+			let tick_height = (self.config.row.height) * self._projects._rows;
 			let tick_y = self.config.header_height + self.config.padding / 2;
 
 			let tick_class = 'tick';
@@ -516,8 +514,8 @@ export default function Gantt(element, projects, config) {
 			if(view_is('Month') && date.month() === 0) {
 				tick_class += ' thick';
 				tick_y = tick_y / 2;
+				tick_height = tick_height + tick_y;
 			}
-
 			self.canvas.path(Snap.format('M {x} {y} v {height}', {
 				x: tick_x,
 				y: tick_y,
@@ -530,6 +528,7 @@ export default function Gantt(element, projects, config) {
 				tick_x += date.daysInMonth() * self.config.column_width / 30;
 			} else {
 				tick_x += self.config.column_width;
+				console.log('tick_x', tick_x);
 			}
 		}
 	}
@@ -609,7 +608,8 @@ export default function Gantt(element, projects, config) {
 			const d = get_date_info(date, last_date, i);
 			last_date = date;
 			d.lower_x = lower_x + self.config.column_width / 2;
-			lower_x += date.daysInMonth() * self.config.column_width / 30;
+			lower_x += view_is('Month') ? date.daysInMonth() * self.config.column_width / 30 : self.config.column_width;
+
 			return d;
 		});
 		return dates;
