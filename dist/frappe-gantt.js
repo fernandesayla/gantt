@@ -115,7 +115,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					curve: 5
 				},
 				padding: 21,
-				view_mode: 'Day',
+				view_mode: 'Month',
 				date_format: 'YYYY-MM-DD',
 				custom_popup_html: null,
 				left_menu_width: 0,
@@ -1955,7 +1955,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	
