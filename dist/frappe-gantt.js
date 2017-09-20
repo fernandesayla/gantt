@@ -1372,7 +1372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			self.action_completed = false;
 			self.task = task;
 			self.details_width = 241;
-			self.details_height = 318;
+			// self.details_height = 316;
 		}
 	
 		function prepare() {
@@ -1496,20 +1496,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function render_details() {
 	
-			// const { x, y } = get_details_position();
-			// self.details_box.transform(`t${x},${y}`);
-			self.details_box.clear();
-	
 			var html = get_details_html();
-			var foreign_object = _snapSvg2.default.parse('<foreignObject width="5000" height="2000">\n\t\t\t\t<body xmlns="http://www.w3.org/1999/xhtml">\n\t\t\t\t\t' + html + '\n\t\t\t\t</body>\n\t\t\t\t</foreignObject>');
+			var div = document.createElement('div');
+			div.innerHTML = html;
 	
-			self.details_box.append(foreign_object);
+			var p = div.getElementsByTagName('p').length * 20;
+			var h5 = div.getElementsByTagName('h5').length * 24;
+			var hr = div.getElementsByTagName('hr').length * 18;
+			self.details_height = p + h5 + hr + 24;
 	
 			var _get_details_position = get_details_position(),
 			    x = _get_details_position.x,
 			    y = _get_details_position.y;
 	
 			self.details_box.transform('t' + x + ',' + y);
+			self.details_box.clear();
+	
+			var foreign_object = _snapSvg2.default.parse('<foreignObject width="5000" height="2000">\n\t\t\t\t<body xmlns="http://www.w3.org/1999/xhtml">\n\t\t\t\t\t' + html + '\n\t\t\t\t</body>\n\t\t\t\t</foreignObject>');
+	
+			self.details_box.append(foreign_object);
 		}
 	
 		function get_details_html() {
@@ -1550,7 +1555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				var ramal = responsavel.responsavel.telefone;
 				var celular = responsavel.responsavel.celular;
 				var link = 'https://humanograma.intranet.bb.com.br/' + chave;
-				responsaveis = responsaveis.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=' + link + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=https://connections.bb.com.br/profiles/photo.do?uid=' + chave + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + chave + ' - ' + nome + '</p>\n\t\t\t\t<p>Telefone: ' + ramal + '</p>\n\t\t\t\t<p>Celular: ' + celular + '</p>\n\t\t\t\t');
+				responsaveis = responsaveis.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=' + link + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=https://connections.bb.com.br/profiles/photo.do?uid=' + chave + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + nome + '</p>\n\t\t\t\t<p>Telefone: ' + ramal + '</p>\n\t\t\t\t<p>Celular: ' + celular + '</p>\n\t\t\t\t');
 			});
 	
 			var uors = '';
@@ -1558,25 +1563,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				var nome = uor.uor.nomeReduzido;
 	
-				uors = uors.concat('\n\t\t\t\t<a href="https://humanograma.intranet.bb.com.br/uor/' + uor.uor_id + '" target="_blank">\n\t\t\t\t\t<p>' + nome + '</p>\n\t\t\t\t</a>\n\t\t\t\t');
+				uors = uors.concat('\n\t\t\t\t<p>\n\t\t\t\t\t<a href="https://humanograma.intranet.bb.com.br/uor/' + uor.uor_id + '" target="_blank">' + nome + '</a>\n\t\t\t\t</p>\n\t\t\t\t');
 			});
 	
-			var html = '\n\t\t\t<div class="details-container" height="auto">\n\t\t\t\t<h5>' + heading + '</h5>\n\t\t\t\t<p>' + line_1 + '</p>\n\t\t\t\t' + (line_2 ? '<p>' + line_2 + '</p>' : '') + '\n\t\t\t\t' + (periodos ? '\n\t\t\t\t\t<br />\n\t\t\t\t\t<h5>Datas:</h5>\n\t\t\t\t\t' + periodos + '\n\t\t\t\t\t' : '') + '\n\t\t\t\t' + (uors ? '\n\t\t\t\t\t<br />\n\t\t\t\t\t<h5>\xC1rea(s):</h5>\n\t\t\t\t\t' + uors + '\n\t\t\t\t\t' : '') + '\n\t\t\t\t' + (responsaveis ? '\n\t\t\t\t\t\t<br />\n\t\t\t\t\t\t<h5>Contato(s):</h5>\n\t\t\t\t\t\t' + responsaveis + '\n\t\t\t\t\t\t' : '') + '\n\t\t\t</div>\n\t\t';
+			var html = '\n\t\t\t<div class="details-container" style="min-width: 200px; max-width: ' + self.details_height + 'px">\n\t\t\t\t<h5>' + heading + '</h5>\n\t\t\t\t<p>' + line_1 + '</p>\n\t\t\t\t' + (line_2 ? '<p>' + line_2 + '</p>' : '') + '\n\t\t\t\t' + (periodos ? '\n\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t<h5>Datas:</h5>\n\t\t\t\t\t' + periodos + '\n\t\t\t\t\t' : '') + '\n\t\t\t\t' + (uors ? '\n\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t<h5>\xC1rea(s):</h5>\n\t\t\t\t\t' + uors + '\n\t\t\t\t\t' : '') + '\n\t\t\t\t' + (responsaveis ? '\n\t\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t\t<h5>Contato(s):</h5>\n\t\t\t\t\t\t' + responsaveis + '\n\t\t\t\t\t\t' : '') + '\n\t\t\t</div>\n\t\t';
 			return html;
 		}
 	
 		function get_details_position() {
 	
-			var details_height = self.details_box.node.getElementsByClassName('details-container')[0].clientHeight;
-			details_height = details_height * 0.45;
-	
 			var width = gt.element_groups.grid.getBBox().width;
 			var height = gt.element_groups.grid.getBBox().height;
 			// const x = self.$bar.getEndX() + 2;
-			var y_end = self.$bar.getY() + details_height;
+			var y_end = self.$bar.getY() + self.details_height;
 			var x_end = self.$bar.getEndX() + self.details_width;
 			var x = x_end > width ? self.$bar.getEndX() - (x_end - width) : self.$bar.getEndX();
 			var y = y_end > height ? self.$bar.getY() - (y_end - height) : self.$bar.getY();
+			y = y < 10 ? 10 : y;
 	
 			return {
 				x: x + 2,
@@ -1952,7 +1955,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	

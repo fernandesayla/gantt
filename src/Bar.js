@@ -25,7 +25,7 @@ export default function Bar(gt, task) {
 		self.action_completed = false;
 		self.task = task;
 		self.details_width = 241;
-		self.details_height = 318;
+		// self.details_height = 316;
 	}
 
 	function prepare() {
@@ -177,11 +177,19 @@ export default function Bar(gt, task) {
 
 	function render_details() {
 
-		// const { x, y } = get_details_position();
-		// self.details_box.transform(`t${x},${y}`);
+		const html = get_details_html();
+		const div = document.createElement('div');
+		div.innerHTML = html;
+
+		const p = div.getElementsByTagName('p').length * 20;
+		const h5 = div.getElementsByTagName('h5').length * 24;
+		const hr = div.getElementsByTagName('hr').length * 18;
+		self.details_height = p + h5 + hr + 24;
+
+		const { x, y } = get_details_position();
+		self.details_box.transform(`t${x},${y}`);
 		self.details_box.clear();
 
-		const html = get_details_html();
 		const foreign_object =
 			Snap.parse(`<foreignObject width="5000" height="2000">
 				<body xmlns="http://www.w3.org/1999/xhtml">
@@ -190,8 +198,6 @@ export default function Bar(gt, task) {
 				</foreignObject>`);
 
 		self.details_box.append(foreign_object);
-		const { x, y } = get_details_position();
-		self.details_box.transform(`t${x},${y}`);
 	}
 
 	function get_details_html() {
@@ -239,7 +245,7 @@ export default function Bar(gt, task) {
 				<a href=${link} target="_blank" class="avatarContainer">
 					<img src=https://connections.bb.com.br/profiles/photo.do?uid=${chave} class="avatar" />
 				</a>
-				<p>${chave} - ${nome}</p>
+				<p>${nome}</p>
 				<p>Telefone: ${ramal}</p>
 				<p>Celular: ${celular}</p>
 				`);
@@ -251,14 +257,14 @@ export default function Bar(gt, task) {
 			const nome = uor.uor.nomeReduzido;
 
 			uors = uors.concat(`
-				<a href="https://humanograma.intranet.bb.com.br/uor/${uor.uor_id}" target="_blank">
-					<p>${nome}</p>
-				</a>
+				<p>
+					<a href="https://humanograma.intranet.bb.com.br/uor/${uor.uor_id}" target="_blank">${nome}</a>
+				</p>
 				`);
 		});
 
 		const html = `
-			<div class="details-container" height="auto">
+			<div class="details-container" style="min-width: 200px; max-width: ${self.details_height}px">
 				<h5>${heading}</h5>
 				<p>${line_1}</p>
 				${
@@ -266,21 +272,21 @@ export default function Bar(gt, task) {
 				}
 				${
 					periodos ? `
-					<br />
+					<p>&nbsp</p>
 					<h5>Datas:</h5>
 					${periodos}
 					` : ''
 				}
 				${
 					uors ? `
-					<br />
+					<p>&nbsp</p>
 					<h5>Área(s):</h5>
 					${uors}
 					` : ''
 				}
 				${
 					responsaveis ? `
-						<br />
+						<p>&nbsp</p>
 						<h5>Contato(s):</h5>
 						${responsaveis}
 						` : ''
@@ -292,16 +298,14 @@ export default function Bar(gt, task) {
 
 	function get_details_position() {
 
-		let details_height = self.details_box.node.getElementsByClassName('details-container')[0].clientHeight;
-		details_height = details_height * 0.45;
-
 		const width = gt.element_groups.grid.getBBox().width;
 		const height = gt.element_groups.grid.getBBox().height;
 		// const x = self.$bar.getEndX() + 2;
-		const y_end = self.$bar.getY() + details_height;
+		const y_end = self.$bar.getY() + self.details_height;
 		const x_end = self.$bar.getEndX() + self.details_width;
 		const x = (x_end > width) ? self.$bar.getEndX() - (x_end - width) : self.$bar.getEndX();
-		const y = (y_end > height) ? self.$bar.getY() - (y_end - height) : self.$bar.getY();
+		let y = (y_end > height) ? self.$bar.getY() - (y_end - height) : self.$bar.getY();
+		y = y < 10 ? 10 : y;
 
 		return {
 			x: x + 2,

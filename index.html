@@ -33,14 +33,46 @@
   let i;
   let j;
 
+  
+
   for (i = 1; i <= 1; i++) {
 
     const tarefas = [];
     let dataInicio = new Date('2017-09-02T03:00:00.000Z');
     let duracao = 30;
-    let latencia = 10;
+    let latencia = 1;
 
-    for (j = 1; j <= 20; j++) {
+    for (j = 1; j <= 15; j++) {
+
+      let resp = [];
+      resp = (j % 2 == 0) ? [{
+        responsavel_id: '54103757',
+        responsavel: {
+          chave: 'F4103757',
+          nome: 'Henrique Fidellis Ferreira',
+          celular: '061 92014477',
+          telefone: '061 34937402',
+        },
+      },
+      {
+        responsavel_id: '56805293',
+        responsavel: {
+          chave: 'F6805293',
+          nome: 'Marcos Andrei',
+          celular: '061 993283558',
+          telefone: '061 34937403',
+        },
+      }] :
+      [
+      {
+        responsavel_id: '56805293',
+        responsavel: {
+          chave: 'F6805293',
+          nome: 'Marcos Andrei',
+          celular: '061 993283558',
+          telefone: '061 34937403',
+        },
+      }];
 
       tarefaId += 1;
 
@@ -76,28 +108,28 @@
               nome: 'Previsão',
             },
           },
-          // {
-          //   id: 2,
-          //   dataInicio: '2017-06-13T12:53:03.348Z',
-          //   dataFim: '2017-06-14T03:00:00.000Z',
+          {
+            id: 2,
+            dataInicio: '2017-06-13T12:53:03.348Z',
+            dataFim: '2017-06-14T03:00:00.000Z',
 
-          //   tipo: {
-          //     id: 2,
-          //     nome: 'Realizado',
-          //   },
+            tipo: {
+              id: 2,
+              nome: 'Realizado',
+            },
 
-          // },
-          // {
-          //   id: 3,
-          //   dataInicio: '2017-06-13T12:53:03.348Z',
-          //   dataFim: '2017-06-14T03:00:00.000Z',
+          },
+          {
+            id: 3,
+            dataInicio: '2017-06-13T12:53:03.348Z',
+            dataFim: '2017-06-14T03:00:00.000Z',
 
-          //   tipo: {
-          //     id: 2,
-          //     nome: 'Realizado',
-          //   },
+            tipo: {
+              id: 2,
+              nome: 'Realizado',
+            },
 
-          // },
+          },
         ],
         vinculos: [
           {
@@ -109,55 +141,18 @@
             tarefaPredecessao_id: j !== 1 ? tarefaId - 1 : null,
           },
         ],
-        responsaveis: [
+        responsaveis: resp,
+        uors: [
           {
-            responsavel_id: '56805293',
-            responsavel: {
-              chave: 'F6805293',
-              nome: 'Marcos Andrei Ivanechtchuk',
-              celular: '061 993283558',
-              telefone: '061 34937403',
+            uor_id: 284651,
+            uor: {
+              id: 284651,
+              nome: 'DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS',
+              nomeReduzido: 'DISEM/DIV INFORM GER',
+              prefixo: 9951,
+              subordinada: 22,
             },
           },
-          // {
-          //   responsavel_id: '54103757',
-          //   responsavel: {
-          //     chave: 'F4103757',
-          //     nome: 'Henrique Fidellis Ferreira',
-          //     celular: '061 92014477',
-          //     telefone: '061 34937402',
-          //   },
-          // },
-          // {
-          //   responsavel_id: '54103757',
-          //   responsavel: {
-          //     chave: 'F4103757',
-          //     nome: 'Henrique Fidellis Ferreira',
-          //     celular: '061 92014477',
-          //     telefone: '061 34937402',
-          //   },
-          // },
-          // {
-          //   responsavel_id: '54103757',
-          //   responsavel: {
-          //     chave: 'F4103757',
-          //     nome: 'Henrique Fidellis Ferreira',
-          //     celular: '061 92014477',
-          //     telefone: '061 34937402',
-          //   },
-          // },
-        ],
-        uors: [
-          // {
-          //   uor_id: 284651,
-          //   uor: {
-          //     id: 284651,
-          //     nome: 'DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS',
-          //     nomeReduzido: 'DISEM/DIV INFORM GER',
-          //     prefixo: 9951,
-          //     subordinada: 22,
-          //   },
-          // },
           // {
           //   uor_id: 284650,
           //   uor: {
