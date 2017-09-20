@@ -185,17 +185,17 @@ body {
 		
 		h5, p {
 			margin: 0;
+			line-height: 1.2;
+			font-size: 12px;
 		}
 
-		h5 {
-			font-size: 12px;
+		h5 {			
 			font-weight: bold;
 			margin-bottom: 10px;
 			color: $text-light;
 		}
 
-		p {
-			font-size: 12px;
+		p {			
 			margin-bottom: 6px;
 			color: $text-muted;
 		}
