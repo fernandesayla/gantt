@@ -53,7 +53,7 @@ export default function Gantt(element, projects, config) {
 				curve: 5
 			},
 			padding: 21,
-			view_mode: 'Month',
+			view_mode: 'Day',
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null,
 			left_menu_width: 0,
