@@ -57,7 +57,7 @@ export default function Gantt(element, projects, config) {
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null,
 			left_menu_width: 0,
-			inline: true,
+			inline: false,
 			projection: false
 		};
 
