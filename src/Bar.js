@@ -220,27 +220,27 @@ export default function Bar(gt, task) {
 		const line_1 = `Duração: ${self.durationDays} dias`;
 		const line_2 = self.task.progress ? `Percentual: ${self.task.progress}%` : null;
 
-		let periodos = '';
-		self.task.periodos.forEach(periodo =>{
+		let dates = '';
+		self.task.dates.forEach(date =>{
 
-			const tipo = periodo.tipo.nome;
-			const dataInicio = moment(periodo.dataInicio).format('DD/MM/YYYY');
-			const dataFim = moment(periodo.dataFim).format('DD/MM/YYYY');
+			const tipo = date.tipo.nome;
+			const dataInicio = moment(date.dataInicio).format('DD/MM/YYYY');
+			const dataFim = moment(date.dataFim).format('DD/MM/YYYY');
 
-			periodos = periodos.concat(`
+			dates = dates.concat(`
 				<p>${tipo}: ${dataInicio} - ${dataFim}</p>
 				`);
 		});
 
-		let responsaveis = '';
-		self.task.responsaveis.forEach((responsavel, i) =>{
+		let users = '';
+		self.task.users.forEach((user, i) =>{
 
-			const chave = responsavel.responsavel.chave;
-			const nome = responsavel.responsavel.nome;
-			const ramal = responsavel.responsavel.telefone;
-			const celular = responsavel.responsavel.celular;
+			const chave = user.chave;
+			const nome = user.nome;
+			const ramal = user.telefone;
+			const celular = user.celular;
 			const link = `https://humanograma.intranet.bb.com.br/${chave}`;
-			responsaveis = responsaveis.concat(`
+			users = users.concat(`
 				${ i !== 0 ? `<hr />` : ``}
 				<a href=${link} target="_blank" class="avatarContainer">
 					<img src=https://connections.bb.com.br/profiles/photo.do?uid=${chave} class="avatar" />
@@ -251,14 +251,14 @@ export default function Bar(gt, task) {
 				`);
 		});
 
-		let uors = '';
-		self.task.uors.forEach(uor =>{
+		let departments = '';
+		self.task.departments.forEach(department =>{
 
-			const nome = uor.uor.nomeReduzido;
+			const nome = department.nomeReduzido;
 
-			uors = uors.concat(`
+			departments = departments.concat(`
 				<p>
-					<a href="https://humanograma.intranet.bb.com.br/uor/${uor.uor_id}" target="_blank">${nome}</a>
+					<a href="https://humanograma.intranet.bb.com.br/uor/${department.id}" target="_blank">${nome}</a>
 				</p>
 				`);
 		});
@@ -271,24 +271,24 @@ export default function Bar(gt, task) {
 					line_2 ? `<p>${line_2}</p>` : ''
 				}
 				${
-					periodos ? `
+					dates ? `
 					<p>&nbsp</p>
 					<h5>Datas:</h5>
-					${periodos}
+					${dates}
 					` : ''
 				}
 				${
-					uors ? `
+					departments ? `
 					<p>&nbsp</p>
 					<h5>Área(s):</h5>
-					${uors}
+					${departments}
 					` : ''
 				}
 				${
-					responsaveis ? `
+					users ? `
 						<p>&nbsp</p>
 						<h5>Contato(s):</h5>
-						${responsaveis}
+						${users}
 						` : ''
 				}
 			</div>

@@ -203,9 +203,9 @@ export default function Gantt(element, projects, config) {
 					_line: project._lastRow,
 					custom_class: 'bar-late',
 					dependencies: [],
-					responsaveis: [],
-					uors: [],
-					periodos: [
+					users: [],
+					departments: [],
+					dates: [
 						{
 							dataInicio: start,
 							dataFim: end,

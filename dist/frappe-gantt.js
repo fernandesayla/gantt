@@ -267,9 +267,9 @@ return /******/ (function(modules) { // webpackBootstrap
 						_line: project._lastRow,
 						custom_class: 'bar-late',
 						dependencies: [],
-						responsaveis: [],
-						uors: [],
-						periodos: [{
+						users: [],
+						departments: [],
+						dates: [{
 							dataInicio: start,
 							dataFim: end,
 	
@@ -1537,36 +1537,36 @@ return /******/ (function(modules) { // webpackBootstrap
 			var line_1 = 'Dura\xE7\xE3o: ' + self.durationDays + ' dias';
 			var line_2 = self.task.progress ? 'Percentual: ' + self.task.progress + '%' : null;
 	
-			var periodos = '';
-			self.task.periodos.forEach(function (periodo) {
+			var dates = '';
+			self.task.dates.forEach(function (date) {
 	
-				var tipo = periodo.tipo.nome;
-				var dataInicio = (0, _moment2.default)(periodo.dataInicio).format('DD/MM/YYYY');
-				var dataFim = (0, _moment2.default)(periodo.dataFim).format('DD/MM/YYYY');
+				var tipo = date.tipo.nome;
+				var dataInicio = (0, _moment2.default)(date.dataInicio).format('DD/MM/YYYY');
+				var dataFim = (0, _moment2.default)(date.dataFim).format('DD/MM/YYYY');
 	
-				periodos = periodos.concat('\n\t\t\t\t<p>' + tipo + ': ' + dataInicio + ' - ' + dataFim + '</p>\n\t\t\t\t');
+				dates = dates.concat('\n\t\t\t\t<p>' + tipo + ': ' + dataInicio + ' - ' + dataFim + '</p>\n\t\t\t\t');
 			});
 	
-			var responsaveis = '';
-			self.task.responsaveis.forEach(function (responsavel, i) {
+			var users = '';
+			self.task.users.forEach(function (user, i) {
 	
-				var chave = responsavel.responsavel.chave;
-				var nome = responsavel.responsavel.nome;
-				var ramal = responsavel.responsavel.telefone;
-				var celular = responsavel.responsavel.celular;
+				var chave = user.chave;
+				var nome = user.nome;
+				var ramal = user.telefone;
+				var celular = user.celular;
 				var link = 'https://humanograma.intranet.bb.com.br/' + chave;
-				responsaveis = responsaveis.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=' + link + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=https://connections.bb.com.br/profiles/photo.do?uid=' + chave + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + nome + '</p>\n\t\t\t\t<p>Telefone: ' + ramal + '</p>\n\t\t\t\t<p>Celular: ' + celular + '</p>\n\t\t\t\t');
+				users = users.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=' + link + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=https://connections.bb.com.br/profiles/photo.do?uid=' + chave + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + nome + '</p>\n\t\t\t\t<p>Telefone: ' + ramal + '</p>\n\t\t\t\t<p>Celular: ' + celular + '</p>\n\t\t\t\t');
 			});
 	
-			var uors = '';
-			self.task.uors.forEach(function (uor) {
+			var departments = '';
+			self.task.departments.forEach(function (department) {
 	
-				var nome = uor.uor.nomeReduzido;
+				var nome = department.nomeReduzido;
 	
-				uors = uors.concat('\n\t\t\t\t<p>\n\t\t\t\t\t<a href="https://humanograma.intranet.bb.com.br/uor/' + uor.uor_id + '" target="_blank">' + nome + '</a>\n\t\t\t\t</p>\n\t\t\t\t');
+				departments = departments.concat('\n\t\t\t\t<p>\n\t\t\t\t\t<a href="https://humanograma.intranet.bb.com.br/uor/' + department.id + '" target="_blank">' + nome + '</a>\n\t\t\t\t</p>\n\t\t\t\t');
 			});
 	
-			var html = '\n\t\t\t<div class="details-container" style="min-width: 200px; max-width: ' + self.details_height + 'px">\n\t\t\t\t<h5>' + heading + '</h5>\n\t\t\t\t<p>' + line_1 + '</p>\n\t\t\t\t' + (line_2 ? '<p>' + line_2 + '</p>' : '') + '\n\t\t\t\t' + (periodos ? '\n\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t<h5>Datas:</h5>\n\t\t\t\t\t' + periodos + '\n\t\t\t\t\t' : '') + '\n\t\t\t\t' + (uors ? '\n\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t<h5>\xC1rea(s):</h5>\n\t\t\t\t\t' + uors + '\n\t\t\t\t\t' : '') + '\n\t\t\t\t' + (responsaveis ? '\n\t\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t\t<h5>Contato(s):</h5>\n\t\t\t\t\t\t' + responsaveis + '\n\t\t\t\t\t\t' : '') + '\n\t\t\t</div>\n\t\t';
+			var html = '\n\t\t\t<div class="details-container" style="min-width: 200px; max-width: ' + self.details_height + 'px">\n\t\t\t\t<h5>' + heading + '</h5>\n\t\t\t\t<p>' + line_1 + '</p>\n\t\t\t\t' + (line_2 ? '<p>' + line_2 + '</p>' : '') + '\n\t\t\t\t' + (dates ? '\n\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t<h5>Datas:</h5>\n\t\t\t\t\t' + dates + '\n\t\t\t\t\t' : '') + '\n\t\t\t\t' + (departments ? '\n\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t<h5>\xC1rea(s):</h5>\n\t\t\t\t\t' + departments + '\n\t\t\t\t\t' : '') + '\n\t\t\t\t' + (users ? '\n\t\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t\t<h5>Contato(s):</h5>\n\t\t\t\t\t\t' + users + '\n\t\t\t\t\t\t' : '') + '\n\t\t\t</div>\n\t\t';
 			return html;
 		}
 	

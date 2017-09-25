@@ -26,62 +26,31 @@
 	</div>
 	<script>
 
-	function getProjects() {
+function getProjects() {
 
   const projetos = [];
   let tarefaId = 0;
   let i;
   let j;
 
-  
-
-  for (i = 1; i <= 1; i++) {
+  for (i = 1; i <= 2; i++) {
 
     const tarefas = [];
-    let dataInicio = new Date('2017-09-02T03:00:00.000Z');
-    let duracao = 10;
-    let latencia = 11;
+    let dataInicio = new Date('2017-09-04T03:00:00.000Z');
+    const duracao = 17;
+    let latencia = 5;
 
     for (j = 1; j <= 15; j++) {
 
-      let resp = [];
-      resp = (j % 2 == 0) ? [{
-        responsavel_id: '54103757',
-        responsavel: {
-          chave: 'F4103757',
-          nome: 'Henrique Fidellis Ferreira',
-          celular: '061 92014477',
-          telefone: '061 34937402',
-        },
-      },
-      {
-        responsavel_id: '56805293',
-        responsavel: {
-          chave: 'F6805293',
-          nome: 'Marcos Andrei',
-          celular: '061 993283558',
-          telefone: '061 34937403',
-        },
-      }] :
-      [
-      {
-        responsavel_id: '56805293',
-        responsavel: {
-          chave: 'F6805293',
-          nome: 'Marcos Andrei',
-          celular: '061 993283558',
-          telefone: '061 34937403',
-        },
-      }];
-
       tarefaId += 1;
-
+      latencia = j % 6 === 0 ? 25 : 5;
       dataInicio = new Date(dataInicio);
       dataInicio.setDate(dataInicio.getDate() + latencia);
       const dataFim = new Date(dataInicio);
-      // duracao = moment(dataInicio).daysInMonth() - 1;      
+      // duracao = moment(dataInicio).daysInMonth() - 1;
       dataFim.setDate(dataFim.getDate() + duracao);
       // latencia = moment(dataInicio).daysInMonth() + j;
+
 
       const tarefa = {
 
@@ -119,17 +88,6 @@
             },
 
           },
-          {
-            id: 3,
-            dataInicio: '2017-06-13T12:53:03.348Z',
-            dataFim: '2017-06-14T03:00:00.000Z',
-
-            tipo: {
-              id: 2,
-              nome: 'Realizado',
-            },
-
-          },
         ],
         vinculos: [
           {
@@ -141,7 +99,28 @@
             tarefaPredecessao_id: j !== 1 ? tarefaId - 1 : null,
           },
         ],
-        responsaveis: resp,
+        responsaveis: [
+          {
+            responsavel_id: '56805293',
+            responsavel: {
+              id: '56805293',
+              chave: 'F6805293',
+              nome: 'Marcos Andrei Ivanechtchuk',
+              celular: '061 993283558',
+              telefone: 37402,
+            },
+          },
+          {
+            responsavel_id: '54103757',
+            responsavel: {
+              id: '54103757',
+              chave: 'F4103757',
+              nome: 'Henrique Fidellis Ferreira',
+              celular: '061 92014477',
+              telefone: 37404,
+            },
+          },
+        ],
         uors: [
           {
             uor_id: 284651,
@@ -153,16 +132,16 @@
               subordinada: 22,
             },
           },
-          // {
-          //   uor_id: 284650,
-          //   uor: {
-          //     id: 284650,
-          //     nome: 'DISEM - DIVISAO CONTROLE',
-          //     nomeReduzido: 'DISEM/CONTROLE',
-          //     prefixo: 9951,
-          //     subordinada: 20,
-          //   },
-          // },
+          {
+            uor_id: 284650,
+            uor: {
+              id: 284650,
+              nome: 'DISEM - DIVISAO CONTROLE',
+              nomeReduzido: 'DISEM/CONTROLE',
+              prefixo: 9951,
+              subordinada: 20,
+            },
+          },
         ],
       };
 
@@ -181,9 +160,15 @@
 
   }
 
+  return convertGanttData(projetos);
+
+}
+
+function convertGanttData(data){
+
   let projects = [];
 
-  projects = projects.concat(projetos.map((projeto) => {
+  projects = projects.concat(data.map((projeto) => {
 
     const tarefas = projeto.tarefas;
 
@@ -191,19 +176,23 @@
 
       const previsao = tarefa.periodos.find(periodo => periodo.tipo.id === 1);
       const dependencies = tarefa.predecessoes.map(vinculo => vinculo.tarefaPredecessao_id);
+      const responsaveis = tarefa.responsaveis.map(responsavel => responsavel.responsavel);
+      const uors = tarefa.uors.map(uor => uor.uor);
+      console.log('tarefa.periodos', tarefa.periodos);
 
       return {
         projectId: projeto.id,
         id: tarefa.id,
         name: tarefa.tarefa.nome,
+        taskId: tarefa.tarefa.id,
         start: previsao.dataInicio,
         end: previsao.dataFim,
         progress: tarefa.percentual,
         dependencies,
         currentTask: tarefa.tarefaAtual,
-        periodos: tarefa.periodos,
-        responsaveis: tarefa.responsaveis,
-        uors: tarefa.uors,
+        dates: tarefa.periodos,
+        users: responsaveis,
+        departments: uors,
       };
 
     });
@@ -215,9 +204,8 @@
     };
 
   }));
-
+  console.log('projects', projects)
   return projects;
-
 }
 
 
