@@ -1540,30 +1540,21 @@ return /******/ (function(modules) { // webpackBootstrap
 			var dates = '';
 			self.task.dates.forEach(function (date) {
 	
-				var tipo = date.tipo.nome;
-				var dataInicio = (0, _moment2.default)(date.dataInicio).format('DD/MM/YYYY');
-				var dataFim = (0, _moment2.default)(date.dataFim).format('DD/MM/YYYY');
+				var start = (0, _moment2.default)(date.start).format('DD/MM/YYYY');
+				var end = (0, _moment2.default)(date.end).format('DD/MM/YYYY');
 	
-				dates = dates.concat('\n\t\t\t\t<p>' + tipo + ': ' + dataInicio + ' - ' + dataFim + '</p>\n\t\t\t\t');
+				dates = dates.concat('\n\t\t\t\t<p>' + date.type.name + ': ' + start + ' - ' + end + '</p>\n\t\t\t\t');
 			});
 	
 			var users = '';
 			self.task.users.forEach(function (user, i) {
 	
-				var chave = user.chave;
-				var nome = user.nome;
-				var ramal = user.telefone;
-				var celular = user.celular;
-				var link = 'https://humanograma.intranet.bb.com.br/' + chave;
-				users = users.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=' + link + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=https://connections.bb.com.br/profiles/photo.do?uid=' + chave + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + nome + '</p>\n\t\t\t\t<p>Telefone: ' + ramal + '</p>\n\t\t\t\t<p>Celular: ' + celular + '</p>\n\t\t\t\t');
+				users = users.concat('\n\t\t\t\t' + (i !== 0 ? '<hr />' : '') + '\n\t\t\t\t<a href=' + user.link + ' target="_blank" class="avatarContainer">\n\t\t\t\t\t<img src=' + user.linkImage + ' class="avatar" />\n\t\t\t\t</a>\n\t\t\t\t<p>' + user.name + '</p>\n\t\t\t\t<p>Telefone: ' + user.telephonenumber + '</p>\n\t\t\t\t<p>Celular: ' + user.mobile + '</p>\n\t\t\t\t');
 			});
 	
 			var departments = '';
 			self.task.departments.forEach(function (department) {
-	
-				var nome = department.nomeReduzido;
-	
-				departments = departments.concat('\n\t\t\t\t<p>\n\t\t\t\t\t<a href="https://humanograma.intranet.bb.com.br/uor/' + department.id + '" target="_blank">' + nome + '</a>\n\t\t\t\t</p>\n\t\t\t\t');
+				departments = departments.concat('\n\t\t\t\t<p><a href="' + department.link + '" target="_blank">' + department.name + '</a></p>');
 			});
 	
 			var html = '\n\t\t\t<div class="details-container" style="min-width: 200px; max-width: ' + self.details_height + 'px">\n\t\t\t\t<h5>' + heading + '</h5>\n\t\t\t\t<p>' + line_1 + '</p>\n\t\t\t\t' + (line_2 ? '<p>' + line_2 + '</p>' : '') + '\n\t\t\t\t' + (dates ? '\n\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t<h5>Datas:</h5>\n\t\t\t\t\t' + dates + '\n\t\t\t\t\t' : '') + '\n\t\t\t\t' + (departments ? '\n\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t<h5>\xC1rea(s):</h5>\n\t\t\t\t\t' + departments + '\n\t\t\t\t\t' : '') + '\n\t\t\t\t' + (users ? '\n\t\t\t\t\t\t<p>&nbsp</p>\n\t\t\t\t\t\t<h5>Contato(s):</h5>\n\t\t\t\t\t\t' + users + '\n\t\t\t\t\t\t' : '') + '\n\t\t\t</div>\n\t\t';
@@ -1955,7 +1946,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	

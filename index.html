@@ -175,11 +175,41 @@ function convertGanttData(data){
     const tasks = tarefas.map((tarefa) => {
 
       const previsao = tarefa.periodos.find(periodo => periodo.tipo.id === 1);
-      const dependencies = tarefa.predecessoes.map(vinculo => vinculo.tarefaPredecessao_id);
-      const responsaveis = tarefa.responsaveis.map(responsavel => responsavel.responsavel);
-      const uors = tarefa.uors.map(uor => uor.uor);
-      console.log('tarefa.periodos', tarefa.periodos);
+      const predecessores = tarefa.predecessoes.map(vinculo => vinculo.tarefaPredecessao_id);
 
+      const periodos = tarefa.periodos.map(periodo => (
+        {
+          id: periodo.id,
+          start: periodo.dataInicio,
+          end: periodo.dataFim,
+          type: {
+            id: periodo.tipo.id,            
+            name: periodo.tipo.nome,
+          }
+        }
+
+      ));
+
+      const responsaveis = tarefa.responsaveis.map(responsavel => (
+          {
+            id: responsavel.responsavel.id,            
+            name: responsavel.responsavel.nome,
+            telephonenumber: responsavel.responsavel.telefone,
+            mobile: responsavel.responsavel.celular,
+            link: `https://humanograma.intranet.bb.com.br/${responsavel.responsavel.chave}`,
+            linkImage: `https://connections.bb.com.br/profiles/photo.do?uid=${responsavel.responsavel.chave}`,
+          }
+        )        
+      );
+      
+      const uors = tarefa.uors.map(uor => (
+        {
+          id: uor.uor.id,
+          name: uor.uor.nomeReduzido,          
+          link: `https://humanograma.intranet.bb.com.br/uor/${uor.uor.id}`,
+        }
+      ));
+      
       return {
         projectId: projeto.id,
         id: tarefa.id,
@@ -188,9 +218,9 @@ function convertGanttData(data){
         start: previsao.dataInicio,
         end: previsao.dataFim,
         progress: tarefa.percentual,
-        dependencies,
+        dependencies: predecessores,
         currentTask: tarefa.tarefaAtual,
-        dates: tarefa.periodos,
+        dates: periodos,
         users: responsaveis,
         departments: uors,
       };

@@ -223,44 +223,32 @@ export default function Bar(gt, task) {
 		let dates = '';
 		self.task.dates.forEach(date =>{
 
-			const tipo = date.tipo.nome;
-			const dataInicio = moment(date.dataInicio).format('DD/MM/YYYY');
-			const dataFim = moment(date.dataFim).format('DD/MM/YYYY');
+			const start = moment(date.start).format('DD/MM/YYYY');
+			const end = moment(date.end).format('DD/MM/YYYY');
 
 			dates = dates.concat(`
-				<p>${tipo}: ${dataInicio} - ${dataFim}</p>
+				<p>${date.type.name}: ${start} - ${end}</p>
 				`);
 		});
 
 		let users = '';
 		self.task.users.forEach((user, i) =>{
 
-			const chave = user.chave;
-			const nome = user.nome;
-			const ramal = user.telefone;
-			const celular = user.celular;
-			const link = `https://humanograma.intranet.bb.com.br/${chave}`;
 			users = users.concat(`
 				${ i !== 0 ? `<hr />` : ``}
-				<a href=${link} target="_blank" class="avatarContainer">
-					<img src=https://connections.bb.com.br/profiles/photo.do?uid=${chave} class="avatar" />
+				<a href=${user.link} target="_blank" class="avatarContainer">
+					<img src=${user.linkImage} class="avatar" />
 				</a>
-				<p>${nome}</p>
-				<p>Telefone: ${ramal}</p>
-				<p>Celular: ${celular}</p>
+				<p>${user.name}</p>
+				<p>Telefone: ${user.telephonenumber}</p>
+				<p>Celular: ${user.mobile}</p>
 				`);
 		});
 
 		let departments = '';
 		self.task.departments.forEach(department =>{
-
-			const nome = department.nomeReduzido;
-
 			departments = departments.concat(`
-				<p>
-					<a href="https://humanograma.intranet.bb.com.br/uor/${department.id}" target="_blank">${nome}</a>
-				</p>
-				`);
+				<p><a href="${department.link}" target="_blank">${department.name}</a></p>`);
 		});
 
 		const html = `
