@@ -103,6 +103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function set_defaults() {
 	
 			var defaults = {
+				screen_width: 1832,
 				header_height: 50,
 				column_width: 30,
 				step: 24,
@@ -464,7 +465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function set_scale(scale) {
 			self.config.view_mode = scale;
-			var screen_width = 1832 - self.config.left_menu_width;
+			var screen_width = self.config.screen_width - self.config.left_menu_width;
 			var min_column_width = 0;
 			self.config.column_width = screen_width / self.dates.length;
 	
@@ -1946,7 +1947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	

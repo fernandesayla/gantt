@@ -34,6 +34,7 @@ export default function Gantt(element, projects, config) {
 	function set_defaults() {
 
 		const defaults = {
+			screen_width: 1832,
 			header_height: 50,
 			column_width: 30,
 			step: 24,
@@ -320,7 +321,7 @@ export default function Gantt(element, projects, config) {
 
 	function set_scale(scale) {
 		self.config.view_mode = scale;
-		const screen_width = 1832 - self.config.left_menu_width;
+		const screen_width = self.config.screen_width - self.config.left_menu_width;
 		let min_column_width = 0;
 		self.config.column_width = screen_width / self.dates.length;
 
