@@ -270,11 +270,11 @@ return /******/ (function(modules) { // webpackBootstrap
 						users: [],
 						departments: [],
 						dates: [{
-							dataInicio: start,
-							dataFim: end,
+							start: start,
+							end: end,
 	
-							tipo: {
-								nome: 'Previsão'
+							type: {
+								name: 'Previsão'
 							}
 						}]
 					};
@@ -1538,6 +1538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			var line_2 = self.task.progress ? 'Percentual: ' + self.task.progress + '%' : null;
 	
 			var dates = '';
+			console.log(self.task);
 			self.task.dates.forEach(function (date) {
 	
 				var start = (0, _moment2.default)(date.start).format('DD/MM/YYYY');

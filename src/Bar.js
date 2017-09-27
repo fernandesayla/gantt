@@ -221,6 +221,7 @@ export default function Bar(gt, task) {
 		const line_2 = self.task.progress ? `Percentual: ${self.task.progress}%` : null;
 
 		let dates = '';
+		console.log(self.task);
 		self.task.dates.forEach(date =>{
 
 			const start = moment(date.start).format('DD/MM/YYYY');

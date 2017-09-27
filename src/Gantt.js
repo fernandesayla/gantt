@@ -207,11 +207,11 @@ export default function Gantt(element, projects, config) {
 					departments: [],
 					dates: [
 						{
-							dataInicio: start,
-							dataFim: end,
+							start: start,
+							end: end,
 
-							tipo: {
-								nome: 'Previsão'
+							type: {
+								name: 'Previsão'
 							}
 						}
 					]

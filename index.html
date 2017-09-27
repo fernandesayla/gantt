@@ -33,17 +33,66 @@ function getProjects() {
   let i;
   let j;
 
-  for (i = 1; i <= 2; i++) {
+  for (i = 1; i <= 6; i++) {
 
     const tarefas = [];
     let dataInicio = new Date('2017-09-04T03:00:00.000Z');
-    const duracao = 17;
-    let latencia = 5;
+    const duracao = 15;
+    let latencia = 3;
 
-    for (j = 1; j <= 15; j++) {
+    for (j = 1; j <= 7; j++) {
+
+      const resp1 = {
+            responsavel_id: '54103757',
+            responsavel: {
+              id: '54103757',
+              chave: 'F4103757',
+              nome: 'Henrique Fidellis Ferreira',
+              celular: '061 92014477',
+              telefone: 37404,
+            },
+          };
+      const resp2 = {
+            responsavel_id: '56805293',
+            responsavel: {
+              id: '56805293',
+              chave: 'F6805293',
+              nome: 'Marcos Andrei Ivanechtchuk',
+              celular: '061 993283558',
+              telefone: 37402,
+            },
+          };
+
+      const responsaveis = [];
+      responsaveis.push(resp1);
+      if(j%2==0) responsaveis.push(resp2);
+
+      const uor1 = {
+            uor_id: 284651,
+            uor: {
+              id: 284651,
+              nome: 'DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS',
+              nomeReduzido: 'DISEM/DIV INFORM GER',
+              prefixo: 9951,
+              subordinada: 22,
+            },
+          };
+      const uor2 = {
+            uor_id: 284650,
+            uor: {
+              id: 284650,
+              nome: 'DISEM - DIVISAO CONTROLE',
+              nomeReduzido: 'DISEM/CONTROLE',
+              prefixo: 9951,
+              subordinada: 20,
+            },
+          };
+      const uors = [];
+      uors.push(uor1);
+      if(j%2===0) uors.push(uor2);      
 
       tarefaId += 1;
-      latencia = j % 6 === 0 ? 25 : 5;
+      latencia = j % 3 === 0 ? 20 : 5;
       dataInicio = new Date(dataInicio);
       dataInicio.setDate(dataInicio.getDate() + latencia);
       const dataFim = new Date(dataInicio);
@@ -57,7 +106,7 @@ function getProjects() {
         id: tarefaId,
         sequencia: j,
         percentual: 30,
-        tarefaAtual: j === i + 2,
+        tarefaAtual: j === i,
         tarefa: {
           id: j,
           nome: j === 2 ? `Tarefa ${j}` : `Tarefa ${j}`,
@@ -99,50 +148,8 @@ function getProjects() {
             tarefaPredecessao_id: j !== 1 ? tarefaId - 1 : null,
           },
         ],
-        responsaveis: [
-          {
-            responsavel_id: '56805293',
-            responsavel: {
-              id: '56805293',
-              chave: 'F6805293',
-              nome: 'Marcos Andrei Ivanechtchuk',
-              celular: '061 993283558',
-              telefone: 37402,
-            },
-          },
-          {
-            responsavel_id: '54103757',
-            responsavel: {
-              id: '54103757',
-              chave: 'F4103757',
-              nome: 'Henrique Fidellis Ferreira',
-              celular: '061 92014477',
-              telefone: 37404,
-            },
-          },
-        ],
-        uors: [
-          {
-            uor_id: 284651,
-            uor: {
-              id: 284651,
-              nome: 'DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS',
-              nomeReduzido: 'DISEM/DIV INFORM GER',
-              prefixo: 9951,
-              subordinada: 22,
-            },
-          },
-          {
-            uor_id: 284650,
-            uor: {
-              id: 284650,
-              nome: 'DISEM - DIVISAO CONTROLE',
-              nomeReduzido: 'DISEM/CONTROLE',
-              prefixo: 9951,
-              subordinada: 20,
-            },
-          },
-        ],
+        responsaveis: responsaveis,
+        uors: uors,
       };
 
       tarefas.push(tarefa);
@@ -256,7 +263,7 @@ function convertGanttData(data){
 			},
 			view_mode: 'Month',
 			inline: false,
-			projection: false,
+			projection: true,
       left_menu_width: 0,
 			// bar: {
 			// 	height: 15
