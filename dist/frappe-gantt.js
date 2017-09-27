@@ -594,6 +594,16 @@ return /******/ (function(modules) { // webpackBootstrap
 					self.canvas.line(0, row_y + height, row_width + left_menu_width, row_y + height).addClass('row-line-project').appendTo(lines);
 	
 					self.canvas.text(self.config.left_menu_width / 2, row_y + height / 2, project.name).addClass('project-text').appendTo(text);
+	
+					// console.log('text', text);
+					// const foreign_object =
+					// Snap.parse(`<foreignObject width="${left_menu_width}" height="${height}">
+					// 		<body xmlns="http://www.w3.org/1999/xhtml">
+					// 			teste
+					// 		</body>
+					// 		</foreignObject>`);
+					// text.append(foreign_object);
+					// foreign_object.transform(`t${0},${row_y}`);
 				}
 	
 				if (view_is('Month') && project._currentDate) {
@@ -1947,7 +1957,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	
