@@ -1538,7 +1538,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			var line_2 = self.task.progress ? 'Percentual: ' + self.task.progress + '%' : null;
 	
 			var dates = '';
-			console.log(self.task);
 			self.task.dates.forEach(function (date) {
 	
 				var start = (0, _moment2.default)(date.start).format('DD/MM/YYYY');
@@ -1947,7 +1946,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	
