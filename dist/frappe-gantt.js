@@ -565,7 +565,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			self.canvas.attr({
 				height: grid_height + self.config.padding,
-				width: '102%'
+				width: '100%'
 			});
 		}
 	
@@ -1577,6 +1577,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			var line_2 = self.task.progress ? 'Percentual: ' + self.task.progress + '%' : null;
 	
 			var dates = '';
+	
+			dates = dates.concat('<p>Previs\xE3o:\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t' + (0, _moment2.default)(self.task._start).format('DD/MM/YYYY') + ' -\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t' + (0, _moment2.default)(self.task._end).format('DD/MM/YYYY') + '</p>');
+	
 			self.task.dates.forEach(function (date) {
 	
 				var start = (0, _moment2.default)(date.start).format('DD/MM/YYYY');
@@ -1989,7 +1992,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	

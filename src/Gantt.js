@@ -407,7 +407,7 @@ export default function Gantt(element, projects, config) {
 
 		self.canvas.attr({
 			height: grid_height + self.config.padding,
-			width: '102%'
+			width: '100%'
 		});
 	}
 
