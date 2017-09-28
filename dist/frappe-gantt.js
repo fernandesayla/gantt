@@ -103,7 +103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function set_defaults() {
 	
 			var defaults = {
-				screen_width: 1816,
+				screen_width: 1800,
 				background_width: 0,
 				header_height: 50,
 				column_width: 30,
