@@ -449,7 +449,9 @@ export default function Bar(gt, task) {
 			}
 			update_attr(bar, 'x', x);
 		}
-		if (width && width >= gt.config.column_width) {
+
+		const column_width = gt.view_is('Month') ? gt.config.column_width / 30 : gt.config.column_width;
+		if (width && width >= column_width) {
 			update_attr(bar, 'width', width);
 		}
 		update_label_position();
@@ -523,7 +525,9 @@ export default function Bar(gt, task) {
 			x = self.task._start.diff(gt.gantt_start, 'days') *
 				gt.config.column_width / 30;
 		}
+
 		return x + gt.config.left_menu_width;
+
 	}
 
 	function compute_y() {
@@ -542,6 +546,7 @@ export default function Bar(gt, task) {
 			rem = dx % (gt.config.column_width / 30);
 			position = odx - rem +
 				((rem < gt.config.column_width / 60) ? 0 : gt.config.column_width / 30);
+			// console.log('column_width', gt.config.column_width / 30, 'odx', odx, 'rem', rem, 'odx - rem', odx - rem);
 		} else {
 			rem = dx % gt.config.column_width;
 			position = odx - rem +

@@ -173,9 +173,14 @@ body {
 	.lower-text {
 		fill: $text-color;
 	}
+	.project-text-container{		
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $text-light;		
+	}
 	.project-text{
-		fill: $text-light;
-		text-anchor: middle;
+		text-align: center;		
 	}
 
 	#details .details-container {

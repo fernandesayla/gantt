@@ -34,7 +34,8 @@ export default function Gantt(element, projects, config) {
 	function set_defaults() {
 
 		const defaults = {
-			screen_width: 1832,
+			screen_width: 1816,
+			background_width: 0,
 			header_height: 50,
 			column_width: 30,
 			step: 24,
@@ -344,6 +345,14 @@ export default function Gantt(element, projects, config) {
 		self.config.column_width = self.config.column_width < min_column_width ?
 															min_column_width :
 															self.config.column_width;
+
+		if(view_is('Month')) {
+			for(let date of self.dates) {
+				self.config.background_width += date.daysInMonth() * self.config.column_width / 30;
+			}
+		} else {
+			self.config.background_width = self.dates.length * self.config.column_width;
+		}
 	}
 
 	function set_width() {
@@ -388,7 +397,7 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function make_grid_background() {
-		const grid_width = (self.dates.length * self.config.column_width) + self.config.left_menu_width,
+		const grid_width = (self.config.background_width) + self.config.left_menu_width,
 			grid_height = self.config.header_height + self.config.padding +
 				(self.config.row.height) * self._projects._rows /* + 400 */;
 
@@ -398,12 +407,12 @@ export default function Gantt(element, projects, config) {
 
 		self.canvas.attr({
 			height: grid_height + self.config.padding,
-			width: '100%'
+			width: '102%'
 		});
 	}
 
 	function make_grid_header() {
-		const header_width = self.dates.length * self.config.column_width,
+		const header_width = self.config.background_width,
 			header_height = self.config.header_height + 10;
 		self.canvas.rect(self.config.left_menu_width, 0, header_width, header_height)
 			.addClass('grid-header')
@@ -414,7 +423,7 @@ export default function Gantt(element, projects, config) {
 
 		const rows = self.canvas.group().appendTo(self.element_groups.grid),
 			lines = self.canvas.group().appendTo(self.element_groups.grid),
-			row_width = self.dates.length * self.config.column_width,
+			row_width = self.config.background_width,
 			row_height = self.config.row.height,
 			left_menu_width = self.config.left_menu_width;
 
@@ -438,11 +447,11 @@ export default function Gantt(element, projects, config) {
 
 	function make_projects() {
 
-		const rows = self.canvas.group().appendTo(self.element_groups.project),
-			lines = self.canvas.group().appendTo(self.element_groups.project),
-			text = self.canvas.group().appendTo(self.element_groups.project),
-			current = self.canvas.group().appendTo(self.element_groups.project),
-			row_width = self.dates.length * self.config.column_width,
+		const rows = self.canvas.group().attr({'id': 'rows'}).appendTo(self.element_groups.project),
+			lines = self.canvas.group().attr({'id': 'lines'}).appendTo(self.element_groups.project),
+			texts = self.canvas.group().attr({'id': 'texts'}).appendTo(self.element_groups.project),
+			current = self.canvas.group().attr({'id': 'current'}).appendTo(self.element_groups.project),
+			row_width = self.config.background_width,
 			row_height = self.config.row.height,
 			left_menu_width = self.config.left_menu_width;
 
@@ -464,19 +473,26 @@ export default function Gantt(element, projects, config) {
 					.addClass('row-line-project')
 					.appendTo(lines);
 
-				self.canvas.text(self.config.left_menu_width / 2, row_y + (height / 2), project.name)
-					.addClass('project-text')
-					.appendTo(text);
+				const text = self.canvas.group().attr({'id': 'text'}).appendTo(texts);
+				text.transform(`t${0},${row_y}`);
 
-				// console.log('text', text);
-				// const foreign_object =
-				// Snap.parse(`<foreignObject width="${left_menu_width}" height="${height}">
-				// 		<body xmlns="http://www.w3.org/1999/xhtml">
-				// 			teste
-				// 		</body>
-				// 		</foreignObject>`);
-				// text.append(foreign_object);
-				// foreign_object.transform(`t${0},${row_y}`);
+				// self.canvas.text(self.config.left_menu_width / 2, row_y + (height / 2), project.name)
+				// 	.addClass('project-text')
+				// 	.appendTo(texts);
+
+				const foreign_object =
+				Snap.parse(`<foreignObject width="${left_menu_width}" height="${height}">
+						<body xmlns="http://www.w3.org/1999/xhtml">
+							<div style="width: ${left_menu_width}px; height: ${height}px"
+									 class="project-text-container">
+								<div class="project-text">
+									${project.name}
+								</div>
+							</div>
+						</body>
+						</foreignObject>`);
+
+				text.append(foreign_object);
 
 			}
 
@@ -703,7 +719,6 @@ export default function Gantt(element, projects, config) {
 
 	function make_bars() {
 		self._bars = self.tasks.map((task, i) => {
-
 			const bar = Bar(self, task);
 			self.element_groups.bar.add(bar.group);
 			return bar;

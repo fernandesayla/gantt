@@ -33,14 +33,12 @@ function getProjects() {
   let i;
   let j;
 
-  for (i = 1; i <= 6; i++) {
+  for (i = 1; i <= 1; i++) {
 
     const tarefas = [];
-    let dataInicio = new Date('2017-09-04T03:00:00.000Z');
-    const duracao = 15;
-    let latencia = 3;
+    let dataInicio = moment('2017-07-01T03:00:00.000Z');
 
-    for (j = 1; j <= 7; j++) {
+    for (j = 1; j <= 5; j++) {
 
       const resp1 = {
             responsavel_id: '54103757',
@@ -92,20 +90,15 @@ function getProjects() {
       if(j%2===0) uors.push(uor2);      
 
       tarefaId += 1;
-      latencia = j % 3 === 0 ? 20 : 5;
-      dataInicio = new Date(dataInicio);
-      dataInicio.setDate(dataInicio.getDate() + latencia);
-      const dataFim = new Date(dataInicio);
-      // duracao = moment(dataInicio).daysInMonth() - 1;
-      dataFim.setDate(dataFim.getDate() + duracao);
-      // latencia = moment(dataInicio).daysInMonth() + j;
-
+      
+      dataInicio = dataInicio.clone().add(1, 'Month');      
+      dataFim = dataInicio.clone().add(dataInicio.daysInMonth() - 1, 'Day');
 
       const tarefa = {
 
         id: tarefaId,
         sequencia: j,
-        percentual: 30,
+        percentual: j < 3 ? 100 : j === 3 ? 40 : 0,
         tarefaAtual: j === i,
         tarefa: {
           id: j,
@@ -144,9 +137,9 @@ function getProjects() {
           },
         ],
         predecessoes: [
-          {
-            tarefaPredecessao_id: j !== 1 ? tarefaId - 1 : null,
-          },
+          // {
+          //   tarefaPredecessao_id: j !== 1 ? tarefaId - 1 : null,
+          // },
         ],
         responsaveis: responsaveis,
         uors: uors,
@@ -159,7 +152,8 @@ function getProjects() {
     const projeto =
       {
         id: i,
-        nome: `Projeto ${i}`,
+        nome: `Projeto Divisão Informações Gerenciais 
+               Projeto Divisão Informações Gerenciais ${i}`,
         tarefas,
       };
 
@@ -253,7 +247,8 @@ function convertGanttData(data){
 				// console.log(task);
 			},
 			on_date_change: function(task, start, end) {
-				console.log(start._d, end._d);
+				console.log(end._d);
+        // console.log(task);
 			},
 			on_progress_change: function(task, progress) {
 				// console.log(task, progress);
