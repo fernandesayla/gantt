@@ -363,7 +363,19 @@ export default function Gantt(element, projects, config) {
 		if(cur_width < actual_width) {
 			self.canvas.attr('width', actual_width);
 		}
+
 	}
+
+	// function set_height(actual_height) {
+
+	// 	const cur_height = self.canvas.node.getBoundingClientRect().height;
+	// 	// const actual_height = parseFloat(self.canvas.select('#grid .grid-row')
+	// 	//					.attr('width')) + self.config.left_menu_width;
+
+	// 	if(cur_height < actual_height) {
+	// 		self.canvas.attr('height', actual_height);
+	// 	}
+	// }
 
 	function set_scroll_position() {
 		const parent_element = document.querySelector(self.element).parentElement;

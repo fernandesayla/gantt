@@ -527,6 +527,17 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 		}
 	
+		// function set_height(actual_height) {
+	
+		// 	const cur_height = self.canvas.node.getBoundingClientRect().height;
+		// 	// const actual_height = parseFloat(self.canvas.select('#grid .grid-row')
+		// 	//					.attr('width')) + self.config.left_menu_width;
+	
+		// 	if(cur_height < actual_height) {
+		// 		self.canvas.attr('height', actual_height);
+		// 	}
+		// }
+	
 		function set_scroll_position() {
 			var parent_element = document.querySelector(self.element).parentElement;
 			if (!parent_element) return;
@@ -1426,7 +1437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			self.y = compute_y();
 			self.corner_radius = 3;
 			self.duration = (self.task._end.diff(self.task._start, 'hours') + 24) / gt.config.step;
-			self.durationDays = self.task._end.diff(self.task._start, 'days') + 1;
+			// self.durationDays = (self.task._end.diff(self.task._start, 'days') + 1);
 			self.width = gt.config.column_width * self.duration;
 			self.progress_width = gt.config.column_width * self.duration * (self.task.progress / 100) || 0;
 			self.group = gt.canvas.group().addClass('bar-wrapper').addClass(self.task.custom_class || '');
@@ -1544,6 +1555,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			var hr = div.getElementsByTagName('hr').length * 18;
 			self.details_height = p + h5 + hr + 24;
 	
+			set_height(self.details_height);
+	
 			var _get_details_position = get_details_position(),
 			    x = _get_details_position.x,
 			    y = _get_details_position.y;
@@ -1554,6 +1567,15 @@ return /******/ (function(modules) { // webpackBootstrap
 			var foreign_object = _snapSvg2.default.parse('<foreignObject width="5000" height="2000">\n\t\t\t\t<body xmlns="http://www.w3.org/1999/xhtml">\n\t\t\t\t\t' + html + '\n\t\t\t\t</body>\n\t\t\t\t</foreignObject>');
 	
 			self.details_box.append(foreign_object);
+		}
+	
+		function set_height(actual_height) {
+	
+			var cur_height = gt.canvas.node.getBoundingClientRect().height;
+	
+			if (cur_height < actual_height) {
+				gt.canvas.attr('height', actual_height);
+			}
 		}
 	
 		function get_details_html() {
@@ -1572,6 +1594,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			// const start_date = self.task._start.format('DD/MM/YYYY');
 			// const end_date = self.task._end.format('DD/MM/YYYY');
 			var heading = '' + self.task.name;
+	
+			self.durationDays = self.task._end.diff(self.task._start, 'days') + 1;
 	
 			var line_1 = 'Dura\xE7\xE3o: ' + self.durationDays + ' dias';
 			var line_2 = self.task.progress ? 'Percentual: ' + self.task.progress + '%' : null;

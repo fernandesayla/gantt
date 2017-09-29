@@ -30,15 +30,15 @@ function getProjects() {
 
   const projetos = [];
   let tarefaId = 0;
-  let i;
-  let j;  
-
-  for (i = 1; i <= 1; i++) {
+  const qtProjetos = 1;
+  const qtTarefas = 5;
+  
+  for (let i = qtProjetos; i <= 1; i++) {
 
     const tarefas = [];
     let dataInicio = moment('2017-07-01T03:00:00.000Z');
 
-    for (j = 1; j <= 10; j++) {
+    for (let j = 1; j <= qtTarefas; j++) {
 
       const resp1 = {
             responsavel_id: '54103757',

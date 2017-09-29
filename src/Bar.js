@@ -40,7 +40,7 @@ export default function Bar(gt, task) {
 		self.y = compute_y();
 		self.corner_radius = 3;
 		self.duration = (self.task._end.diff(self.task._start, 'hours') + 24) / gt.config.step;
-		self.durationDays = (self.task._end.diff(self.task._start, 'days') + 1);
+		// self.durationDays = (self.task._end.diff(self.task._start, 'days') + 1);
 		self.width = gt.config.column_width * self.duration;
 		self.progress_width = gt.config.column_width * self.duration * (self.task.progress / 100) || 0;
 		self.group = gt.canvas.group().addClass('bar-wrapper').addClass(self.task.custom_class || '');
@@ -186,6 +186,8 @@ export default function Bar(gt, task) {
 		const hr = div.getElementsByTagName('hr').length * 18;
 		self.details_height = p + h5 + hr + 24;
 
+		set_height(self.details_height);
+
 		const { x, y } = get_details_position();
 		self.details_box.transform(`t${x},${y}`);
 		self.details_box.clear();
@@ -198,6 +200,15 @@ export default function Bar(gt, task) {
 				</foreignObject>`);
 
 		self.details_box.append(foreign_object);
+	}
+
+	function set_height(actual_height) {
+
+		const cur_height = gt.canvas.node.getBoundingClientRect().height;
+
+		if(cur_height < actual_height) {
+			gt.canvas.attr('height', actual_height);
+		}
 	}
 
 	function get_details_html() {
@@ -216,6 +227,8 @@ export default function Bar(gt, task) {
 		// const start_date = self.task._start.format('DD/MM/YYYY');
 		// const end_date = self.task._end.format('DD/MM/YYYY');
 		const heading = `${self.task.name}`;
+
+		self.durationDays = (self.task._end.diff(self.task._start, 'days') + 1);
 
 		const line_1 = `Duração: ${self.durationDays} dias`;
 		const line_2 = self.task.progress ? `Percentual: ${self.task.progress}%` : null;
