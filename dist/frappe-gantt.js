@@ -527,17 +527,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 		}
 	
-		// function set_height(actual_height) {
-	
-		// 	const cur_height = self.canvas.node.getBoundingClientRect().height;
-		// 	// const actual_height = parseFloat(self.canvas.select('#grid .grid-row')
-		// 	//					.attr('width')) + self.config.left_menu_width;
-	
-		// 	if(cur_height < actual_height) {
-		// 		self.canvas.attr('height', actual_height);
-		// 	}
-		// }
-	
 		function set_scroll_position() {
 			var parent_element = document.querySelector(self.element).parentElement;
 			if (!parent_element) return;
@@ -564,6 +553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			make_grid_background();
 			make_grid_header();
 			make_grid_rows();
+			if (view_is('Day')) make_grid_weekend();
 			make_grid_ticks();
 			make_grid_highlights();
 		}
@@ -721,6 +711,43 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 		}
 	
+		function make_grid_weekend() {
+			var x = 0;
+			var width = self.config.column_width;
+			var height = self.config.row.height * self._projects._rows;
+			var y = self.config.header_height + self.config.padding / 2;
+	
+			var _iteratorNormalCompletion7 = true;
+			var _didIteratorError7 = false;
+			var _iteratorError7 = undefined;
+	
+			try {
+				for (var _iterator7 = self.dates[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+					var date = _step7.value;
+	
+	
+					if (date.isoWeekday() === 6 || date.isoWeekday() === 7) {
+						self.canvas.rect(x, y, width, height).addClass('grid-weekend').appendTo(self.element_groups.grid);
+					}
+	
+					x += self.config.column_width;
+				}
+			} catch (err) {
+				_didIteratorError7 = true;
+				_iteratorError7 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion7 && _iterator7.return) {
+						_iterator7.return();
+					}
+				} finally {
+					if (_didIteratorError7) {
+						throw _iteratorError7;
+					}
+				}
+			}
+		}
+	
 		function make_grid_highlights() {
 			// highlight today's date
 	
@@ -750,13 +777,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function make_dates() {
-			var _iteratorNormalCompletion7 = true;
-			var _didIteratorError7 = false;
-			var _iteratorError7 = undefined;
+			var _iteratorNormalCompletion8 = true;
+			var _didIteratorError8 = false;
+			var _iteratorError8 = undefined;
 	
 			try {
-				for (var _iterator7 = get_dates_to_draw()[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-					var date = _step7.value;
+				for (var _iterator8 = get_dates_to_draw()[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+					var date = _step8.value;
 	
 	
 					var grid_width = self.element_groups.grid.getBBox().width;
@@ -779,16 +806,16 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 				}
 			} catch (err) {
-				_didIteratorError7 = true;
-				_iteratorError7 = err;
+				_didIteratorError8 = true;
+				_iteratorError8 = err;
 			} finally {
 				try {
-					if (!_iteratorNormalCompletion7 && _iterator7.return) {
-						_iterator7.return();
+					if (!_iteratorNormalCompletion8 && _iterator8.return) {
+						_iterator8.return();
 					}
 				} finally {
-					if (_didIteratorError7) {
-						throw _iteratorError7;
+					if (_didIteratorError8) {
+						throw _iteratorError8;
 					}
 				}
 			}
@@ -799,14 +826,19 @@ return /******/ (function(modules) { // webpackBootstrap
 			    last_date = null;
 	
 			var dates = self.dates.map(function (date, i) {
-	
 				var d = get_date_info(date, last_date, i);
 				last_date = date;
 				d.lower_x = lower_x + self.config.column_width / 2;
 				lower_x += view_is('Month') ? date.daysInMonth() * self.config.column_width / 30 : self.config.column_width;
 	
+				if (view_is('Day') && d.upper_text && d.lower_text !== '1') {
+					var daysMonth = date.daysInMonth() - d.lower_text + 1;
+					d.upper_x = self.config.column_width * daysMonth / 2;
+				}
+	
 				return d;
 			});
+	
 			return dates;
 		}
 	
@@ -866,13 +898,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function make_arrows() {
 			self._arrows = [];
-			var _iteratorNormalCompletion8 = true;
-			var _didIteratorError8 = false;
-			var _iteratorError8 = undefined;
+			var _iteratorNormalCompletion9 = true;
+			var _didIteratorError9 = false;
+			var _iteratorError9 = undefined;
 	
 			try {
 				var _loop = function _loop() {
-					var task = _step8.value;
+					var task = _step9.value;
 	
 					var arrows = [];
 					arrows = task.dependencies.map(function (dep) {
@@ -890,20 +922,20 @@ return /******/ (function(modules) { // webpackBootstrap
 					self._arrows = self._arrows.concat(arrows);
 				};
 	
-				for (var _iterator8 = self.tasks[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+				for (var _iterator9 = self.tasks[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
 					_loop();
 				}
 			} catch (err) {
-				_didIteratorError8 = true;
-				_iteratorError8 = err;
+				_didIteratorError9 = true;
+				_iteratorError9 = err;
 			} finally {
 				try {
-					if (!_iteratorNormalCompletion8 && _iterator8.return) {
-						_iterator8.return();
+					if (!_iteratorNormalCompletion9 && _iterator9.return) {
+						_iterator9.return();
 					}
 				} finally {
-					if (_didIteratorError8) {
-						throw _iteratorError8;
+					if (_didIteratorError9) {
+						throw _iteratorError9;
 					}
 				}
 			}
@@ -918,33 +950,33 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function map_arrows_on_bars() {
-			var _iteratorNormalCompletion9 = true;
-			var _didIteratorError9 = false;
-			var _iteratorError9 = undefined;
+			var _iteratorNormalCompletion10 = true;
+			var _didIteratorError10 = false;
+			var _iteratorError10 = undefined;
 	
 			try {
 				var _loop2 = function _loop2() {
-					var bar = _step9.value;
+					var bar = _step10.value;
 	
 					bar.arrows = self._arrows.filter(function (arrow) {
 						return arrow.from_task.task.id === bar.task.id || arrow.to_task.task.id === bar.task.id;
 					});
 				};
 	
-				for (var _iterator9 = self._bars[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+				for (var _iterator10 = self._bars[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
 					_loop2();
 				}
 			} catch (err) {
-				_didIteratorError9 = true;
-				_iteratorError9 = err;
+				_didIteratorError10 = true;
+				_iteratorError10 = err;
 			} finally {
 				try {
-					if (!_iteratorNormalCompletion9 && _iterator9.return) {
-						_iterator9.return();
+					if (!_iteratorNormalCompletion10 && _iterator10.return) {
+						_iterator10.return();
 					}
 				} finally {
-					if (_didIteratorError9) {
-						throw _iteratorError9;
+					if (_didIteratorError10) {
+						throw _iteratorError10;
 					}
 				}
 			}
@@ -969,27 +1001,27 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (typeof modes === 'string') {
 				return self.config.view_mode === modes;
 			} else if (Array.isArray(modes)) {
-				var _iteratorNormalCompletion10 = true;
-				var _didIteratorError10 = false;
-				var _iteratorError10 = undefined;
+				var _iteratorNormalCompletion11 = true;
+				var _didIteratorError11 = false;
+				var _iteratorError11 = undefined;
 	
 				try {
-					for (var _iterator10 = modes[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-						var mode = _step10.value;
+					for (var _iterator11 = modes[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+						var mode = _step11.value;
 	
 						if (self.config.view_mode === mode) return true;
 					}
 				} catch (err) {
-					_didIteratorError10 = true;
-					_iteratorError10 = err;
+					_didIteratorError11 = true;
+					_iteratorError11 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion10 && _iterator10.return) {
-							_iterator10.return();
+						if (!_iteratorNormalCompletion11 && _iterator11.return) {
+							_iterator11.return();
 						}
 					} finally {
-						if (_didIteratorError10) {
-							throw _iteratorError10;
+						if (_didIteratorError11) {
+							throw _iteratorError11;
 						}
 					}
 				}
@@ -1071,7 +1103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "body {\n  font-family: sans-serif; }\n\n.gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.6; }\n  .gantt .tick.thick {\n    stroke-width: 0.8; }\n\n.gantt .tick-today, .gantt .tick-current, .gantt .tick-current-late {\n  stroke-width: 1;\n  opacity: 0.8;\n  stroke-dasharray: 7; }\n\n.gantt .tick-today {\n  stroke: #43a047; }\n\n.gantt .tick-current {\n  stroke: #82b1f3; }\n\n.gantt .tick-current-late {\n  stroke: #f1aa9e; }\n\n.gantt .today-highlight, .gantt .current-highlight, .gantt .current-highlight-late {\n  opacity: 0.5; }\n\n.gantt .today-highlight {\n  fill: #b9f3b9; }\n\n.gantt .current-highlight {\n  fill: #82b1f3; }\n\n.gantt .current-highlight-late {\n  fill: #f1aa9e; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #1976d2;\n  stroke: #1976d2;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-late .bar {\n  fill: #f1b4a9 !important;\n  stroke: tomato;\n  stroke-width: 0.8;\n  opacity: 0.8; }\n\n.gantt .bar-progress {\n  fill: #43a047; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #1976d2;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt .project-text-container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #555; }\n\n.gantt .project-text {\n  text-align: center; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0;\n    line-height: 1.2;\n    font-size: 12px; }\n  .gantt #details .details-container h5 {\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #f5f5f5; }\n\n.gantt .avatarContainer {\n  height: 64px;\n  display: flex;\n  align-items: center;\n  padding-right: 10px;\n  float: left; }\n\n.gantt .avatar {\n  height: 50px !important; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAmBA;EACE,wBAAuB,EACxB;;AAED;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBA3BoB;EA4BpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cAjCgB,EAkChB;;AAfF;EAiBE,gBAnC0B,EAoC1B;;AAlBF;EAoBE,gBAxCoB;EAyCpB,kBAAiB,EACjB;;AAtBF;EAwBE,gBA5CoB;EA6CpB,kBAAiB,EAIjB;EA7BF;IA2BG,kBAAiB,EACjB;;AA5BH;EAgCE,gBAAe;EACf,aAAY;EACZ,oBAAmB,EACnB;;AAnCF;EAsCE,gBA9Ca,EA+Cb;;AAvCF;EA0CE,gBArDkB,EAuDlB;;AA5CF;EA8CE,gBAxDiB,EAyDjB;;AA/CF;EAkDE,aAAY,EACZ;;AAnDF;EAsDE,cA7DmB,EA8DnB;;AAvDF;EA0DE,cArEkB,EAsElB;;AA3DF;EA8DE,cAxEiB,EAyEjB;;AA/DF;EAkEE,WAAU;EACV,aAnFe;EAoFf,kBAAiB,EACjB;;AArEF;EAwEE,cA9FiB;EA+FjB,gBA9FkB;EA+FlB,gBAAe;EACf,kCAAiC,EACjC;;AA5EF;EA+EE,yBAAwB;EACxB,eAAc;EAEd,kBAAiB;EACjB,aAAY,EACZ;;AApFF;EAuFE,cA/Fa,EAgGb;;AAxFF;EA0FE,kBAAiB;EACjB,gBAhHkB;EAiHlB,gBAAe;EACf,oBAAmB,EAKnB;EAlGF;IAgGG,WA/Gc,EAgHd;;AAjGH;EAoGE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EAEf,sBAAqB,EAMrB;EA/GF;IA4GG,WA3Hc;IA4Hd,mBAAkB,EAClB;;AA9GH;EAkHE,WAnIiB;EAoIjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AAvHF;EA0HE,gBAAe,EAkBf;EA5IF;IA8HI,gBAAe,EACf;EA/HJ;IAkII,oBAAmB;IACnB,WAAU,EACV;EApIJ;IAyII,gBAAe,EACf;;AA1IJ;EA+IE,gBAAe;EACf,oBAAmB,EACnB;;AAjJF;EAmJE,WAlKe,EAmKf;;AApJF;EAsJE,WApKe,EAqKf;;AAvJF;EAyJE,cAAa;EACb,oBAAmB;EACnB,wBAAuB;EACvB,YA3Ke,EA4Kf;;AA7JF;EA+JE,mBAAkB,EAClB;;AAhKF;EAmKE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EA3LF;IAwKG,UAAS;IACT,iBAAgB;IAChB,gBAAe,EACf;EA3KH;IA8KG,kBAAiB;IACjB,oBAAmB;IACnB,YA/Lc,EAgMd;EAjLH;IAoLG,mBAAkB;IAClB,YArMc,EAsMd;EAtLH;IAyLG,iBAAgB,EAChB;;AA1LH;EA8LE,cAAa,EACb;;AA/LF;EAkME,cArNgB,EAsNhB;;AAnMF;EAsME,aAAY;EACZ,cAAa;EACb,oBAAmB;EACnB,oBAAmB;EACnB,YAAW,EAEX;;AA5MF;EA8ME,wBAAuB,EACvB","file":"gantt.scss","sourcesContent":["// $bar-color: #b8c2cc;\n$bar-color: #1976d2;\n$bar-stroke: #1976d2;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n$handle-color: #ddd;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n$grey: #b8c2cc;\n$blue: #3887f3;\n$light-blue: #82b1f3;\n$light-red: #f1aa9e;\n$light-yellow: #fcf8e3;\n$green: #43a047;\n$light-green: #b9f3b9;\n\n\nbody {\n  font-family: sans-serif; \n}\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\t\t\n\t\tstroke: $border-color;\t\t\n\t\tstroke-width: 1.4;\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.6;\n\t\t&.thick {\n\t\t\tstroke-width: 0.8;\n\t\t}\n\t}\n\n\t.tick-today, .tick-current, .tick-current-late {\t\t\n\t\tstroke-width: 1;\t\n\t\topacity: 0.8;\t\n\t\tstroke-dasharray: 7;\n\t}\n\n\t.tick-today {\n\t\tstroke: $green;\t\t\n\t}\n\n\t.tick-current {\n\t\tstroke: $light-blue;\n\t\t\n\t}\n\t.tick-current-late {\n\t\tstroke: $light-red;\n\t}\n\n\t.today-highlight, .current-highlight, .current-highlight-late{\n\t\topacity: 0.5;\n\t}\n\n\t.today-highlight {\n\t\tfill: $light-green;\t\t\n\t}\n\n\t.current-highlight {\n\t\tfill: $light-blue;\n\t}\n\n\t.current-highlight-late {\n\t\tfill: $light-red;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\n\t.bar-late .bar {\t\n\t\tfill: #f1b4a9 !important;\n\t\tstroke: tomato;\n\t\t// stroke-dasharray: 7;\n\t\tstroke-width: 0.8;\n\t\topacity: 0.8;\n\t}\t\n\n\t.bar-progress {\n\t\tfill: $green;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\t// font-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\t.project-text-container{\t\t\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tjustify-content: center;\n\t\tcolor: $text-light;\t\t\n\t}\n\t.project-text{\n\t\ttext-align: center;\t\t\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\t\t\n\t\t\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t\tline-height: 1.2;\n\t\t\tfont-size: 12px;\n\t\t}\n\n\t\th5 {\t\t\t\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\t\t\t\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: $light-bg;\n\t}\n\n\t.avatarContainer{\n\t\theight: 64px;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tpadding-right: 10px;\n\t\tfloat: left;\n\t\t\n\t}\n\t.avatar{\n\t\theight: 50px !important;\n\t}\t\n\n}\n\n"],"sourceRoot":""}]);
+	exports.push([module.id, "body {\n  font-family: sans-serif; }\n\n.gantt .grid-background {\n  fill: none; }\n\n.gantt .grid-header {\n  fill: #ffffff;\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .grid-row {\n  fill: #ffffff; }\n\n.gantt .grid-row:nth-child(even) {\n  fill: #f5f5f5; }\n\n.gantt .grid-weekend {\n  fill: #fdfdfd; }\n\n.gantt .row-line {\n  stroke: #ebeff2; }\n\n.gantt .row-line-project {\n  stroke: #e0e0e0;\n  stroke-width: 1.4; }\n\n.gantt .tick {\n  stroke: #e0e0e0;\n  stroke-width: 0.6; }\n  .gantt .tick.thick {\n    stroke-width: 0.8; }\n\n.gantt .tick-today, .gantt .tick-current, .gantt .tick-current-late {\n  stroke-width: 1;\n  opacity: 0.8;\n  stroke-dasharray: 7; }\n\n.gantt .tick-today {\n  stroke: #43a047; }\n\n.gantt .tick-current {\n  stroke: #82b1f3; }\n\n.gantt .tick-current-late {\n  stroke: #f1aa9e; }\n\n.gantt .today-highlight, .gantt .current-highlight, .gantt .current-highlight-late {\n  opacity: 0.5; }\n\n.gantt .today-highlight {\n  fill: #b9f3b9; }\n\n.gantt .current-highlight {\n  fill: #82b1f3; }\n\n.gantt .current-highlight-late {\n  fill: #f1aa9e; }\n\n.gantt #arrow {\n  fill: none;\n  stroke: #666;\n  stroke-width: 1.4; }\n\n.gantt .bar {\n  fill: #1976d2;\n  stroke: #1976d2;\n  stroke-width: 0;\n  transition: stroke-width .3s ease; }\n\n.gantt .bar-late .bar {\n  fill: #f1b4a9 !important;\n  stroke: tomato;\n  stroke-width: 0.8;\n  opacity: 0.8; }\n\n.gantt .bar-progress {\n  fill: #43a047; }\n\n.gantt .bar-invalid {\n  fill: transparent;\n  stroke: #1976d2;\n  stroke-width: 1;\n  stroke-dasharray: 5; }\n  .gantt .bar-invalid ~ .bar-label {\n    fill: #555; }\n\n.gantt .bar-label {\n  fill: #fff;\n  dominant-baseline: central;\n  text-anchor: middle;\n  font-size: 12px;\n  letter-spacing: 0.8px; }\n  .gantt .bar-label.big {\n    fill: #555;\n    text-anchor: start; }\n\n.gantt .handle {\n  fill: #ddd;\n  cursor: ew-resize;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity .3s ease; }\n\n.gantt .bar-wrapper {\n  cursor: pointer; }\n  .gantt .bar-wrapper:hover .bar {\n    stroke-width: 2; }\n  .gantt .bar-wrapper:hover .handle {\n    visibility: visible;\n    opacity: 1; }\n  .gantt .bar-wrapper.active .bar {\n    stroke-width: 2; }\n\n.gantt .lower-text, .gantt .upper-text {\n  font-size: 12px;\n  text-anchor: middle; }\n\n.gantt .upper-text {\n  fill: #555; }\n\n.gantt .lower-text {\n  fill: #333; }\n\n.gantt .project-text-container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #555; }\n\n.gantt .project-text {\n  text-align: center; }\n\n.gantt #details .details-container {\n  background: #fff;\n  display: inline-block;\n  padding: 12px; }\n  .gantt #details .details-container h5, .gantt #details .details-container p {\n    margin: 0;\n    line-height: 1.2;\n    font-size: 12px; }\n  .gantt #details .details-container h5 {\n    font-weight: bold;\n    margin-bottom: 10px;\n    color: #555; }\n  .gantt #details .details-container p {\n    margin-bottom: 6px;\n    color: #666; }\n  .gantt #details .details-container p:last-child {\n    margin-bottom: 0; }\n\n.gantt .hide {\n  display: none; }\n\n.gantt .grid-project-row {\n  fill: #f5f5f5; }\n\n.gantt .avatarContainer {\n  height: 64px;\n  display: flex;\n  align-items: center;\n  padding-right: 10px;\n  float: left; }\n\n.gantt .avatar {\n  height: 50px !important; }\n", "", {"version":3,"sources":["/home/f4103757/workspace/gantt/src/src/gantt.scss"],"names":[],"mappings":"AAoBA;EACE,wBAAuB,EACxB;;AAED;EAGE,WAAU,EACV;;AAJF;EAME,cAAa;EACb,gBA5BoB;EA6BpB,kBAAiB,EACjB;;AATF;EAWE,cAAa,EACb;;AAZF;EAcE,cAlCgB,EAmChB;;AAfF;EAiBE,cA9BkB,EA+BlB;;AAlBF;EAoBE,gBAvC0B,EAwC1B;;AArBF;EAuBE,gBA5CoB;EA6CpB,kBAAiB,EACjB;;AAzBF;EA2BE,gBAhDoB;EAiDpB,kBAAiB,EAIjB;EAhCF;IA8BG,kBAAiB,EACjB;;AA/BH;EAmCE,gBAAe;EACf,aAAY;EACZ,oBAAmB,EACnB;;AAtCF;EAyCE,gBAjDa,EAkDb;;AA1CF;EA6CE,gBAxDkB,EA0DlB;;AA/CF;EAiDE,gBA3DiB,EA4DjB;;AAlDF;EAqDE,aAAY,EACZ;;AAtDF;EAyDE,cAhEmB,EAiEnB;;AA1DF;EA6DE,cAxEkB,EAyElB;;AA9DF;EAiEE,cA3EiB,EA4EjB;;AAlEF;EAqEE,WAAU;EACV,aAvFe;EAwFf,kBAAiB,EACjB;;AAxEF;EA2EE,cAlGiB;EAmGjB,gBAlGkB;EAmGlB,gBAAe;EACf,kCAAiC,EACjC;;AA/EF;EAkFE,yBAAwB;EACxB,eAAc;EAEd,kBAAiB;EACjB,aAAY,EACZ;;AAvFF;EA0FE,cAlGa,EAmGb;;AA3FF;EA6FE,kBAAiB;EACjB,gBApHkB;EAqHlB,gBAAe;EACf,oBAAmB,EAKnB;EArGF;IAmGG,WAnHc,EAoHd;;AApGH;EAuGE,WAAU;EACV,2BAA0B;EAC1B,oBAAmB;EACnB,gBAAe;EAEf,sBAAqB,EAMrB;EAlHF;IA+GG,WA/Hc;IAgId,mBAAkB,EAClB;;AAjHH;EAqHE,WAvIiB;EAwIjB,kBAAiB;EACjB,WAAU;EACV,mBAAkB;EAClB,6BAA4B,EAC5B;;AA1HF;EA6HE,gBAAe,EAkBf;EA/IF;IAiII,gBAAe,EACf;EAlIJ;IAqII,oBAAmB;IACnB,WAAU,EACV;EAvIJ;IA4II,gBAAe,EACf;;AA7IJ;EAkJE,gBAAe;EACf,oBAAmB,EACnB;;AApJF;EAsJE,WAtKe,EAuKf;;AAvJF;EAyJE,WAxKe,EAyKf;;AA1JF;EA4JE,cAAa;EACb,oBAAmB;EACnB,wBAAuB;EACvB,YA/Ke,EAgLf;;AAhKF;EAkKE,mBAAkB,EAClB;;AAnKF;EAsKE,iBAAgB;EAChB,sBAAqB;EACrB,cAAa,EAsBb;EA9LF;IA2KG,UAAS;IACT,iBAAgB;IAChB,gBAAe,EACf;EA9KH;IAiLG,kBAAiB;IACjB,oBAAmB;IACnB,YAnMc,EAoMd;EApLH;IAuLG,mBAAkB;IAClB,YAzMc,EA0Md;EAzLH;IA4LG,iBAAgB,EAChB;;AA7LH;EAiME,cAAa,EACb;;AAlMF;EAqME,cAzNgB,EA0NhB;;AAtMF;EAyME,aAAY;EACZ,cAAa;EACb,oBAAmB;EACnB,oBAAmB;EACnB,YAAW,EAEX;;AA/MF;EAiNE,wBAAuB,EACvB","file":"gantt.scss","sourcesContent":["// $bar-color: #b8c2cc;\n$bar-color: #1976d2;\n$bar-stroke: #1976d2;\n$border-color: #e0e0e0;\n$light-bg: #f5f5f5;\n$light-border-color: #ebeff2;\n$handle-color: #ddd;\n$text-muted: #666;\n$text-light: #555;\n$text-color: #333;\n$grey: #b8c2cc;\n$light-grey: #fdfdfd;\n$blue: #3887f3;\n$light-blue: #82b1f3;\n$light-red: #f1aa9e;\n$light-yellow: #fcf8e3;\n$green: #43a047;\n$light-green: #b9f3b9;\n\n\nbody {\n  font-family: sans-serif; \n}\n\n.gantt {\n\n\t.grid-background {\n\t\tfill: none;\n\t}\n\t.grid-header {\n\t\tfill: #ffffff;\n\t\tstroke: $border-color;\n\t\tstroke-width: 1.4;\n\t}\n\t.grid-row {\n\t\tfill: #ffffff;\n\t}\n\t.grid-row:nth-child(even) {\n\t\tfill: $light-bg;\n\t}\n\t.grid-weekend {\n\t\tfill: $light-grey;\n\t}\n\t.row-line {\n\t\tstroke: $light-border-color;\t\t\n\t}\n\t.row-line-project {\t\t\n\t\tstroke: $border-color;\t\t\n\t\tstroke-width: 1.4;\n\t}\n\t.tick {\n\t\tstroke: $border-color;\n\t\tstroke-width: 0.6;\n\t\t&.thick {\n\t\t\tstroke-width: 0.8;\n\t\t}\n\t}\n\n\t.tick-today, .tick-current, .tick-current-late {\t\t\n\t\tstroke-width: 1;\t\n\t\topacity: 0.8;\t\n\t\tstroke-dasharray: 7;\n\t}\n\n\t.tick-today {\n\t\tstroke: $green;\t\t\n\t}\n\n\t.tick-current {\n\t\tstroke: $light-blue;\n\t\t\n\t}\n\t.tick-current-late {\n\t\tstroke: $light-red;\n\t}\n\n\t.today-highlight, .current-highlight, .current-highlight-late{\n\t\topacity: 0.5;\n\t}\n\n\t.today-highlight {\n\t\tfill: $light-green;\t\t\n\t}\n\n\t.current-highlight {\n\t\tfill: $light-blue;\n\t}\n\n\t.current-highlight-late {\n\t\tfill: $light-red;\n\t}\n\n\t#arrow {\n\t\tfill: none;\n\t\tstroke: $text-muted;\n\t\tstroke-width: 1.4;\n\t}\n\n\t.bar {\n\t\tfill: $bar-color;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 0;\n\t\ttransition: stroke-width .3s ease;\n\t}\n\n\t.bar-late .bar {\t\n\t\tfill: #f1b4a9 !important;\n\t\tstroke: tomato;\n\t\t// stroke-dasharray: 7;\n\t\tstroke-width: 0.8;\n\t\topacity: 0.8;\n\t}\t\n\n\t.bar-progress {\n\t\tfill: $green;\n\t}\n\t.bar-invalid {\n\t\tfill: transparent;\n\t\tstroke: $bar-stroke;\n\t\tstroke-width: 1;\n\t\tstroke-dasharray: 5;\n\n\t\t&~.bar-label {\n\t\t\tfill: $text-light;\n\t\t}\n\t}\n\t.bar-label {\n\t\tfill: #fff;\n\t\tdominant-baseline: central;\n\t\ttext-anchor: middle;\n\t\tfont-size: 12px;\n\t\t// font-weight: lighter;\n\t\tletter-spacing: 0.8px;\n\n\t\t&.big {\n\t\t\tfill: $text-light;\n\t\t\ttext-anchor: start;\n\t\t}\n\t}\n\n\t.handle {\n\t\tfill: $handle-color;\n\t\tcursor: ew-resize;\n\t\topacity: 0;\n\t\tvisibility: hidden;\n\t\ttransition: opacity .3s ease;\n\t}\n\n\t.bar-wrapper {\n\t\tcursor: pointer;\n\n\t\t&:hover {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\n\t\t\t.handle {\n\t\t\t\tvisibility: visible;\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t}\n\n\t\t&.active {\n\t\t\t.bar {\n\t\t\t\tstroke-width: 2;\n\t\t\t}\n\t\t}\n\t}\n\n\t.lower-text, .upper-text {\n\t\tfont-size: 12px;\n\t\ttext-anchor: middle;\n\t}\n\t.upper-text {\n\t\tfill: $text-light;\n\t}\n\t.lower-text {\n\t\tfill: $text-color;\n\t}\n\t.project-text-container{\t\t\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tjustify-content: center;\n\t\tcolor: $text-light;\t\t\n\t}\n\t.project-text{\n\t\ttext-align: center;\t\t\n\t}\n\n\t#details .details-container {\n\t\tbackground: #fff;\n\t\tdisplay: inline-block;\n\t\tpadding: 12px;\t\t\n\t\t\n\t\th5, p {\n\t\t\tmargin: 0;\n\t\t\tline-height: 1.2;\n\t\t\tfont-size: 12px;\n\t\t}\n\n\t\th5 {\t\t\t\n\t\t\tfont-weight: bold;\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: $text-light;\n\t\t}\n\n\t\tp {\t\t\t\n\t\t\tmargin-bottom: 6px;\n\t\t\tcolor: $text-muted;\n\t\t}\n\n\t\tp:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\t}\n\n\t.hide {\n\t\tdisplay: none;\n\t}\n\n\t.grid-project-row {\n\t\tfill: $light-bg;\n\t}\n\n\t.avatarContainer{\n\t\theight: 64px;\n\t\tdisplay: flex;\n\t\talign-items: center;\n\t\tpadding-right: 10px;\n\t\tfloat: left;\n\t\t\n\t}\n\t.avatar{\n\t\theight: 50px !important;\n\t}\t\n\n}\n\n"],"sourceRoot":""}]);
 	
 	// exports
 

@@ -9,6 +9,7 @@ $text-muted: #666;
 $text-light: #555;
 $text-color: #333;
 $grey: #b8c2cc;
+$light-grey: #fdfdfd;
 $blue: #3887f3;
 $light-blue: #82b1f3;
 $light-red: #f1aa9e;
@@ -36,6 +37,9 @@ body {
 	}
 	.grid-row:nth-child(even) {
 		fill: $light-bg;
+	}
+	.grid-weekend {
+		fill: $light-grey;
 	}
 	.row-line {
 		stroke: $light-border-color;		

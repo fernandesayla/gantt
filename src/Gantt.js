@@ -366,17 +366,6 @@ export default function Gantt(element, projects, config) {
 
 	}
 
-	// function set_height(actual_height) {
-
-	// 	const cur_height = self.canvas.node.getBoundingClientRect().height;
-	// 	// const actual_height = parseFloat(self.canvas.select('#grid .grid-row')
-	// 	//					.attr('width')) + self.config.left_menu_width;
-
-	// 	if(cur_height < actual_height) {
-	// 		self.canvas.attr('height', actual_height);
-	// 	}
-	// }
-
 	function set_scroll_position() {
 		const parent_element = document.querySelector(self.element).parentElement;
 		if(!parent_element) return;
@@ -404,6 +393,7 @@ export default function Gantt(element, projects, config) {
 		make_grid_background();
 		make_grid_header();
 		make_grid_rows();
+		if(view_is('Day')) make_grid_weekend();
 		make_grid_ticks();
 		make_grid_highlights();
 	}
@@ -571,6 +561,25 @@ export default function Gantt(element, projects, config) {
 		}
 	}
 
+	function make_grid_weekend() {
+		let x = 0;
+		const width = self.config.column_width;
+		let height = (self.config.row.height) * self._projects._rows;
+		let y = self.config.header_height + self.config.padding / 2;
+
+		for(let date of self.dates) {
+
+			if(date.isoWeekday() === 6 || date.isoWeekday() === 7) {
+				self.canvas.rect(x, y, width, height)
+						.addClass('grid-weekend')
+						.appendTo(self.element_groups.grid);
+			}
+
+			x += self.config.column_width;
+
+		}
+	}
+
 	function make_grid_highlights() {
 		// highlight today's date
 
@@ -642,14 +651,19 @@ export default function Gantt(element, projects, config) {
 			last_date = null;
 
 		const dates = self.dates.map((date, i) => {
-
 			const d = get_date_info(date, last_date, i);
 			last_date = date;
 			d.lower_x = lower_x + self.config.column_width / 2;
 			lower_x += view_is('Month') ? date.daysInMonth() * self.config.column_width / 30 : self.config.column_width;
 
+			if(view_is('Day') && d.upper_text && d.lower_text !== '1') {
+				const daysMonth = (date.daysInMonth() - d.lower_text) + 1;
+				d.upper_x = self.config.column_width * daysMonth / 2;
+			}
+
 			return d;
 		});
+
 		return dates;
 	}
 

@@ -31,7 +31,7 @@ function getProjects() {
   const projetos = [];
   let tarefaId = 0;
   const qtProjetos = 1;
-  const qtTarefas = 5; 
+  const qtTarefas = 10; 
   
   for (let i = qtProjetos; i <= 1; i++) {
 
@@ -258,7 +258,7 @@ function convertGanttData(data){
 			on_view_change: function(mode) {
 				// console.log(mode);
 			},
-			view_mode: 'Month',
+			view_mode: 'Day',
 			inline: false,
 			projection: false,
       left_menu_width: 0,      
