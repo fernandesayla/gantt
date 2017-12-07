@@ -122,7 +122,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				custom_popup_html: null,
 				left_menu_width: 0,
 				inline: false,
-				projection: false
+				projection: false,
+				number_months_add: 0
 			};
 	
 			if (!config.left_menu_width && projects.length > 1) config.left_menu_width = 200;
@@ -136,7 +137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function reset_variables() {
 			self.element = element;
-			self._tasks = [];
+			self._tasks = [];0;
 			projects.forEach(function (project) {
 				return self._tasks = self._tasks.concat(project.tasks);
 			});
@@ -405,6 +406,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function set_gantt_dates() {
+			var number_months_add = self.config.number_months_add;
+	
 	
 			if (view_is(['Quarter Day', 'Half Day'])) {
 				self.gantt_start = self.gantt_start.clone().subtract(7, 'day');
@@ -417,6 +420,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				self.gantt_start = self.gantt_start.clone().subtract(1, 'days'); // .startOf('month');
 				self.gantt_end = self.gantt_end.clone().add(1, 'days'); // .endOf('month');
 			}
+	
+			if (number_months_add > 0) self.gantt_end = self.gantt_end.clone().add(number_months_add, 'Month');
 		}
 	
 		function setup_dates() {
@@ -1467,7 +1472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			self.height = gt.config.bar.height;
 			self.x = compute_x();
 			self.y = compute_y();
-			self.corner_radius = 7;
+			self.corner_radius = 5;
 			self.duration = (self.task._end.diff(self.task._start, 'hours') + 24) / gt.config.step;
 			// self.durationDays = (self.task._end.diff(self.task._start, 'days') + 1);
 			self.width = gt.config.column_width * self.duration;
