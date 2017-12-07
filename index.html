@@ -31,12 +31,12 @@ function getProjects() {
   const projetos = [];
   let tarefaId = 0;
   const qtProjetos = 1;
-  const qtTarefas = 10; 
+  const qtTarefas = 3; 
   
   for (let i = qtProjetos; i <= 1; i++) {
 
     const tarefas = [];
-    let dataInicio = moment('2017-07-01T03:00:00.000Z');
+    let dataInicio = moment('2017-06-25T03:00:00.000Z');
 
     for (let j = 1; j <= qtTarefas; j++) {
 
@@ -91,8 +91,10 @@ function getProjects() {
 
       tarefaId += 1;
       
-      dataInicio = dataInicio.clone().add(1, 'Month');      
-      dataFim = dataInicio.clone().add(dataInicio.daysInMonth() - 1, 'Day');
+      // dataInicio = dataInicio.clone().add(1, 'Month');      
+      dataInicio = dataInicio.clone().add(10, 'Day');      
+      // dataFim = dataInicio.clone().add(dataInicio.daysInMonth() - 1, 'Day');
+      dataFim = dataInicio.clone().add(5, 'Day');
 
       const tarefa = {
 
@@ -258,7 +260,7 @@ function convertGanttData(data){
 			on_view_change: function(mode) {
 				// console.log(mode);
 			},
-			view_mode: 'Day',
+			view_mode: 'Month',
 			inline: false,
 			projection: false,
       left_menu_width: 0,      

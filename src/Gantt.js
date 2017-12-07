@@ -289,8 +289,8 @@ export default function Gantt(element, projects, config) {
 			// self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
 			self.gantt_end = self.gantt_end.clone().endOf('month');
 		} else {
-			self.gantt_start = self.gantt_start.clone().subtract(3, 'days');// .startOf('month');
-			self.gantt_end = self.gantt_end.clone().add(3, 'days'); // .endOf('month');
+			self.gantt_start = self.gantt_start.clone().subtract(1, 'days');// .startOf('month');
+			self.gantt_end = self.gantt_end.clone().add(1, 'days'); // .endOf('month');
 		}
 	}
 
@@ -300,8 +300,13 @@ export default function Gantt(element, projects, config) {
 		let cur_date = null;
 
 		while(cur_date === null || cur_date < self.gantt_end) {
+			console.log('curr', moment(cur_date).format('DD/MM/YYYY'));
+			console.log('end', moment(self.gantt_end._d).format('DD/MM/YYYY'));
+			console.log(cur_date < self.gantt_end);
 			if(!cur_date) {
-				cur_date = self.gantt_start.clone();
+				cur_date = view_is('Month') ?
+					self.gantt_start.clone().endOf('month') :
+					self.gantt_start.clone();
 			} else {
 				cur_date = view_is('Month') ?
 					cur_date.clone().add(1, 'month').endOf('month') :
