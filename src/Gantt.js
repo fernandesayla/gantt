@@ -300,9 +300,6 @@ export default function Gantt(element, projects, config) {
 		let cur_date = null;
 
 		while(cur_date === null || cur_date < self.gantt_end) {
-			console.log('curr', moment(cur_date).format('DD/MM/YYYY'));
-			console.log('end', moment(self.gantt_end._d).format('DD/MM/YYYY'));
-			console.log(cur_date < self.gantt_end);
 			if(!cur_date) {
 				cur_date = view_is('Month') ?
 					self.gantt_start.clone().endOf('month') :

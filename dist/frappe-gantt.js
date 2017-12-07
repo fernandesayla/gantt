@@ -425,9 +425,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			var cur_date = null;
 	
 			while (cur_date === null || cur_date < self.gantt_end) {
-				console.log('curr', (0, _moment2.default)(cur_date).format('DD/MM/YYYY'));
-				console.log('end', (0, _moment2.default)(self.gantt_end._d).format('DD/MM/YYYY'));
-				console.log(cur_date < self.gantt_end);
 				if (!cur_date) {
 					cur_date = view_is('Month') ? self.gantt_start.clone().endOf('month') : self.gantt_start.clone();
 				} else {
@@ -1470,7 +1467,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			self.height = gt.config.bar.height;
 			self.x = compute_x();
 			self.y = compute_y();
-			self.corner_radius = 3;
+			self.corner_radius = 7;
 			self.duration = (self.task._end.diff(self.task._start, 'hours') + 24) / gt.config.step;
 			// self.durationDays = (self.task._end.diff(self.task._start, 'days') + 1);
 			self.width = gt.config.column_width * self.duration;
