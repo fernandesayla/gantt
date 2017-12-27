@@ -1,6 +1,6 @@
 {
   "name": "gantt",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A simple, modern, interactive gantt library for the web",
   "main": "dist/frappe-gantt.js",
   "scripts": {
@@ -10,8 +10,7 @@
     "start": "npm-run-all -p build:dev start:dev",
     "test": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js",
     "release": "yarn version --new-version patch",
-    "preversion": "npm run test",
-    "version": "git add --all",    
+    "version": "git add --all",
     "postversion": "git push origin"
   },
   "devDependencies": {
