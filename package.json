@@ -8,7 +8,11 @@
     "build:dev": "webpack --progress --colors --watch --mode=dev",
     "start:dev": "serve",
     "start": "npm-run-all -p build:dev start:dev",
-    "test": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js"
+    "test": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js",
+    "release": "yarn version --new-version patch",
+    "preversion": "npm run test",
+    "version": "git add --all",    
+    "postversion": "git push origin"
   },
   "devDependencies": {
     "babel": "6.3.13",
