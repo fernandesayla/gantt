@@ -5,7 +5,7 @@
  *   task: { id, name, start, end, progress, dependencies, custom_class }
  * 	config: configuration options, optional
  */
-import './gantt.scss';
+// import './gantt.scss';
 
 import Bar from './Bar';
 import Arrow from './Arrow';
