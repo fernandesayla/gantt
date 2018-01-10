@@ -56,6 +56,7 @@ export default function Gantt(element, projects, config) {
 			},
 			padding: 21,
 			view_mode: 'Month',
+			edit_mode: true,
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null,
 			left_menu_width: 0,

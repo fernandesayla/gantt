@@ -30,10 +30,10 @@ function getProjects() {
 
   const projetos = [];
   let tarefaId = 0;
-  const qtProjetos = 1;
-  const qtTarefas = 3; 
+  const qtProjetos = 2;
+  const qtTarefas = 6; 
   
-  for (let i = qtProjetos; i <= 1; i++) {
+  for (let i = 1; i <= qtProjetos; i++) {
 
     const tarefas = [];
     let dataInicio = moment('2017-06-25T03:00:00.000Z');
@@ -154,15 +154,14 @@ function getProjects() {
     const projeto =
       {
         id: i,
-        nome: `Projeto Divisão Informações Gerenciais 
-               Projeto Divisão Informações Gerenciais ${i}`,
+        nome: `Projeto Divisão Informações Gerenciais ${i}`,
         tarefas,
       };
-
+    
     projetos.push(projeto);
-
+    
   }
-
+  
   return convertGanttData(projetos);
 
 }
@@ -251,7 +250,7 @@ function convertGanttData(data){
 				// console.log(task);
 			},
 			on_date_change: function(task, start, end) {
-				console.log(end._d);
+				console.log(start._d);
         // console.log(task);
 			},
 			on_progress_change: function(task, progress) {
@@ -260,11 +259,12 @@ function convertGanttData(data){
 			on_view_change: function(mode) {
 				// console.log(mode);
 			},
-			view_mode: 'Month',
+			view_mode: 'Day',
 			inline: true,
 			projection: false,
       left_menu_width: 0,
       number_months_add: 0,
+      edit_mode: true,
 			// bar: {
 			// 	height: 15
 			// },
