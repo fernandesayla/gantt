@@ -1,5 +1,3 @@
-/*eslint-disable */
-/* global moment, Snap */
 /**
  * Gantt:
  * 	element: querySelector string, required
@@ -7,13 +5,15 @@
  *   task: { id, name, start, end, progress, dependencies, custom_class }
  * 	config: configuration options, optional
  */
-import './gantt.scss';
+// import './gantt.scss';
 
 import Bar from './Bar';
 import Arrow from './Arrow';
+import moment from 'moment';
+import Snap from 'imports-loader?this=>window,fix=>module.exports=0!snapsvg/dist/snap.svg.js';
 
 export default function Gantt(element, projects, config) {
-	
+
 	const self = {};
 
 	function init() {
@@ -34,6 +34,8 @@ export default function Gantt(element, projects, config) {
 	function set_defaults() {
 
 		const defaults = {
+			screen_width: 1800,
+			background_width: 0,
 			header_height: 50,
 			column_width: 30,
 			step: 24,
@@ -47,27 +49,37 @@ export default function Gantt(element, projects, config) {
 			bar: {
 				height: 20
 			},
+			row: {
+			},
 			arrow: {
 				curve: 5
 			},
-			padding: 18,
-			view_mode: 'Day',
+			padding: 21,
+			view_mode: 'Month',
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null,
-			project_group_width: 0,
-			inline: true
+			left_menu_width: 0,
+			inline: false,
+			projection: false,
+			number_months_add: 0
 		};
+
+		if(!config.left_menu_width && projects.length > 1) config.left_menu_width = 200;
+
 		self.config = Object.assign({}, defaults, config);
 
-		reset_variables(tasks);
+		self.config.row.height = self.config.bar.height + self.config.padding;
+
+		reset_variables();
 	}
 
-	function reset_variables(tasks) {		
+	function reset_variables() {
 		self.element = element;
-		self._tasks = [];
-		projects.forEach(project => 
+		self._tasks = [];0;
+		projects.forEach(project =>
 			self._tasks = self._tasks.concat(project.tasks));
 		self._projects = projects;
+		self._projects._rows = self._tasks.length;
 		self._bars = [];
 		self._arrows = [];
 		self.element_groups = {};
@@ -78,7 +90,7 @@ export default function Gantt(element, projects, config) {
 		change_view_mode(self.config.view_mode);
 	}
 
-	function change_view_mode(mode) {		
+	function change_view_mode(mode) {
 		prepare();
 		set_scale(mode);
 		render();
@@ -162,20 +174,57 @@ export default function Gantt(element, projects, config) {
 
 	function prepare_projects() {
 
-		let rows = 0;	
-		
+		let rows = 0;
+
 		self._projects.forEach((project, i) => {
-			tasks = project.tasks;
-			tasks.forEach((task, i) => {								
+
+			const tasks = project.tasks;
+
+			tasks.forEach((task, i) => {
 				const nextTask = tasks[i + 1];
-				if(i == 0) project._firstRow = task._line;				
-				if(!nextTask) project._lastRow = task._line;
-				if(task.currentTask) project._currentDate = task._start;				
+				if(i === 0) project._firstRow = task._line;
+				if(!nextTask) {
+					project._lastRow = task._line;
+					project._lastDate = get_max_date(project.tasks);
+				}
+				if(task.currentTask && self.config.projection) project._currentDate = get_date_progress(task);
 			});
-			project._late = moment().diff(project._currentDate, 'days') 			
+
+			project._late = moment().diff(project._currentDate, 'days');
+
+			if(project._late > 0) {
+
+				const start = moment(project._lastDate, self.config.date_format).clone().add(1, 'days');
+				const end = moment(project._lastDate, self.config.date_format).clone().add(project._late, 'days');
+
+				const task = {
+					projectId: project.id,
+					id: self.tasks.length + 1,
+					name: 'Projeção de Término',
+					_start: start,
+					_end: end,
+					_line: project._lastRow,
+					custom_class: 'bar-late',
+					dependencies: [],
+					users: [],
+					departments: [],
+					dates: [
+						{
+							start: start,
+							end: end,
+
+							type: {
+								name: 'Previsão'
+							}
+						}
+					]
+				};
+				self.tasks.push(task);
+			}
+
 			project._rows = project._lastRow - project._firstRow + 1;
-			rows += project._rows;				
-		})
+			rows += project._rows;
+		});
 		self._projects._rows = rows;
 	}
 
@@ -207,8 +256,8 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function prepare_canvas() {
-		if(self.canvas) return;		
-		self.canvas = Snap(self.element).addClass('gantt');		
+		if(self.canvas) return;
+		self.canvas = Snap(self.element).addClass('gantt');
 	}
 
 	function render() {
@@ -233,17 +282,22 @@ export default function Gantt(element, projects, config) {
 
 	function set_gantt_dates() {
 
+		const { number_months_add } = self.config;
+
 		if(view_is(['Quarter Day', 'Half Day'])) {
 			self.gantt_start = self.gantt_start.clone().subtract(7, 'day');
 			self.gantt_end = self.gantt_end.clone().add(7, 'day');
 		} else if(view_is('Month')) {
-			self.gantt_start = self.gantt_start.clone().startOf('month').subtract(1, 'Month');
+			self.gantt_start = self.gantt_start.clone().startOf('month').subtract(0, 'Month');
 			// self.gantt_end = self.gantt_end.clone().endOf('month').add(1, 'year');
 			self.gantt_end = self.gantt_end.clone().endOf('month');
 		} else {
-			self.gantt_start = self.gantt_start.clone().startOf('month'); // .subtract(1, 'month');
-			self.gantt_end = self.gantt_end.clone().endOf('month'); // .add(1, 'month');
+			self.gantt_start = self.gantt_start.clone().subtract(1, 'days');// .startOf('month');
+			self.gantt_end = self.gantt_end.clone().add(1, 'days'); // .endOf('month');
 		}
+
+		if(number_months_add > 0) self.gantt_end = self.gantt_end.clone().add(number_months_add, 'Month');
+
 	}
 
 	function setup_dates() {
@@ -253,14 +307,16 @@ export default function Gantt(element, projects, config) {
 
 		while(cur_date === null || cur_date < self.gantt_end) {
 			if(!cur_date) {
-				cur_date = self.gantt_start.clone();
+				cur_date = view_is('Month') ?
+					self.gantt_start.clone().endOf('month') :
+					self.gantt_start.clone();
 			} else {
 				cur_date = view_is('Month') ?
-					cur_date.clone().add(1, 'month') :
+					cur_date.clone().add(1, 'month').endOf('month') :
 					cur_date.clone().add(self.config.step, 'hours');
 			}
-			self.dates.push(cur_date);			
-		}		
+			self.dates.push(cur_date);
+		}
 	}
 
 	function setup_groups() {
@@ -274,36 +330,48 @@ export default function Gantt(element, projects, config) {
 
 	function set_scale(scale) {
 		self.config.view_mode = scale;
-		const screen_width = 1832 - self.config.project_group_width;
-		var min_width = 0;
+		const screen_width = self.config.screen_width - self.config.left_menu_width;
+		let min_column_width = 0;
 		self.config.column_width = screen_width / self.dates.length;
 
 		if(scale === 'Day') {
-			min_width = 18;
-			self.config.step = 24;			
+			min_column_width = 18;
+			self.config.step = 24;
 		} else if(scale === 'Half Day') {
-			min_width = 38;
-			self.config.step = 24 / 2;			
+			min_column_width = 38;
+			self.config.step = 24 / 2;
 		} else if(scale === 'Quarter Day') {
-			min_width = 38;
-			self.config.step = 24 / 4;			
+			min_column_width = 38;
+			self.config.step = 24 / 4;
 		} else if(scale === 'Week') {
-			min_width = 140;
-			self.config.step = 24 * 7;			
+			min_column_width = 140;
+			self.config.step = 24 * 7;
 		} else if(scale === 'Month') {
-			min_width = 20; 
-			self.config.step = 24 * 30;		
+			min_column_width = 20;
+			self.config.step = 24 * 30;
 		}
-		self.config.column_width = self.config.column_width < min_width ? min_width : self.config.column_width;
+		self.config.column_width = self.config.column_width < min_column_width ?
+															min_column_width :
+															self.config.column_width;
+
+		if(view_is('Month')) {
+			for(let date of self.dates) {
+				self.config.background_width += date.daysInMonth() * self.config.column_width / 30;
+			}
+		} else {
+			self.config.background_width = self.dates.length * self.config.column_width;
+		}
 	}
 
 	function set_width() {
 		const cur_width = self.canvas.node.getBoundingClientRect().width;
-		const actual_width = parseFloat(self.canvas.select('#grid .grid-row').attr('width')) + self.config.project_group_width;
+		const actual_width = parseFloat(self.canvas.select('#grid .grid-row')
+							.attr('width')) + self.config.left_menu_width;
 
 		if(cur_width < actual_width) {
 			self.canvas.attr('width', actual_width);
 		}
+
 	}
 
 	function set_scroll_position() {
@@ -322,34 +390,41 @@ export default function Gantt(element, projects, config) {
 		return task._start;
 	}
 
+	function get_max_date(tasks) {
+		const task = tasks.reduce((acc, curr) => {
+			return curr._end.isSameOrAfter(acc._end) ? curr : acc;
+		});
+		return task.end;
+	}
+
 	function make_grid() {
 		make_grid_background();
 		make_grid_header();
-		make_grid_rows();		
+		make_grid_rows();
+		if(view_is('Day')) make_grid_weekend();
 		make_grid_ticks();
 		make_grid_highlights();
 	}
 
 	function make_grid_background() {
-
-		const grid_width = (self.dates.length * self.config.column_width) + self.config.project_group_width,
+		const grid_width = (self.config.background_width) + self.config.left_menu_width,
 			grid_height = self.config.header_height + self.config.padding +
-				(self.config.bar.height + self.config.padding) * self._projects._rows + 400; 				
+				(self.config.row.height) * self._projects._rows /* + 400 */;
 
 		self.canvas.rect(0, 0, grid_width, grid_height)
 			.addClass('grid-background')
 			.appendTo(self.element_groups.grid);
-		
+
 		self.canvas.attr({
 			height: grid_height + self.config.padding,
-			width: '110%'
+			width: '100%'
 		});
 	}
 
 	function make_grid_header() {
-		const header_width = self.dates.length * self.config.column_width,
+		const header_width = self.config.background_width,
 			header_height = self.config.header_height + 10;
-		self.canvas.rect(self.config.project_group_width, 0, header_width, header_height)
+		self.canvas.rect(self.config.left_menu_width, 0, header_width, header_height)
 			.addClass('grid-header')
 			.appendTo(self.element_groups.grid);
 	}
@@ -358,93 +433,111 @@ export default function Gantt(element, projects, config) {
 
 		const rows = self.canvas.group().appendTo(self.element_groups.grid),
 			lines = self.canvas.group().appendTo(self.element_groups.grid),
-			row_width = self.dates.length * self.config.column_width,
-			row_height = self.config.bar.height + self.config.padding,
-			project_group_width = self.config.project_group_width;
+			row_width = self.config.background_width,
+			row_height = self.config.row.height,
+			left_menu_width = self.config.left_menu_width;
 
 		let row_y = self.config.header_height + self.config.padding / 2;
 
-		self.tasks.forEach((task, index) => { // eslint-disable-line
-
+		self.tasks.forEach((task, index) => { // eslint-disable-line			
 			const nextTask = self.tasks[index + 1];
+			if((!nextTask || task._line !== nextTask._line)) {
 
-			if(nextTask && task._line !== nextTask._line) {
-
-				self.canvas.rect(project_group_width, row_y, row_width, row_height)
+				self.canvas.rect(left_menu_width, row_y, row_width, row_height)
 				.addClass('grid-row')
 				.appendTo(rows);
-
-				self.canvas.line(project_group_width, row_y + row_height, row_width + project_group_width, row_y + row_height)
+				self.canvas.line(left_menu_width, row_y + row_height, row_width + left_menu_width, row_y + row_height)
 				.addClass('row-line')
 				.appendTo(lines);
 
-				row_y += self.config.bar.height + self.config.padding;
+				row_y += self.config.row.height;
 			}
 		});
 	}
 
 	function make_projects() {
 
-		const rows = self.canvas.group().appendTo(self.element_groups.project),
-			lines = self.canvas.group().appendTo(self.element_groups.project),
-			text = self.canvas.group().appendTo(self.element_groups.project),
-			current = self.canvas.group().appendTo(self.element_groups.project),
-			row_width = self.dates.length * self.config.column_width,
-			row_height = self.config.bar.height + self.config.padding,
-			project_group_width = self.config.project_group_width;
+		const rows = self.canvas.group().attr({'id': 'rows'}).appendTo(self.element_groups.project),
+			lines = self.canvas.group().attr({'id': 'lines'}).appendTo(self.element_groups.project),
+			texts = self.canvas.group().attr({'id': 'texts'}).appendTo(self.element_groups.project),
+			current = self.canvas.group().attr({'id': 'current'}).appendTo(self.element_groups.project),
+			row_width = self.config.background_width,
+			row_height = self.config.row.height,
+			left_menu_width = self.config.left_menu_width;
 
 		const header_height = self.config.header_height + self.config.padding / 2;
 		let row_y = header_height;
 
 		self._projects.forEach((project) => { // eslint-disable-line
 
+			const height = row_height * project._rows,
+				late = project._late > 0 ? '-late' : '';
 			row_y = header_height + (row_height * project._firstRow);
-			const late = project._late > 0 ? '-late' : '';
-			
-			if(self.config.project_group_width > 0)	{
-				self.canvas.rect(0, row_y, project_group_width, row_height * project._rows)
+
+			if(self.config.left_menu_width > 0)	{
+				self.canvas.rect(0, row_y, left_menu_width, height)
 					.addClass('grid-project-row')
 					.appendTo(rows);
 
-				self.canvas.line(0, row_y + (row_height * project._rows), row_width + project_group_width, row_y + (row_height * project._rows))
+				self.canvas.line(0, row_y + height, row_width + left_menu_width, row_y + height)
 					.addClass('row-line-project')
 					.appendTo(lines);
 
-				self.canvas.text(self.config.project_group_width / 2, row_y + (row_height * project._rows / 2), project.name)
-					.addClass('project-text')
-					.appendTo(text);
+				const text = self.canvas.group().attr({'id': 'text'}).appendTo(texts);
+				text.transform(`t${0},${row_y}`);
+
+				// self.canvas.text(self.config.left_menu_width / 2, row_y + (height / 2), project.name)
+				// 	.addClass('project-text')
+				// 	.appendTo(texts);
+
+				const foreign_object =
+				Snap.parse(`<foreignObject width="${left_menu_width}" height="${height}">
+						<body xmlns="http://www.w3.org/1999/xhtml">
+							<div style="width: ${left_menu_width}px; height: ${height}px"
+									 class="project-text-container">
+								<div class="project-text">
+									${project.name}
+								</div>
+							</div>
+						</body>
+						</foreignObject>`);
+
+				text.append(foreign_object);
+
 			}
 
 			if(view_is('Month') && project._currentDate) {
 				const x = (project._currentDate.startOf('day').diff(self.gantt_start, 'days') *
-							self.config.column_width / 30) + self.config.project_group_width;				
+							self.config.column_width / 30) + self.config.left_menu_width;
 
 				self.canvas.path(Snap.format('M {x} {y} v {height}', {
 					x: x,
 					y: row_y,
-					height: (row_height * project._rows)
+					height: height
 				}))
 				.addClass('tick-current' + late)
 				.appendTo(current);
 			} else if(view_is('Day') && project._currentDate) {
 				const x = (project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') /
-						self.config.step * self.config.column_width) + self.config.project_group_width;
+						self.config.step * self.config.column_width) + self.config.left_menu_width;
 				const width = self.config.column_width;
 
-				self.canvas.rect(x, row_y, width, (row_height * project._rows))
+				self.canvas.rect(x, row_y, width, height)
 				.addClass('current-highlight' + late)
 				.appendTo(current);
-			}			
+			}
 
 		});
 	}
 
 	function make_grid_ticks() {
-		let tick_x = self.config.project_group_width,
-			tick_y = self.config.header_height + self.config.padding / 2,
-			tick_height = (self.config.bar.height + self.config.padding) * self._projects._rows;
+		let tick_x = self.config.left_menu_width;
 
 		for(let date of self.dates) {
+
+			let tick_height = (self.config.row.height) * self._projects._rows;
+			let tick_y = self.config.header_height + self.config.padding / 2;
+
 			let tick_class = 'tick';
 			// thick tick for monday
 			if(view_is('Day') && date.day() === 1) {
@@ -455,10 +548,11 @@ export default function Gantt(element, projects, config) {
 				tick_class += ' thick';
 			}
 			// thick ticks for quarters
-			if(view_is('Month') && date.month() % 3 === 0) {
+			if(view_is('Month') && date.month() === 0) {
 				tick_class += ' thick';
+				tick_y = tick_y / 2;
+				tick_height = tick_height + tick_y;
 			}
-			
 			self.canvas.path(Snap.format('M {x} {y} v {height}', {
 				x: tick_x,
 				y: tick_y,
@@ -466,7 +560,7 @@ export default function Gantt(element, projects, config) {
 			}))
 			.addClass(tick_class)
 			.appendTo(self.element_groups.grid);
-			
+
 			if(view_is('Month')) {
 				tick_x += date.daysInMonth() * self.config.column_width / 30;
 			} else {
@@ -475,68 +569,109 @@ export default function Gantt(element, projects, config) {
 		}
 	}
 
+	function make_grid_weekend() {
+		let x = 0;
+		const width = self.config.column_width;
+		let height = (self.config.row.height) * self._projects._rows;
+		let y = self.config.header_height + self.config.padding / 2;
+
+		for(let date of self.dates) {
+
+			if(date.isoWeekday() === 6 || date.isoWeekday() === 7) {
+				self.canvas.rect(x, y, width, height)
+						.addClass('grid-weekend')
+						.appendTo(self.element_groups.grid);
+			}
+
+			x += self.config.column_width;
+
+		}
+	}
+
 	function make_grid_highlights() {
 		// highlight today's date
+
 		const y = 0;
-		const height = (self.config.bar.height + self.config.padding) * self._projects._rows +
-				self.config.header_height + self.config.padding / 2;
+		const header_height = self.config.header_height + self.config.padding / 2;
+		const height = (self.config.row.height) * self._projects._rows +
+				header_height;
 
 		if(view_is('Day')) {
 			const x = (moment().startOf('day').diff(self.gantt_start, 'hours') /
-					self.config.step * self.config.column_width) + self.config.project_group_width;
+						self.config.step * self.config.column_width) + self.config.left_menu_width;
 			const width = self.config.column_width;
 
-			self.canvas.rect(x, y, width, height)
-				.addClass('today-highlight')
-				.appendTo(self.element_groups.grid);
+			if (x <= self.element_groups.grid.getBBox().width && x >= self.config.left_menu_width) {
+				self.canvas.rect(x, y, width, height)
+					.addClass('today-highlight')
+					.appendTo(self.element_groups.grid);
+			}
 
 		}else {
 
 			const x = (moment().startOf('day').diff(self.gantt_start, 'days') *
-					self.config.column_width / 30) + self.config.project_group_width;
+					self.config.column_width / 30) + self.config.left_menu_width;
 
-			self.canvas.path(Snap.format('M {x} {y} v {height}', {
-				x: x,
-				y: y,
-				height: height
-			}))
-			.addClass('tick-today')
-			.appendTo(self.element_groups.grid);
+			if (x <= self.element_groups.grid.getBBox().width && x >= self.config.left_menu_width) {
+				self.canvas.path(Snap.format('M {x} {y} v {height}', {
+					x: x,
+					y: header_height,
+					height: height - header_height
+				}))
+				.addClass('tick-today')
+				.appendTo(self.element_groups.grid);
+			}
 		}
 	}
 
-	function make_dates() {		
+	function make_dates() {
+		for(let date of get_dates_to_draw()) {
 
-		for(let date of get_dates_to_draw()) {			
-			self.canvas.text(self.config.project_group_width + date.lower_x, date.lower_y, date.lower_text)
+			let grid_width = self.element_groups.grid.getBBox().width;
+			date.lower_x += self.config.left_menu_width;
+			date.upper_x += self.config.left_menu_width;
+
+			self.canvas.text(date.lower_x, date.lower_y, date.lower_text)
 				.addClass('lower-text')
 				.appendTo(self.element_groups.date);
 
 			if(date.upper_text) {
-				const $upper_text = self.canvas.text(self.config.project_group_width + date.upper_x, date.upper_y, date.upper_text)
+
+				const $upper_text = self.canvas.text(date.upper_x, date.upper_y, date.upper_text)
 					.addClass('upper-text')
 					.appendTo(self.element_groups.date);
 
-				// remove out-of-bound dates				
-				if($upper_text.getBBox().x2 > self.element_groups.grid.getBBox().width) {
+				date.lower_x += ((grid_width) - (date.lower_x)) / 2;
+
+				if($upper_text.getBBox().x2 > grid_width) {
+					self.canvas.text(date.lower_x, date.upper_y, date.upper_text)
+					.addClass('upper-text')
+					.appendTo(self.element_groups.date);
+
 					$upper_text.remove();
 				}
 			}
-			
-			
 		}
 	}
 
 	function get_dates_to_draw() {
 		let lower_x = 0,
-		 	last_date = null;
+			last_date = null;
+
 		const dates = self.dates.map((date, i) => {
 			const d = get_date_info(date, last_date, i);
-			last_date = date;			
+			last_date = date;
 			d.lower_x = lower_x + self.config.column_width / 2;
-			lower_x += date.daysInMonth() * self.config.column_width / 30;			
+			lower_x += view_is('Month') ? date.daysInMonth() * self.config.column_width / 30 : self.config.column_width;
+
+			if(view_is('Day') && d.upper_text && d.lower_text !== '1') {
+				const daysMonth = (date.daysInMonth() - d.lower_text) + 1;
+				d.upper_x = self.config.column_width * daysMonth / 2;
+			}
+
 			return d;
 		});
+
 		return dates;
 	}
 
@@ -544,15 +679,15 @@ export default function Gantt(element, projects, config) {
 		if(!last_date) {
 			last_date = date.clone().add(1, 'year').add(1, 'month').add(1, 'day');
 		}
-		const min_width_month = 60;
-		
+		const min_column_width_month = 60;
+
 		const date_text = {
 			'Quarter Day_lower': date.format('HH'),
 			'Half Day_lower': date.format('HH'),
 			'Day_lower': date.date() !== last_date.date() ? date.format('D') : '',
 			'Week_lower': date.month() !== last_date.month() ?
 				date.format('D MMM') : date.format('D'),
-			'Month_lower': date.format(self.config.column_width < min_width_month ? 'MM' : 'MMMM'),
+			'Month_lower': date.format(self.config.column_width < min_column_width_month ? 'MM' : 'MMMM'),
 			'Quarter Day_upper': date.date() !== last_date.date() ? date.format('D MMM') : '',
 			'Half Day_upper': date.date() !== last_date.date() ?
 				date.month() !== last_date.month() ?
@@ -560,8 +695,8 @@ export default function Gantt(element, projects, config) {
 			'Day_upper': date.month() !== last_date.month() ? date.format('MMMM') : '',
 			'Week_upper': date.month() !== last_date.month() ? date.format('MMMM') : '',
 			'Month_upper': date.year() !== last_date.year() ? date.format('YYYY') : ''
-		};		
-		
+		};
+
 		const base_pos = {
 			x: i * self.config.column_width,
 			lower_y: self.config.header_height,
@@ -578,9 +713,10 @@ export default function Gantt(element, projects, config) {
 			'Week_lower': 0,
 			'Week_upper': (self.config.column_width * 4) / 2,
 			// 'Month_lower': self.config.column_width / 2,
-			'Month_upper': (self.config.column_width * 12) / 2
+			'Month_upper': (self.config.column_width * (12 - date.month())) / 2
+
 		};
-		
+
 		return {
 			upper_text: date_text[`${self.config.view_mode}_upper`],
 			lower_text: date_text[`${self.config.view_mode}_lower`],
@@ -591,6 +727,11 @@ export default function Gantt(element, projects, config) {
 		};
 	}
 
+	function get_date_progress(task) {
+		const duration = (task._end.diff(task._start, 'hours') + 24) / self.config.step;
+		return task._start.clone().add((duration * task.progress) / 100, 'days');
+	}
+
 	function make_arrows() {
 		self._arrows = [];
 		for(let task of self.tasks) {
@@ -598,7 +739,6 @@ export default function Gantt(element, projects, config) {
 			arrows = task.dependencies.map(dep => {
 				const dependency = get_task(dep);
 				if(!dependency) return;
-
 				const arrow = Arrow(
 					self, // gt
 					self._bars[dependency._index], // from_task
@@ -612,9 +752,7 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function make_bars() {
-
 		self._bars = self.tasks.map((task, i) => {
-
 			const bar = Bar(self, task);
 			self.element_groups.bar.add(bar.group);
 			return bar;
@@ -668,9 +806,9 @@ export default function Gantt(element, projects, config) {
 		});
 	}
 
-	function get_project(id) {
-		return self._projects.find(project => project.id === id);
-	}
+	// function get_project(id) {
+	// 	return self._projects.find(project => project.id === id);
+	// }
 
 	function generate_id(task) {
 		return task.name + '_' + Math.random().toString(36).slice(2, 12);

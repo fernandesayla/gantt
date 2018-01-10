@@ -1,0 +1,163 @@
+.gantt .grid-background {
+  fill: none; }
+
+.gantt .grid-header {
+  fill: #ffffff;
+  stroke: #e0e0e0;
+  stroke-width: 1.4; }
+
+.gantt .grid-row {
+  fill: #ffffff; }
+
+.gantt .grid-row:nth-child(even) {
+  fill: #f5f5f5; }
+
+.gantt .grid-weekend {
+  fill: #fdfdfd; }
+
+.gantt .row-line {
+  stroke: #ebeff2; }
+
+.gantt .row-line-project {
+  stroke: #e0e0e0;
+  stroke-width: 1.4; }
+
+.gantt .tick {
+  stroke: #e0e0e0;
+  stroke-width: 0.6; }
+  .gantt .tick.thick {
+    stroke-width: 0.8; }
+
+.gantt .tick-today, .gantt .tick-current, .gantt .tick-current-late {
+  stroke-width: 1;
+  opacity: 0.8;
+  stroke-dasharray: 7; }
+
+.gantt .tick-today {
+  stroke: #43a047; }
+
+.gantt .tick-current {
+  stroke: #82b1f3; }
+
+.gantt .tick-current-late {
+  stroke: #f1aa9e; }
+
+.gantt .today-highlight, .gantt .current-highlight, .gantt .current-highlight-late {
+  opacity: 0.5; }
+
+.gantt .today-highlight {
+  fill: #b9f3b9; }
+
+.gantt .current-highlight {
+  fill: #82b1f3; }
+
+.gantt .current-highlight-late {
+  fill: #f1aa9e; }
+
+.gantt #arrow {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.4; }
+
+.gantt .bar {
+  fill: #1976d2;
+  stroke: #1976d2;
+  stroke-width: 0;
+  transition: stroke-width .3s ease; }
+
+.gantt .bar-late .bar {
+  fill: #f1b4a9 !important;
+  stroke: tomato;
+  stroke-width: 0.8;
+  opacity: 0.8; }
+
+.gantt .bar-progress {
+  fill: #43a047; }
+
+.gantt .bar-invalid {
+  fill: transparent;
+  stroke: #1976d2;
+  stroke-width: 1;
+  stroke-dasharray: 5; }
+  .gantt .bar-invalid ~ .bar-label {
+    fill: #555; }
+
+.gantt .bar-label {
+  fill: #fff;
+  dominant-baseline: central;
+  text-anchor: middle;
+  font-size: 12px;
+  letter-spacing: 0.8px; }
+  .gantt .bar-label.big {
+    fill: #555;
+    text-anchor: start; }
+
+.gantt .handle {
+  fill: #ddd;
+  cursor: ew-resize;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s ease; }
+
+.gantt .bar-wrapper {
+  cursor: pointer; }
+  .gantt .bar-wrapper:hover .bar {
+    stroke-width: 2; }
+  .gantt .bar-wrapper:hover .handle {
+    visibility: visible;
+    opacity: 1; }
+  .gantt .bar-wrapper.active .bar {
+    stroke-width: 2; }
+
+.gantt .lower-text, .gantt .upper-text {
+  font-size: 12px;
+  text-anchor: middle; }
+
+.gantt .upper-text {
+  fill: #555; }
+
+.gantt .lower-text {
+  fill: #333; }
+
+.gantt .project-text-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555; }
+
+.gantt .project-text {
+  text-align: center; }
+
+.gantt #details .details-container {
+  background: #fff;
+  display: inline-block;
+  padding: 12px; }
+  .gantt #details .details-container h5, .gantt #details .details-container p {
+    margin: 0;
+    line-height: 1.2;
+    font-size: 12px; }
+  .gantt #details .details-container h5 {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #555; }
+  .gantt #details .details-container p {
+    margin-bottom: 6px;
+    color: #666; }
+  .gantt #details .details-container p:last-child {
+    margin-bottom: 0; }
+
+.gantt .hide {
+  display: none; }
+
+.gantt .grid-project-row {
+  fill: #f5f5f5; }
+
+.gantt .avatarContainer {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+  float: left; }
+
+.gantt .avatar {
+  height: 50px !important; }

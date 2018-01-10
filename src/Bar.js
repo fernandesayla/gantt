@@ -1,4 +1,3 @@
-/* global moment, Snap */
 /*
 	Class: Bar
 
@@ -7,6 +6,8 @@
 		task: task object
 */
 
+import Snap from 'imports-loader?this=>window,fix=>module.exports=0!snapsvg/dist/snap.svg.js';
+import moment from 'moment';
 import './gantt.scss';
 
 export default function Bar(gt, task) {
@@ -23,6 +24,8 @@ export default function Bar(gt, task) {
 	function set_defaults() {
 		self.action_completed = false;
 		self.task = task;
+		self.details_width = 241;
+		// self.details_height = 316;
 	}
 
 	function prepare() {
@@ -35,9 +38,9 @@ export default function Bar(gt, task) {
 		self.height = gt.config.bar.height;
 		self.x = compute_x();
 		self.y = compute_y();
-		self.corner_radius = 3;
+		self.corner_radius = 5;
 		self.duration = (self.task._end.diff(self.task._start, 'hours') + 24) / gt.config.step;
-		self.durationDays = (self.task._end.diff(self.task._start, 'days') + 1);
+		// self.durationDays = (self.task._end.diff(self.task._start, 'days') + 1);
 		self.width = gt.config.column_width * self.duration;
 		self.progress_width = gt.config.column_width * self.duration * (self.task.progress / 100) || 0;
 		self.group = gt.canvas.group().addClass('bar-wrapper').addClass(self.task.custom_class || '');
@@ -173,18 +176,39 @@ export default function Bar(gt, task) {
 	}
 
 	function render_details() {
-		const {x, y} = get_details_position();
+
+		const html = get_details_html();
+		const div = document.createElement('div');
+		div.innerHTML = html;
+
+		const p = div.getElementsByTagName('p').length * 20;
+		const h5 = div.getElementsByTagName('h5').length * 24;
+		const hr = div.getElementsByTagName('hr').length * 18;
+		self.details_height = p + h5 + hr + 24;
+
+		set_height(self.details_height);
+
+		const { x, y } = get_details_position();
 		self.details_box.transform(`t${x},${y}`);
 		self.details_box.clear();
 
-		const html = get_details_html();
 		const foreign_object =
 			Snap.parse(`<foreignObject width="5000" height="2000">
 				<body xmlns="http://www.w3.org/1999/xhtml">
 					${html}
 				</body>
 				</foreignObject>`);
+
 		self.details_box.append(foreign_object);
+	}
+
+	function set_height(actual_height) {
+
+		const cur_height = gt.canvas.node.getBoundingClientRect().height;
+
+		if(cur_height < actual_height) {
+			gt.canvas.attr('height', actual_height);
+		}
 	}
 
 	function get_details_html() {
@@ -204,78 +228,73 @@ export default function Bar(gt, task) {
 		// const end_date = self.task._end.format('DD/MM/YYYY');
 		const heading = `${self.task.name}`;
 
+		self.durationDays = (self.task._end.diff(self.task._start, 'days') + 1);
+
 		const line_1 = `Duração: ${self.durationDays} dias`;
 		const line_2 = self.task.progress ? `Percentual: ${self.task.progress}%` : null;
 
-		let periodos = '';
-		self.task.periodos.forEach(periodo =>{
+		let dates = '';
 
-			const tipo = periodo.tipo.nome;
-			const dataInicio = moment(periodo.dataInicio).format('DD/MM/YYYY');
-			const dataFim = moment(periodo.dataFim).format('DD/MM/YYYY');
+		dates = dates.concat(`<p>Previsão:
+														${moment(self.task._start).format('DD/MM/YYYY')} -
+														${moment(self.task._end).format('DD/MM/YYYY')}</p>`);
 
-			periodos = periodos.concat(`
-				<p>${tipo}: ${dataInicio} - ${dataFim}</p>
+		self.task.dates.forEach(date =>{
+
+			const start = moment(date.start).format('DD/MM/YYYY');
+			const end = moment(date.end).format('DD/MM/YYYY');
+
+			dates = dates.concat(`
+				<p>${date.type.name}: ${start} - ${end}</p>
 				`);
 		});
 
-		let responsaveis = '';
-		self.task.responsaveis.forEach((responsavel, i) =>{
+		let users = '';
+		self.task.users.forEach((user, i) =>{
 
-			const chave = responsavel.responsavel.chave;
-			const nome = responsavel.responsavel.nome;
-			const ramal = responsavel.responsavel.telefone;
-			const celular = responsavel.responsavel.celular;
-
-			responsaveis = responsaveis.concat(`
+			users = users.concat(`
 				${ i !== 0 ? `<hr />` : ``}
-				<a href=https://connections.bb.com.br/profiles/html/myProfileView.do?uid=${chave} target="_blank" class="avatarContainer">
-					<img src=https://connections.bb.com.br/profiles/photo.do?uid=${chave} class="avatar" />
+				<a href=${user.link} target="_blank" class="avatarContainer">
+					<img src=${user.linkImage} class="avatar" />
 				</a>
-				<p>${chave} - ${nome}</p>
-				<p>Ramal: ${ramal}</p>
-				<p>Celular: ${celular}</p>
+				<p>${user.name}</p>
+				<p>Telefone: ${user.telephonenumber}</p>
+				<p>Celular: ${user.mobile}</p>
 				`);
 		});
 
-		let uors = '';
-		self.task.uors.forEach(uor =>{
-
-			const nome = uor.uor.nomeReduzido;
-
-			uors = uors.concat(`
-				<a href="https://humanograma.intranet.bb.com.br/uor/${uor.uor_id}" target="_blank">
-					<p>${nome}</p>
-				</a>
-				`);
+		let departments = '';
+		self.task.departments.forEach(department =>{
+			departments = departments.concat(`
+				<p><a href="${department.link}" target="_blank">${department.name}</a></p>`);
 		});
 
 		const html = `
-			<div class="details-container">
+			<div class="details-container" style="min-width: 200px; max-width: ${self.details_height}px">
 				<h5>${heading}</h5>
 				<p>${line_1}</p>
 				${
 					line_2 ? `<p>${line_2}</p>` : ''
 				}
 				${
-					periodos ? `
-					<br />
+					dates ? `
+					<p>&nbsp</p>
 					<h5>Datas:</h5>
-					${periodos}
+					${dates}
 					` : ''
 				}
 				${
-					uors ? `
-					<br />
+					departments ? `
+					<p>&nbsp</p>
 					<h5>Área(s):</h5>
-					${uors}
+					${departments}
 					` : ''
 				}
 				${
-					responsaveis ? `
-						<br />
+					users ? `
+						<p>&nbsp</p>
 						<h5>Contato(s):</h5>
-						${responsaveis}
+						${users}
 						` : ''
 				}
 			</div>
@@ -284,9 +303,19 @@ export default function Bar(gt, task) {
 	}
 
 	function get_details_position() {
+
+		const width = gt.element_groups.grid.getBBox().width;
+		const height = gt.element_groups.grid.getBBox().height;
+		// const x = self.$bar.getEndX() + 2;
+		const y_end = self.$bar.getY() + self.details_height;
+		const x_end = self.$bar.getEndX() + self.details_width;
+		const x = (x_end > width) ? self.$bar.getEndX() - (x_end - width) : self.$bar.getEndX();
+		let y = (y_end > height) ? self.$bar.getY() - (y_end - height) : self.$bar.getY();
+		y = y < 10 ? 10 : y;
+
 		return {
-			x: self.$bar.getEndX() + 2,
-			y: self.$bar.getY() - 10
+			x: x + 2,
+			y: y - 10
 		};
 	}
 
@@ -438,7 +467,9 @@ export default function Bar(gt, task) {
 			}
 			update_attr(bar, 'x', x);
 		}
-		if (width && width >= gt.config.column_width) {
+
+		const column_width = gt.view_is('Month') ? gt.config.column_width / 30 : gt.config.column_width;
+		if (width && width >= column_width) {
 			update_attr(bar, 'width', width);
 		}
 		update_label_position();
@@ -512,7 +543,9 @@ export default function Bar(gt, task) {
 			x = self.task._start.diff(gt.gantt_start, 'days') *
 				gt.config.column_width / 30;
 		}
-		return x + gt.config.project_group_width;
+
+		return x + gt.config.left_menu_width;
+
 	}
 
 	function compute_y() {
@@ -531,6 +564,7 @@ export default function Bar(gt, task) {
 			rem = dx % (gt.config.column_width / 30);
 			position = odx - rem +
 				((rem < gt.config.column_width / 60) ? 0 : gt.config.column_width / 30);
+			// console.log('column_width', gt.config.column_width / 30, 'odx', odx, 'rem', rem, 'odx - rem', odx - rem);
 		} else {
 			rem = dx % gt.config.column_width;
 			position = odx - rem +

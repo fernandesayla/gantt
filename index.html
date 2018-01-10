@@ -2,12 +2,8 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Simple Gantt</title>
+	<title>Gantt</title>
 	<style>
-		body {
-			font-family: sans-serif;
-			/*background: #ccc;*/
-		}
 		.container {
 			width: 100%;
 			margin: 0 auto;
@@ -15,239 +11,267 @@
 		.gantt-container {
 			/*overflow: scroll;*/
 		}
-		/* custom class */
-		.gantt .bar-milestone .bar-progress {
-			fill: tomato;
-		}
+		
+
 	</style>
 	<script src="node_modules/moment/min/moment.min.js"></script>
 	<script src="node_modules/snapsvg/dist/snap.svg-min.js"></script>
 	<script src="dist/frappe-gantt.js"></script>
 </head>
 <body>
-	<div class="container">
-		<h2>Gantt Chart!</h2>
+	<div class="container">			
 		<div class="gantt-container">
 			<svg id="gantt" width="400" height="600"></svg>
 		</div>
 	</div>
 	<script>
 
-		// var today = new Date();
+function getProjects() {
 
-		// var names = [
-		// 	["Redesign website", [0, 14]],
-		// 	["Write new content", [1, 8]],
-		// 	["Apply new styles", [3, 12]],
-		// 	["Review", [7, 14]],
-		// 	["Deploy", [8, 18]],
-		// 	["Go Live!", [10, 20]]
-		// ];
+  const projetos = [];
+  let tarefaId = 0;
+  const qtProjetos = 1;
+  const qtTarefas = 3; 
+  
+  for (let i = qtProjetos; i <= 1; i++) {
 
-		// var tasks = names.map(function(name, i) {
-		// 	var today = new Date();
-		// 	var start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-		// 	var end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-		// 	start.setDate(today.getDate() + name[1][0]);
-		// 	end.setDate(today.getDate() + name[1][1]);
-		// 	return {
-		// 		start: start,
-		// 		end: end,
-		// 		name: name[0],
-		// 		id: "Task " + i,
-		// 		progress: parseInt(Math.random() * 100, 10)
-		// 	}
-		// });
-						
-		// tasks[1].progress = 0;
-		// tasks[1].dependencies = "Task 0"
-		// tasks[2].dependencies = "Task 1"
-		// tasks[3].dependencies = "Task 2"
-		// tasks[5].dependencies = "Task 4"
-		// tasks[5].custom_class = "bar-milestone";
+    const tarefas = [];
+    let dataInicio = moment('2017-06-25T03:00:00.000Z');
 
-		// console.log('tasks',tasks)
+    for (let j = 1; j <= qtTarefas; j++) {
 
-		let projetos = [];
-		let tarefaId = 0;
+      const resp1 = {
+            responsavel_id: '54103757',
+            responsavel: {
+              id: '54103757',
+              chave: 'F4103757',
+              nome: 'Henrique Fidellis Ferreira',
+              celular: '061 92014477',
+              telefone: 37404,
+            },
+          };
+      const resp2 = {
+            responsavel_id: '56805293',
+            responsavel: {
+              id: '56805293',
+              chave: 'F6805293',
+              nome: 'Marcos Andrei Ivanechtchuk',
+              celular: '061 993283558',
+              telefone: 37402,
+            },
+          };
+
+      const responsaveis = [];
+      responsaveis.push(resp1);
+      if(j%2==0) responsaveis.push(resp2);
+
+      const uor1 = {
+            uor_id: 284651,
+            uor: {
+              id: 284651,
+              nome: 'DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS',
+              nomeReduzido: 'DISEM/DIV INFORM GER',
+              prefixo: 9951,
+              subordinada: 22,
+            },
+          };
+      const uor2 = {
+            uor_id: 284650,
+            uor: {
+              id: 284650,
+              nome: 'DISEM - DIVISAO CONTROLE',
+              nomeReduzido: 'DISEM/CONTROLE',
+              prefixo: 9951,
+              subordinada: 20,
+            },
+          };
+      const uors = [];
+      uors.push(uor1);
+      if(j%2===0) uors.push(uor2);      
+
+      tarefaId += 1;
+      
+      // dataInicio = dataInicio.clone().add(1, 'Month');      
+      dataInicio = dataInicio.clone().add(6, 'Day');      
+      // dataFim = dataInicio.clone().add(dataInicio.daysInMonth() - 1, 'Day');
+      dataFim = dataInicio.clone().add(5, 'Day');
+
+      const tarefa = {
+
+        id: tarefaId,
+        sequencia: j,
+        percentual: j < 3 ? 100 : j === 3 ? 40 : 0,
+        tarefaAtual: j === i,
+        tarefa: {
+          id: j,
+          nome: j === 2 ? `Tarefa ${j}` : `Tarefa ${j}`,
+        },
+        situacao: {
+          id: 1,
+          nome: 'Não Iniciado',
+        },
+        periodos: [
+          {
+            id: 1,
+            dataInicio,
+            dataFim,
+
+            tipo: {
+              id: 1,
+              nome: 'Previsão',
+            },
+          },
+          {
+            id: 2,
+            dataInicio: '2017-06-13T12:53:03.348Z',
+            dataFim: '2017-06-14T03:00:00.000Z',
+
+            tipo: {
+              id: 2,
+              nome: 'Realizado',
+            },
+
+          },
+        ],
+        vinculos: [
+          {
+            tarefaSubordinada_id: 2,
+          },
+        ],
+        predecessoes: [
+          // {
+          //   tarefaPredecessao_id: j !== 1 ? tarefaId - 1 : null,
+          // },
+        ],
+        responsaveis: responsaveis,
+        uors: uors,
+      };
+
+      tarefas.push(tarefa);
+
+    }
+
+    const projeto =
+      {
+        id: i,
+        nome: `Projeto Divisão Informações Gerenciais 
+               Projeto Divisão Informações Gerenciais ${i}`,
+        tarefas,
+      };
+
+    projetos.push(projeto);
+
+  }
+
+  return convertGanttData(projetos);
+
+}
+
+function convertGanttData(data){
+
+  let projects = [];
+
+  projects = projects.concat(data.map((projeto) => {
+
+    const tarefas = projeto.tarefas;
+
+    const tasks = tarefas.map((tarefa) => {
+
+      const previsao = tarefa.periodos.find(periodo => periodo.tipo.id === 1);
+      const predecessores = tarefa.predecessoes.map(vinculo => vinculo.tarefaPredecessao_id);
+
+      let periodos = tarefa.periodos.map(periodo => (
+        {
+          id: periodo.id,
+          start: periodo.dataInicio,
+          end: periodo.dataFim,
+          type: {
+            id: periodo.tipo.id,            
+            name: periodo.tipo.nome,
+          }
+        }
+
+      ));
+
+      periodos = periodos.filter(p => p.type.id != 1);
+      
+      const responsaveis = tarefa.responsaveis.map(responsavel => (
+          {
+            id: responsavel.responsavel.id,            
+            name: responsavel.responsavel.nome,
+            telephonenumber: responsavel.responsavel.telefone,
+            mobile: responsavel.responsavel.celular,
+            link: `https://humanograma.intranet.bb.com.br/${responsavel.responsavel.chave}`,
+            linkImage: `https://connections.bb.com.br/profiles/photo.do?uid=${responsavel.responsavel.chave}`,
+          }
+        )        
+      );
+      
+      const uors = tarefa.uors.map(uor => (
+        {
+          id: uor.uor.id,
+          name: uor.uor.nomeReduzido,          
+          link: `https://humanograma.intranet.bb.com.br/uor/${uor.uor.id}`,
+        }
+      ));
+      
+      return {
+        projectId: projeto.id,
+        id: tarefa.id,
+        name: tarefa.tarefa.nome,
+        taskId: tarefa.tarefa.id,
+        start: previsao.dataInicio,
+        end: previsao.dataFim,
+        progress: tarefa.percentual,
+        dependencies: predecessores,
+        currentTask: tarefa.tarefaAtual,
+        dates: periodos,
+        users: responsaveis,
+        departments: uors,
+      };
+
+    });
+
+    return {
+      id: projeto.id,
+      name: projeto.nome,
+      tasks,
+    };
+
+  }));
+  // console.log('projects', projects)
+  return projects;
+}
+
+
+		// console.log('const projects = ', JSON.stringify(getProjects()))
 		
-
-		for(i = 1; i <= 3; i++){
-			
-			let tarefas = [];			
-			let dataInicio = new Date("2016-11-01T03:00:00.000Z");
-			let duracao = 0;
-			let latencia = 0;			
-
-			for(j = 1; j <= 8; j++){
-
-				tarefaId++;
-				
-				dataInicio = new Date(dataInicio);
-				dataInicio.setDate(dataInicio.getDate() + latencia);				
-				dataFim = new Date(dataInicio);
-				duracao = moment(dataInicio).daysInMonth() - 1;
-				// duracao = 2;
-				dataFim.setDate(dataFim.getDate() + duracao);
-				latencia = moment(dataInicio).daysInMonth() + j - 10;
-				// latencia = 1;
-				
-				tarefa = {
-
-					id: tarefaId,
-					sequencia: j,					
-					percentual: j < i + 4 ? 100: j > i + 4 ? 0 : 20,
-					tarefaAtual: j == i + 4 ? true : false,
-					tarefa: {
-						id: j,
-						nome: "Tarefa " + j,								
-					},
-					situacao: {
-						id: 1,
-						nome: "Não Iniciado"
-					},												
-					periodos: [
-						{
-							id: 1,
-							dataInicio: dataInicio,
-							dataFim: dataFim,
-							
-							tipo: {
-								id: 1,
-								nome: "Previsão",																				
-							},																
-						},
-						{
-							id: 2,
-							dataInicio: "2017-06-13T12:53:03.348Z",
-							dataFim: "2017-06-14T03:00:00.000Z",
-							
-							tipo: {
-								id: 2,
-								nome: "Realizado",																				
-							},
-														
-						},
-					],
-					vinculos: [ 
-						{
-							tarefaSubordinada_id: 2,
-						}
-					],
-					predecessoes: [
-						{
-							tarefaPredecessao_id: j != 1 ? tarefaId - 1 : null,
-						},													
-					],
-					responsaveis: [
-						{
-							responsavel_id: "56805293",
-							responsavel: {
-								chave: "F6805293",
-								nome: "Marcos Andrei Ivanechtchuk",
-								celular: "061 993283558",
-								telefone: 37402
-							}
-						},
-						{
-							responsavel_id: "54103757",
-							responsavel: {
-								chave: "F4103757",
-								nome: "Henrique Fidellis Ferreira",
-								celular: "061 92014477",
-								telefone: 37404
-							}
-						}
-					],
-					uors: [
-						{
-						uor_id: 284651,
-						uor: {
-								id: 284651,
-								nome: "DISEM - DIVISAO GEST ATIVOS E INFORMA GERENCIAIS",
-								nomeReduzido: "DISEM/DIV INFORM GER",
-								prefixo: 9951,
-								subordinada: 22
-							}
-						},
-						{
-						uor_id: 284650,
-						uor: {
-								id: 284650,
-								nome: "DISEM - DIVISAO CONTROLE",
-								nomeReduzido: "DISEM/CONTROLE",
-								prefixo: 9951,
-								subordinada: 20
-							}
-						}
-					],					
-				};
-
-				tarefas.push(tarefa);
-			};			
-
-			projeto = 
-				{
-					id: i,
-					nome: "Projeto " + i,
-					tarefas: tarefas,
-				};
-
-			projetos.push(projeto)
-		}
-
-		let projects = [];		
-
-		projects = projects.concat(projetos.map(projeto =>{
-
-			tarefas = projeto.tarefas;			
-
-			tasks = tarefas.map((tarefa, i) => {
-							
-				let previsao = tarefa.periodos.find(periodo => periodo.tipo.id == 1)			
-				let dependencies = tarefa.predecessoes.map(vinculo => vinculo.tarefaPredecessao_id)
-								
-				return {
-					projectId: projeto.id,
-					id: tarefa.id,
-					name: tarefa.tarefa.nome,
-					start: previsao.dataInicio,
-					end: previsao.dataFim,					
-					progress: tarefa.percentual,
-					dependencies: dependencies,
-					currentTask: tarefa.tarefaAtual,
-					periodos: tarefa.periodos,
-					responsaveis: tarefa.responsaveis,
-					uors: tarefa.uors,
-				}
-			});
-
-			return {
-				id: projeto.id,
-				name: projeto.nome,
-				tasks: tasks,
-			}			
-		}));
-				
-		var gantt_chart = Gantt("#gantt", projects, {
+		var gantt_chart = Gantt("#gantt", getProjects(), {
 			on_click: function (task) {
-				console.log(task);
+				// console.log(task);
 			},
 			on_date_change: function(task, start, end) {
-				console.log(task, start, end);
+				console.log(end._d);
+        // console.log(task);
 			},
 			on_progress_change: function(task, progress) {
-				console.log(task, progress);
+				// console.log(task, progress);
 			},
 			on_view_change: function(mode) {
-				console.log(mode);
+				// console.log(mode);
 			},
 			view_mode: 'Month',
-			project_group_width: projects.length > 1 ? 150 : 0,
 			inline: true,
+			projection: false,
+      left_menu_width: 0,
+      number_months_add: 0,
+			// bar: {
+			// 	height: 15
+			// },
 		});
+
 		//console.log(gantt_chart);
+		
 	</script>
 </body>
 </html>
-

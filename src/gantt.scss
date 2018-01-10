@@ -1,6 +1,6 @@
 // $bar-color: #b8c2cc;
-$bar-color: #485f7d;
-$bar-stroke: #8D99A6;
+$bar-color: #1976d2;
+$bar-stroke: #1976d2;
 $border-color: #e0e0e0;
 $light-bg: #f5f5f5;
 $light-border-color: #ebeff2;
@@ -9,12 +9,18 @@ $text-muted: #666;
 $text-light: #555;
 $text-color: #333;
 $grey: #b8c2cc;
+$light-grey: #fdfdfd;
 $blue: #3887f3;
-$light-blue: #3887f3;
-$light-red: tomato;
+$light-blue: #82b1f3;
+$light-red: #f1aa9e;
 $light-yellow: #fcf8e3;
-$light-green: #6be26b;
+$green: #43a047;
+$light-green: #b9f3b9;
 
+
+// body {
+//   font-family: sans-serif; 
+// }
 
 .gantt {
 
@@ -32,31 +38,37 @@ $light-green: #6be26b;
 	.grid-row:nth-child(even) {
 		fill: $light-bg;
 	}
+	.grid-weekend {
+		fill: $light-grey;
+	}
 	.row-line {
 		stroke: $light-border-color;		
 	}
-	.row-line-project {
-		stroke: $text-color;		
+	.row-line-project {		
+		stroke: $border-color;		
+		stroke-width: 1.4;
 	}
 	.tick {
 		stroke: $border-color;
-		stroke-width: 0.2;
+		stroke-width: 0.6;
 		&.thick {
-			stroke-width: 0.4;
+			stroke-width: 0.8;
 		}
 	}
 
 	.tick-today, .tick-current, .tick-current-late {		
 		stroke-width: 1;	
 		opacity: 0.8;	
+		stroke-dasharray: 7;
 	}
 
 	.tick-today {
-		stroke: $light-green;		
+		stroke: $green;		
 	}
 
 	.tick-current {
 		stroke: $light-blue;
+		
 	}
 	.tick-current-late {
 		stroke: $light-red;
@@ -90,8 +102,17 @@ $light-green: #6be26b;
 		stroke-width: 0;
 		transition: stroke-width .3s ease;
 	}
+
+	.bar-late .bar {	
+		fill: #f1b4a9 !important;
+		stroke: tomato;
+		// stroke-dasharray: 7;
+		stroke-width: 0.8;
+		opacity: 0.8;
+	}	
+
 	.bar-progress {
-		fill: $grey;
+		fill: $green;
 	}
 	.bar-invalid {
 		fill: transparent;
@@ -108,7 +129,7 @@ $light-green: #6be26b;
 		dominant-baseline: central;
 		text-anchor: middle;
 		font-size: 12px;
-		font-weight: lighter;
+		// font-weight: lighter;
 		letter-spacing: 0.8px;
 
 		&.big {
@@ -156,29 +177,34 @@ $light-green: #6be26b;
 	.lower-text {
 		fill: $text-color;
 	}
+	.project-text-container{		
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $text-light;		
+	}
 	.project-text{
-		fill: $text-light;
-		text-anchor: middle;
+		text-align: center;		
 	}
 
 	#details .details-container {
 		background: #fff;
 		display: inline-block;
-		padding: 12px;
-
+		padding: 12px;		
+		
 		h5, p {
 			margin: 0;
+			line-height: 1.2;
+			font-size: 12px;
 		}
 
-		h5 {
-			font-size: 12px;
+		h5 {			
 			font-weight: bold;
 			margin-bottom: 10px;
 			color: $text-light;
 		}
 
-		p {
-			font-size: 12px;
+		p {			
 			margin-bottom: 6px;
 			color: $text-muted;
 		}
@@ -206,6 +232,7 @@ $light-green: #6be26b;
 	}
 	.avatar{
 		height: 50px !important;
-	}
-	
+	}	
+
 }
+
