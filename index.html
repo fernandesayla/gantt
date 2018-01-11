@@ -31,7 +31,7 @@ function getProjects() {
   const projetos = [];
   let tarefaId = 0;
   const qtProjetos = 1;
-  const qtTarefas = 3; 
+  const qtTarefas = 5; 
   
   for (let i = qtProjetos; i <= 1; i++) {
 
@@ -101,7 +101,7 @@ function getProjects() {
         id: tarefaId,
         sequencia: j,
         percentual: j < 3 ? 100 : j === 3 ? 40 : 0,
-        tarefaAtual: j === i,
+        tarefaAtual: j === 2,
         tarefa: {
           id: j,
           nome: j === 2 ? `Tarefa ${j}` : `Tarefa ${j}`,
@@ -162,7 +162,7 @@ function getProjects() {
     projetos.push(projeto);
 
   }
-
+  console.log(convertGanttData(projetos))
   return convertGanttData(projetos);
 
 }
@@ -261,8 +261,8 @@ function convertGanttData(data){
 				// console.log(mode);
 			},
 			view_mode: 'Month',
-			inline: true,
-			projection: false,
+			inline: false,
+			projection: true,
       left_menu_width: 0,
       number_months_add: 0,
 			// bar: {
