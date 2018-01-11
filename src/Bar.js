@@ -320,6 +320,7 @@ export default function Bar(gt, task) {
 	}
 
 	function bind_resize() {
+
 		const { left, right } = get_handles();
 
 		left.drag(onmove_left, onstart, onstop_left);
@@ -393,6 +394,7 @@ export default function Bar(gt, task) {
 	self.onstart = onstart;
 
 	function onmove(dx, dy) {
+
 		const bar = self.$bar;
 		bar.finaldx = get_snap_position(dx);
 		update_bar_position({x: bar.ox + bar.finaldx});
@@ -457,6 +459,7 @@ export default function Bar(gt, task) {
 			const xs = task.dependencies.map(dep => {
 				return gt.get_bar(dep).$bar.getX();
 			});
+
 			// child task must not go before parent
 			const valid_x = xs.reduce((prev, curr) => {
 				return x >= curr;
@@ -465,6 +468,7 @@ export default function Bar(gt, task) {
 				width = null;
 				return;
 			}
+
 			update_attr(bar, 'x', x);
 		}
 
@@ -495,6 +499,7 @@ export default function Bar(gt, task) {
 
 	function date_changed() {
 		const { new_start_date, new_end_date } = compute_start_end_date();
+
 		self.task._start = new_start_date;
 		self.task._end = new_end_date;
 		render_details();
@@ -517,7 +522,7 @@ export default function Bar(gt, task) {
 
 	function compute_start_end_date() {
 		const bar = self.$bar;
-		const x_in_units = bar.getX() / gt.config.column_width;
+		const x_in_units = (bar.getX() - gt.config.left_menu_width) / gt.config.column_width;
 		const new_start_date = gt.gantt_start.clone().add(x_in_units * gt.config.step, 'hours');
 		const width_in_units = bar.getWidth() / gt.config.column_width;
 		const new_end_date = new_start_date.clone().add(width_in_units * gt.config.step, 'hours');
@@ -576,7 +581,7 @@ export default function Bar(gt, task) {
 	function update_attr(element, attr, value) {
 		value = +value;
 		if (!isNaN(value)) {
-			element.attr(attr, value);
+			if(gt.config.edit_mode) element.attr(attr, value);
 		}
 		return element;
 	}
