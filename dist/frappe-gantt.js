@@ -1203,8 +1203,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (self.invalid) return;
 			setup_click_event();
 			show_details();
-			bind_resize();
-			bind_drag();
+			if (gt.config.edit_mode) {
+				bind_resize();
+				bind_drag();
+			}
 			bind_resize_progress();
 		}
 	
@@ -1621,7 +1623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function update_attr(element, attr, value) {
 			value = +value;
 			if (!isNaN(value)) {
-				if (gt.config.edit_mode) element.attr(attr, value);
+				element.attr(attr, value);
 			}
 			return element;
 		}
@@ -1710,7 +1712,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	

@@ -139,8 +139,10 @@ export default function Bar(gt, task) {
 		if (self.invalid) return;
 		setup_click_event();
 		show_details();
-		bind_resize();
-		bind_drag();
+		if(gt.config.edit_mode) {
+			bind_resize();
+			bind_drag();
+		}
 		bind_resize_progress();
 	}
 
@@ -581,7 +583,7 @@ export default function Bar(gt, task) {
 	function update_attr(element, attr, value) {
 		value = +value;
 		if (!isNaN(value)) {
-			if(gt.config.edit_mode) element.attr(attr, value);
+			element.attr(attr, value);
 		}
 		return element;
 	}

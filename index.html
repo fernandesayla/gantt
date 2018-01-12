@@ -30,13 +30,8 @@ function getProjects() {
 
   const projetos = [];
   let tarefaId = 0;
-<<<<<<< HEAD
-  const qtProjetos = 1;
-  const qtTarefas = 5; 
-=======
   const qtProjetos = 2;
   const qtTarefas = 6; 
->>>>>>> 586426264414adbb40a9bdf7a7e9ceaa008795f0
   
   for (let i = 1; i <= qtProjetos; i++) {
 
@@ -166,11 +161,7 @@ function getProjects() {
     projetos.push(projeto);
     
   }
-<<<<<<< HEAD
-  console.log(convertGanttData(projetos))
-=======
   
->>>>>>> 586426264414adbb40a9bdf7a7e9ceaa008795f0
   return convertGanttData(projetos);
 
 }
@@ -273,7 +264,7 @@ function convertGanttData(data){
 			projection: false,
       left_menu_width: 0,
       number_months_add: 0,
-      edit_mode: true,
+      edit_mode: false,
 			// bar: {
 			// 	height: 15
 			// },
