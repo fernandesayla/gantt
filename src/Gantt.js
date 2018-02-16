@@ -65,7 +65,7 @@ export default function Gantt(element, projects, config) {
 		};
 
 		if(!config.left_menu_width && projects.length > 1) config.left_menu_width = 200;
-
+		console.log('config', config);
 		self.config = Object.assign({}, defaults, config);
 
 		self.config.row.height = self.config.bar.height + self.config.padding;
@@ -189,11 +189,11 @@ export default function Gantt(element, projects, config) {
 				}
 				if(task.currentTask && self.config.projection) project._currentDate = get_date_progress(task);
 			});
-
-			project._late = moment().diff(project._currentDate, 'days');
-
+			console.log('project._currentDate', project._currentDate);
+			project._late = project._currentDate ? moment().diff(project._currentDate, 'days') : 0;
+			console.log('atraso', project._late);
 			if(project._late > 0) {
-
+				console.log('if atraso', project._late);
 				const start = moment(project._lastDate, self.config.date_format).clone().add(1, 'days');
 				const end = moment(project._lastDate, self.config.date_format).clone().add(project._late, 'days');
 
