@@ -208,6 +208,7 @@ export default function Gantt(element, projects, config) {
 					dependencies: [],
 					users: [],
 					departments: [],
+					projection: true,
 					dates: [
 						{
 							start: start,
@@ -244,11 +245,15 @@ export default function Gantt(element, projects, config) {
 		self.gantt_start = self.gantt_end = null;
 		for(let task of self.tasks) {
 			// set global start and end date
+			console.log('-----', task.projection);
 			if(!self.gantt_start || task._start < self.gantt_start) {
 				self.gantt_start = task._start;
+				self.tasks_start = task._start;
 			}
 			if(!self.gantt_end || task._end > self.gantt_end) {
 				self.gantt_end = task._end;
+				if(!task.projection) self.tasks_end = task._end;
+				self.tasks_projection = task._end;
 			}
 		}
 		set_gantt_dates();
@@ -570,7 +575,7 @@ export default function Gantt(element, projects, config) {
 	}
 
 	function make_grid_weekend() {
-		let x = 0;
+		let x = 0 + self.config.left_menu_width;
 		const width = self.config.column_width;
 		let height = (self.config.row.height) * self._projects._rows;
 		let y = self.config.header_height + self.config.padding / 2;

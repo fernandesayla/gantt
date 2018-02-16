@@ -279,6 +279,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						dependencies: [],
 						users: [],
 						departments: [],
+						projection: true,
 						dates: [{
 							start: start,
 							end: end,
@@ -361,11 +362,15 @@ return /******/ (function(modules) { // webpackBootstrap
 					var task = _step3.value;
 	
 					// set global start and end date
+					console.log('-----', task.projection);
 					if (!self.gantt_start || task._start < self.gantt_start) {
 						self.gantt_start = task._start;
+						self.tasks_start = task._start;
 					}
 					if (!self.gantt_end || task._end > self.gantt_end) {
 						self.gantt_end = task._end;
+						if (!task.projection) self.tasks_end = task._end;
+						self.tasks_projection = task._end;
 					}
 				}
 			} catch (err) {
@@ -724,7 +729,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function make_grid_weekend() {
-			var x = 0;
+			var x = 0 + self.config.left_menu_width;
 			var width = self.config.column_width;
 			var height = self.config.row.height * self._projects._rows;
 			var y = self.config.header_height + self.config.padding / 2;
@@ -1711,7 +1716,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	

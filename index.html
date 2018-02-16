@@ -36,7 +36,7 @@ function getProjects() {
   for (let i = 1; i <= qtProjetos; i++) {
 
     const tarefas = [];
-    let dataInicio = moment('2017-06-25T03:00:00.000Z');
+    let dataInicio = moment('2018-01-20T02:00:00.000Z');
 
     for (let j = 1; j <= qtTarefas; j++) {
 
@@ -123,7 +123,7 @@ function getProjects() {
           },
           {
             id: 2,
-            dataInicio: '2017-06-13T12:53:03.348Z',
+            dataInicio: '2017-06-13T03:00:00.000Z',
             dataFim: '2017-06-14T03:00:00.000Z',
 
             tipo: {
@@ -223,7 +223,8 @@ function convertGanttData(data){
         end: previsao.dataFim,
         progress: tarefa.percentual,
         dependencies: predecessores,
-        currentTask: tarefa.tarefaAtual,
+        // currentTask: tarefa.tarefaAtual,
+        currentTask: tarefa.sequencia == 3,
         dates: periodos,
         users: responsaveis,
         departments: uors,
@@ -238,7 +239,7 @@ function convertGanttData(data){
     };
 
   }));
-  console.log('projects', projects)
+  // console.log('projects', projects)
   return projects;
 }
 
@@ -260,17 +261,21 @@ function convertGanttData(data){
 				// console.log(mode);
 			},
 			view_mode: 'Day',
-			inline: true,
-			projection: false,
+			inline: false,
+			projection: true,
       left_menu_width: 0,
       number_months_add: 0,
-      edit_mode: false,
+      edit_mode: true,
 			// bar: {
 			// 	height: 15
 			// },
 		});
 
-		//console.log(gantt_chart);
+    console.log('gantt start', gantt_chart.gantt_start.format('DD/MM/YYYY'));
+    console.log('gantt end', gantt_chart.gantt_end.format('DD/MM/YYYY'));
+    console.log('tasks start', gantt_chart.tasks_start.format('DD/MM/YYYY'));    
+    console.log('tasks end', gantt_chart.tasks_end.format('DD/MM/YYYY'));
+    console.log('tasks projection', gantt_chart.tasks_projection.format('DD/MM/YYYY'));
 		
 	</script>
 </body>
