@@ -129,7 +129,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				custom_popup_html: null,
 				left_menu_width: 0,
 				inline: false,
-				projection: false,
+				projection: true,
 				number_months_add: 0
 			};
 	
@@ -279,7 +279,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						dependencies: [],
 						users: [],
 						departments: [],
-						projection: true,
+						isProjection: true,
 						dates: [{
 							start: start,
 							end: end,
@@ -353,6 +353,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function prepare_dates() {
 	
 			self.gantt_start = self.gantt_end = null;
+			self.tasks_start = self.tasks_end = self.tasks_projection = null;
 			var _iteratorNormalCompletion3 = true;
 			var _didIteratorError3 = false;
 			var _iteratorError3 = undefined;
@@ -362,14 +363,13 @@ return /******/ (function(modules) { // webpackBootstrap
 					var task = _step3.value;
 	
 					// set global start and end date
-					console.log('-----', task.projection);
 					if (!self.gantt_start || task._start < self.gantt_start) {
 						self.gantt_start = task._start;
 						self.tasks_start = task._start;
 					}
 					if (!self.gantt_end || task._end > self.gantt_end) {
 						self.gantt_end = task._end;
-						if (!task.projection) self.tasks_end = task._end;
+						if (!task.isProjection) self.tasks_end = (0, _moment2.default)(task._end).clone();
 						self.tasks_projection = task._end;
 					}
 				}
@@ -1716,7 +1716,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	

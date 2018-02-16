@@ -60,7 +60,7 @@ export default function Gantt(element, projects, config) {
 			custom_popup_html: null,
 			left_menu_width: 0,
 			inline: false,
-			projection: false,
+			projection: true,
 			number_months_add: 0
 		};
 
@@ -208,7 +208,7 @@ export default function Gantt(element, projects, config) {
 					dependencies: [],
 					users: [],
 					departments: [],
-					projection: true,
+					isProjection: true,
 					dates: [
 						{
 							start: start,
@@ -243,16 +243,16 @@ export default function Gantt(element, projects, config) {
 	function prepare_dates() {
 
 		self.gantt_start = self.gantt_end = null;
+		self.tasks_start = self.tasks_end = self.tasks_projection = null;
 		for(let task of self.tasks) {
 			// set global start and end date
-			console.log('-----', task.projection);
 			if(!self.gantt_start || task._start < self.gantt_start) {
 				self.gantt_start = task._start;
 				self.tasks_start = task._start;
 			}
 			if(!self.gantt_end || task._end > self.gantt_end) {
 				self.gantt_end = task._end;
-				if(!task.projection) self.tasks_end = task._end;
+				if(!task.isProjection) self.tasks_end = moment(task._end).clone();
 				self.tasks_projection = task._end;
 			}
 		}
