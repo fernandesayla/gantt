@@ -94,7 +94,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		function init() {
 			set_defaults();
-	
 			// expose methods
 			self.change_view_mode = change_view_mode;
 			self.unselect_all = unselect_all;
@@ -104,7 +103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			self.refresh = refresh;
 	
 			// initialize with default view mode
-			change_view_mode(self.config.view_mode);
+			if (self._tasks.length > 0) change_view_mode(self.config.view_mode);
 		}
 	
 		function set_defaults() {
@@ -1712,7 +1711,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	

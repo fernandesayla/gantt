@@ -18,7 +18,6 @@ export default function Gantt(element, projects, config) {
 
 	function init() {
 		set_defaults();
-
 		// expose methods
 		self.change_view_mode = change_view_mode;
 		self.unselect_all = unselect_all;
@@ -28,7 +27,7 @@ export default function Gantt(element, projects, config) {
 		self.refresh = refresh;
 
 		// initialize with default view mode
-		change_view_mode(self.config.view_mode);
+		if(self._tasks.length > 0) change_view_mode(self.config.view_mode);
 	}
 
 	function set_defaults() {
