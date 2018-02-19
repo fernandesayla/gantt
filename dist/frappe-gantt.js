@@ -129,7 +129,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				custom_popup_html: null,
 				left_menu_width: 0,
 				inline: false,
-				projection: true,
+				hasProjection: true,
 				number_months_add: 0
 			};
 	
@@ -258,9 +258,9 @@ return /******/ (function(modules) { // webpackBootstrap
 						project._lastRow = task._line;
 						project._lastDate = get_max_date(project.tasks);
 					}
-					if (task.currentTask && self.config.projection) project._currentDate = get_date_progress(task);
+					if (task.currentTask && self.config.hasProjection) project._currentDate = get_date_progress(task);
 				});
-				project._late = self.config.projection ? (0, _moment2.default)().diff(project._currentDate, 'days') : 0;
+				project._late = self.config.hasProjection ? (0, _moment2.default)().diff(project._currentDate, 'days') : 0;
 				if (project._late > 0) {
 					var start = (0, _moment2.default)(project._lastDate, self.config.date_format).clone().add(1, 'days');
 					var end = (0, _moment2.default)(project._lastDate, self.config.date_format).clone().add(project._late, 'days');
@@ -276,7 +276,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						dependencies: [],
 						users: [],
 						departments: [],
-						isProjection: true,
+						isProjectionBar: true,
 						dates: [{
 							start: start,
 							end: end,
@@ -366,7 +366,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 					if (!self.gantt_end || task._end > self.gantt_end) {
 						self.gantt_end = task._end;
-						if (!task.isProjection) self.tasks_end = (0, _moment2.default)(task._end).clone();
+						if (!task.isProjectionBar) self.tasks_end = (0, _moment2.default)(task._end).clone();
 						self.tasks_projection = task._end;
 					}
 				}

@@ -262,7 +262,7 @@ function convertGanttData(data){
 			},
 			view_mode: 'Day',
 			inline: false,
-			projection: false,
+			hasProjection: false,
       left_menu_width: 0,
       number_months_add: 0,
       edit_mode: true,
@@ -273,7 +273,7 @@ function convertGanttData(data){
     
     console.log('tasks start', gantt_chart.tasks_start.format('DD/MM/YYYY'));    
     console.log('tasks end', gantt_chart.tasks_end.format('DD/MM/YYYY'));
-    console.log('tasks projection', gantt_chart.tasks_projection.format('DD/MM/YYYY'));
+    console.log('tasks hasProjection', gantt_chart.tasks_projection.format('DD/MM/YYYY'));
 		
 	</script>
 </body>
