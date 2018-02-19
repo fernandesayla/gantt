@@ -260,11 +260,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 					if (task.currentTask && self.config.projection) project._currentDate = get_date_progress(task);
 				});
-				console.log('project._currentDate', project._currentDate);
 				project._late = self.config.projection ? (0, _moment2.default)().diff(project._currentDate, 'days') : 0;
-				console.log('atraso', project._late);
 				if (project._late > 0) {
-					console.log('if atraso', project._late);
 					var start = (0, _moment2.default)(project._lastDate, self.config.date_format).clone().add(1, 'days');
 					var end = (0, _moment2.default)(project._lastDate, self.config.date_format).clone().add(project._late, 'days');
 	
@@ -1716,7 +1713,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	
