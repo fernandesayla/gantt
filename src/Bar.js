@@ -44,6 +44,7 @@ export default function Bar(gt, task) {
 		self.width = gt.config.column_width * self.duration;
 		self.progress_width = gt.config.column_width * self.duration * (self.task.progress / 100) || 0;
 		self.group = gt.canvas.group().addClass('bar-wrapper').addClass(self.task.custom_class || '');
+		if(self.task.externalUser) self.group = gt.canvas.group().addClass('external-user');
 		self.bar_group = gt.canvas.group().addClass('bar-group').appendTo(self.group);
 		self.handle_group = gt.canvas.group().addClass('handle-group').appendTo(self.group);
 	}

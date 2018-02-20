@@ -225,6 +225,7 @@ function convertGanttData(data){
         dependencies: predecessores,
         // currentTask: tarefa.tarefaAtual,
         currentTask: tarefa.sequencia == 3,
+        externalUser: tarefa.sequencia == 4,
         dates: periodos,
         users: responsaveis,
         departments: uors,
