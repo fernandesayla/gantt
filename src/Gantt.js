@@ -508,25 +508,28 @@ export default function Gantt(element, projects, config) {
 
 			}
 
-			if(view_is('Month') && project._currentDate) {
-				const x = (project._currentDate.startOf('day').diff(self.gantt_start, 'days') *
-							self.config.column_width / 30) + self.config.left_menu_width;
+			if(self.config.hasProjection) {
 
-				self.canvas.path(Snap.format('M {x} {y} v {height}', {
-					x: x,
-					y: row_y,
-					height: height
-				}))
-				.addClass('tick-current' + late)
-				.appendTo(current);
-			} else if(view_is('Day') && project._currentDate) {
-				const x = (project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') /
-						self.config.step * self.config.column_width) + self.config.left_menu_width;
-				const width = self.config.column_width;
+				if(view_is('Month') && project._currentDate) {
+					const x = (project._currentDate.startOf('day').diff(self.gantt_start, 'days') *
+								self.config.column_width / 30) + self.config.left_menu_width;
 
-				self.canvas.rect(x, row_y, width, height)
-				.addClass('current-highlight' + late)
-				.appendTo(current);
+					self.canvas.path(Snap.format('M {x} {y} v {height}', {
+						x: x,
+						y: row_y,
+						height: height
+					}))
+					.addClass('tick-current' + late)
+					.appendTo(current);
+				} else if(view_is('Day') && project._currentDate) {
+					const x = (project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') /
+							self.config.step * self.config.column_width) + self.config.left_menu_width;
+					const width = self.config.column_width;
+
+					self.canvas.rect(x, row_y, width, height)
+					.addClass('current-highlight' + late)
+					.appendTo(current);
+				}
 			}
 
 		});

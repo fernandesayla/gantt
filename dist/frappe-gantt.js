@@ -650,19 +650,22 @@ return /******/ (function(modules) { // webpackBootstrap
 					text.append(foreign_object);
 				}
 	
-				if (view_is('Month') && project._currentDate) {
-					var x = project._currentDate.startOf('day').diff(self.gantt_start, 'days') * self.config.column_width / 30 + self.config.left_menu_width;
+				if (self.config.hasProjection) {
 	
-					self.canvas.path(_snapSvg2.default.format('M {x} {y} v {height}', {
-						x: x,
-						y: row_y,
-						height: height
-					})).addClass('tick-current' + late).appendTo(current);
-				} else if (view_is('Day') && project._currentDate) {
-					var _x = project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.left_menu_width;
-					var width = self.config.column_width;
+					if (view_is('Month') && project._currentDate) {
+						var x = project._currentDate.startOf('day').diff(self.gantt_start, 'days') * self.config.column_width / 30 + self.config.left_menu_width;
 	
-					self.canvas.rect(_x, row_y, width, height).addClass('current-highlight' + late).appendTo(current);
+						self.canvas.path(_snapSvg2.default.format('M {x} {y} v {height}', {
+							x: x,
+							y: row_y,
+							height: height
+						})).addClass('tick-current' + late).appendTo(current);
+					} else if (view_is('Day') && project._currentDate) {
+						var _x = project._currentDate.clone().startOf('day').diff(self.gantt_start, 'hours') / self.config.step * self.config.column_width + self.config.left_menu_width;
+						var width = self.config.column_width;
+	
+						self.canvas.rect(_x, row_y, width, height).addClass('current-highlight' + late).appendTo(current);
+					}
 				}
 			});
 		}
@@ -1714,7 +1717,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	
