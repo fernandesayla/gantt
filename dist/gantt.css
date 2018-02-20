@@ -65,7 +65,7 @@
   stroke-width: 0;
   transition: stroke-width .3s ease; }
 
-.gantt .bar-late .bar {
+.gantt .projection-bar .bar {
   fill: #f1b4a9 !important;
   stroke: tomato;
   stroke-width: 0.8;

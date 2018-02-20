@@ -65,7 +65,7 @@ export default function Gantt(element, projects, config) {
 		};
 
 		if(!config.left_menu_width && projects.length > 1) config.left_menu_width = 200;
-		console.log('config', config);
+
 		self.config = Object.assign({}, defaults, config);
 
 		self.config.row.height = self.config.bar.height + self.config.padding;
@@ -201,7 +201,7 @@ export default function Gantt(element, projects, config) {
 					_start: start,
 					_end: end,
 					_line: project._lastRow,
-					custom_class: 'bar-late',
+					custom_class: 'projection-bar',
 					dependencies: [],
 					users: [],
 					departments: [],
