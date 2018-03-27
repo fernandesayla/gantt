@@ -95,6 +95,25 @@ function getProjects() {
       dataInicio = dataInicio.clone().add(6, 'Day');      
       // dataFim = dataInicio.clone().add(dataInicio.daysInMonth() - 1, 'Day');
       dataFim = dataInicio.clone().add(5, 'Day');
+      const vinculos = tarefaId == 1 ? [
+                        {
+                          tarefaProjeto_id: tarefaId,
+                          tarefaSubordinada_id: 2,
+                        }
+                      ] : tarefaId == 3  ? [
+                        {
+                          tarefaProjeto_id: tarefaId,
+                          tarefaSubordinada_id: 4,
+                        },
+                        {
+                          tarefaProjeto_id: tarefaId,
+                          tarefaSubordinada_id: 5,
+                        },
+                        {
+                          tarefaProjeto_id: tarefaId,
+                          tarefaSubordinada_id: 6,
+                        },
+                      ] : [];
 
       const tarefa = {
 
@@ -133,15 +152,11 @@ function getProjects() {
 
           },
         ],
-        vinculos: [
-          {
-            tarefaSubordinada_id: 2,
-          },
-        ],
+        vinculos: vinculos,        
         predecessoes: [
-          // {
-          //   tarefaPredecessao_id: j !== 1 ? tarefaId - 1 : null,
-          // },
+          {
+            tarefaPredecessao_id: j !== 1 ? tarefaId - 1 : null,
+          },
         ],
         responsaveis: responsaveis,
         uors: uors,
@@ -224,6 +239,7 @@ function convertGanttData(data){
         progress: tarefa.percentual,
         dependencies: predecessores,
         // currentTask: tarefa.tarefaAtual,
+        isGroup: !!tarefa.vinculos.length,
         currentTask: tarefa.sequencia == 6,
         externalUser: tarefa.sequencia == 4,
         dates: periodos,
@@ -240,7 +256,7 @@ function convertGanttData(data){
     };
 
   }));
-  // console.log('projects', projects)
+  console.log('projects', projects)
   return projects;
 }
 
@@ -271,10 +287,6 @@ function convertGanttData(data){
 			// 	height: 15
 			// },
 		});
-    
-    console.log('tasks start', gantt_chart.tasks_start.format('DD/MM/YYYY'));    
-    console.log('tasks end', gantt_chart.tasks_end.format('DD/MM/YYYY'));
-    console.log('tasks hasProjection', gantt_chart.tasks_projection.format('DD/MM/YYYY'));
 		
 	</script>
 </body>

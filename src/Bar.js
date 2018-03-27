@@ -44,7 +44,13 @@ export default function Bar(gt, task) {
 		self.width = gt.config.column_width * self.duration;
 		self.progress_width = gt.config.column_width * self.duration * (self.task.progress / 100) || 0;
 		self.group = gt.canvas.group().addClass('bar-wrapper').addClass(self.task.custom_class || '');
-		if(self.task.externalUser) self.group = gt.canvas.group().addClass('external-user');
+		if(self.task.externalUser) {
+			self.group = gt.canvas.group().addClass('external-user');
+			console.log(self.task.id, 'if');
+		} else if(self.task.isGroup) {
+			console.log(self.task.id, 'else');
+			self.group = gt.canvas.group().addClass('group-bar');
+		};
 		self.bar_group = gt.canvas.group().addClass('bar-group').appendTo(self.group);
 		self.handle_group = gt.canvas.group().addClass('handle-group').appendTo(self.group);
 	}
@@ -92,7 +98,7 @@ export default function Bar(gt, task) {
 		self.$bar_progress = gt.canvas.rect(self.x, self.y,
 			self.progress_width, self.height,
 			self.corner_radius, self.corner_radius)
-			.addClass('bar-progress')
+			.addClass(self.task.isGroup ? 'group-bar-progress' : 'bar-progress')
 			.appendTo(self.bar_group);
 	}
 
@@ -140,7 +146,7 @@ export default function Bar(gt, task) {
 		if (self.invalid) return;
 		setup_click_event();
 		show_details();
-		if(gt.config.edit_mode) {
+		if(gt.config.edit_mode && !task.isGroup) {
 			bind_resize();
 			bind_drag();
 		}

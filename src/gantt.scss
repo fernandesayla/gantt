@@ -10,10 +10,12 @@ $text-light: #555;
 $text-color: #333;
 $grey: #b8c2cc;
 $light-grey: #fdfdfd;
+$dark-blue: #03396f;
 $blue: #3887f3;
 $light-blue: #82b1f3;
 $light-red: #f1aa9e;
 $light-yellow: #fcf8e3;
+$dark-green: #16611a;
 $green: #43a047;
 $light-green: #b9f3b9;
 
@@ -103,6 +105,10 @@ $light-green: #b9f3b9;
 		transition: stroke-width .3s ease;
 	}
 
+	.group-bar .bar {
+		fill: $dark-blue !important;		
+	}
+
 	.projection-bar .bar {	
 		fill: #f1b4a9 !important;
 		stroke: tomato;
@@ -111,9 +117,14 @@ $light-green: #b9f3b9;
 		opacity: 0.8;
 	}	
 
+	.group-bar-progress{
+		fill: $dark-green !important;
+	}
+
 	.bar-progress {
 		fill: $green;
 	}
+
 	.bar-invalid {
 		fill: transparent;
 		stroke: $bar-stroke;
