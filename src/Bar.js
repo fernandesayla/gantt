@@ -143,9 +143,8 @@ export default function Bar(gt, task) {
 	function bind() {
 		if (self.invalid) return;
 		setup_click_event();
-		show_details();
-		console.log(task);
-		if(gt.config.edit_mode && !task.isGroup && task.progress < 100) {
+		show_details();		
+		if(gt.config.edit_mode && !task.isGroup && task.progress === 0) {
 			bind_resize();
 			bind_drag();
 		}
