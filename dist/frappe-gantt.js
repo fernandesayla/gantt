@@ -1180,8 +1180,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		function draw_label() {
-			gt.canvas.text(self.x + self.width / 2, self.y + self.height / 2, self.task.name).addClass('bar-label').appendTo(self.bar_group);
+			var bar = self.$bar,
+			    label = gt.canvas.text(self.x + self.width / 2, self.y + self.height / 2, self.task.name).addClass('bar-label').appendTo(self.bar_group);
+	
 			update_label_position();
+	
+			if (label.getBBox().width > bar.getWidth() && gt.config.inline) {
+				label.remove();
+			}
 		}
 	
 		function draw_resize_handles() {
