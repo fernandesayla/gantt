@@ -10,6 +10,7 @@
 import Bar from './Bar';
 import Arrow from './Arrow';
 import moment from 'moment';
+// import moment from 'moment-timezone';
 import Snap from 'imports-loader?this=>window,fix=>module.exports=0!snapsvg/dist/snap.svg.js';
 
 export default function Gantt(element, projects, config) {
@@ -316,8 +317,8 @@ export default function Gantt(element, projects, config) {
 				cur_date = view_is('Month') ?
 					cur_date.clone().add(1, 'month').endOf('month') :
 					cur_date.clone().add(self.config.step, 'hours');
-			}
-			self.dates.push(cur_date);
+			};
+			self.dates.push(cur_date.add(1, 'hours').hour(0));
 		}
 	}
 
@@ -676,7 +677,6 @@ export default function Gantt(element, projects, config) {
 
 			return d;
 		});
-
 		return dates;
 	}
 

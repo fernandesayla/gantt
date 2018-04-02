@@ -54,7 +54,7 @@
   "homepage": "https://github.com/frappe/gantt",
   "dependencies": {
     "imports-loader": "^0.7.1",
-    "moment": "^2.17.1",
+    "moment": "^2.22.0",
     "serve": "^6.5.3",
     "snapsvg": "^0.4.0"
   }
