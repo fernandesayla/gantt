@@ -440,13 +440,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			while (cur_date === null || cur_date < self.gantt_end) {
 				if (!cur_date) {
-					console.log('1', self.gantt_start._d);
 					cur_date = view_is('Month') ? self.gantt_start.clone().endOf('month') : self.gantt_start.clone();
-					console.log('2', cur_date._d);
 				} else {
-					console.log('3', cur_date._d);
 					cur_date = view_is('Month') ? cur_date.clone().add(1, 'month').endOf('month') : cur_date.clone().add(self.config.step, 'hours');
-					console.log('4', cur_date._d);
 				};
 				self.dates.push(view_is('Month') ? cur_date : cur_date.add(1, 'hours').hour(0));
 			}
@@ -845,8 +841,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		function get_dates_to_draw() {
 			var lower_x = 0,
 			    last_date = null;
-	
-			console.log(self.dates);
 			var dates = self.dates.map(function (date, i) {
 				var d = get_date_info(date, last_date, i);
 				last_date = date;
@@ -1728,7 +1722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*** IMPORTS FROM imports-loader ***/
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_LOCAL_MODULE_0__;/*** IMPORTS FROM imports-loader ***/
 	(function() {
 	var fix = module.exports=0;
 	
